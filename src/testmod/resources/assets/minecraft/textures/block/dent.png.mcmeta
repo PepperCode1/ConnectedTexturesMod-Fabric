@@ -1,0 +1,13 @@
+{
+  "ctm": {
+    "ctm_version": 1,
+    "type": "ctm",
+    "textures": [
+      "minecraft:block/dent_ctm"
+    ],
+    "extra": {
+      "ignore_states": true,
+      "untransform": true
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "ctm": {
+    "ctm_version": 1,
+    "type": "ctm",
+    "textures": [
+      "minecraft:block/polished_granite_ctm"
+    ],
+    "extra": {
+      "ignore_states": true,
+      "connect_inside": true
+    }
+  }
+}

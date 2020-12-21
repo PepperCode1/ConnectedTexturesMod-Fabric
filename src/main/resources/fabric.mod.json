@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "ctm",
+  "version": "${version}",
+
+  "name": "ConnectedTexturesMod for Fabric",
+  "description": "Allows resource packs to create dynamic models.",
+  "authors": [
+    "Team Chisel",
+    "Pepper_Bell"
+  ],
+  "contact": {
+    "issues": "https://github.com/PepperCode1/ConnectedTexturesMod-Fabric/issues",
+    "sources": "https://github.com/PepperCode1/ConnectedTexturesMod-Fabric"
+  },
+
+  "license": "GPLv2",
+  "icon": "assets/ctm/icon.png",
+
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "team.chisel.ctm.client.CTMClient"
+    ]
+  },
+  "mixins": [
+    "ctm.mixins.json"
+  ],
+  "accessWidener": "ctm.accesswidener",
+
+  "depends": {
+    "fabricloader": ">=0.10.4",
+    "fabric": "*",
+    "minecraft": "1.16.x"
+  }
+}

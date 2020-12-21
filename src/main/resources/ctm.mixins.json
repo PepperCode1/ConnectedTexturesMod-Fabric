@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "team.chisel.ctm.client.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "BakedModelManagerMixin",
+    "BakedQuadAccessor",
+    "JsonUnbakedModelAccessor",
+    "JsonUnbakedModelDeserializerMixin",
+    "ModelLoaderMixin",
+    "SpriteAtlasTextureMixin",
+    "WeightedBakedModelEntryAccessor",
+    "WeightedBakedModelMixin"
+  ],
+  "injectors": {
+	"defaultRequire": 1
+  }
+}

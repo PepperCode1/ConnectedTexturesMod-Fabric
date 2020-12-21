@@ -1,0 +1,10 @@
+{
+  "ctm": {
+    "ctm_version": 1,
+    "type": "ctm_simple",
+    "extra": {
+      "ignore_states": true,
+      "untransform": true
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "ctm_testmod",
+  "version": "1.0.0",
+
+  "name": "CTM Test Mod",
+  "description": "CTM Test Mod",
+  "authors": [
+	"Pepper_Bell"
+  ],
+  "contact": {
+	"sources": "https://github.com/PepperCode1/ConnectedTexturesMod-Fabric"
+  },
+
+  "license": "GPLv2",
+
+  "environment": "*",
+  "entrypoints": {
+	"main": [
+	  "team.chisel.ctm.test.CTMTest"
+	]
+  },
+  "mixins": [
+  ],
+
+  "depends": {
+	"fabricloader": ">=0.8.0",
+	"fabric": "*",
+	"minecraft": "1.16.x",
+	"ctm": "*"
+  }
+}
