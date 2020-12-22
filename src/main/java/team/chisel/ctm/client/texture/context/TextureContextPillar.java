@@ -19,14 +19,14 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import com.google.common.collect.ObjectArrays;
+import org.apache.commons.lang3.ArrayUtils;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
+
 import team.chisel.ctm.api.texture.TextureContext;
 import team.chisel.ctm.client.util.ConnectionLocation;
 
@@ -34,7 +34,7 @@ public class TextureContextPillar implements TextureContext {
 	private static final ConnectionLocation[] MAIN_VALUES = {UP, DOWN, NORTH, SOUTH, EAST, WEST};
 	private static final ConnectionLocation[] OFFSET_VALUES = ArrayUtils.removeElements(ConnectionLocation.VALUES, ObjectArrays.concat(new ConnectionLocation[] {NORTH_EAST_UP, NORTH_EAST_DOWN, NORTH_WEST_UP, NORTH_WEST_DOWN, SOUTH_WEST_UP, SOUTH_WEST_DOWN, SOUTH_EAST_UP, SOUTH_EAST_DOWN}, MAIN_VALUES, ConnectionLocation.class));
 	private static final ConnectionLocation[] ALL_VALUES = ObjectArrays.concat(MAIN_VALUES, OFFSET_VALUES, ConnectionLocation.class);
-	
+
 	private ConnectionData data;
 	private long compressedData;
 
@@ -60,9 +60,17 @@ public class TextureContextPillar implements TextureContext {
 	public ConnectionData getData() {
 		return this.data;
 	}
-	
+
 	public static class Connections {
 		private EnumSet<Direction> connections;
+
+		public Connections(final EnumSet<Direction> connections) {
+			this.connections = connections;
+		}
+
+		public EnumSet<Direction> getConnections() {
+			return this.connections;
+		}
 
 		public boolean connected(Direction facing) {
 			return connections.contains(facing);
@@ -123,14 +131,6 @@ public class TextureContextPillar implements TextureContext {
 				}
 			}
 			return new Connections(connections);
-		}
-
-		public Connections(final EnumSet<Direction> connections) {
-			this.connections = connections;
-		}
-
-		public EnumSet<Direction> getConnections() {
-			return this.connections;
 		}
 
 		@Override

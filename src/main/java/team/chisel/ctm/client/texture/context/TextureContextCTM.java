@@ -8,6 +8,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
+
 import team.chisel.ctm.api.texture.TextureContext;
 import team.chisel.ctm.client.render.CTMLogic;
 import team.chisel.ctm.client.texture.TextureCTM;
@@ -19,7 +20,7 @@ public class TextureContextCTM implements TextureContext {
 
 	public TextureContextCTM(@NotNull BlockState state, BlockView world, BlockPos pos, TextureCTM<?> texture) {
 		this.texture = texture;
-		
+
 		for (Direction face : Direction.values()) {
 			CTMLogic logic = createCTM(state);
 			logic.createSubmapIndices(world, pos, face);
@@ -27,7 +28,7 @@ public class TextureContextCTM implements TextureContext {
 			this.data |= logic.serialized() << (face.ordinal() * 10);
 		}
 	}
-	
+
 	protected CTMLogic createCTM(@NotNull BlockState state) {
 		CTMLogic logic = new CTMLogic()
 				.ignoreStates(texture.ignoreStates())

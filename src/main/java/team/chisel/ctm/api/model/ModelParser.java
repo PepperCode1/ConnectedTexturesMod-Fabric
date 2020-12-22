@@ -2,10 +2,9 @@ package team.chisel.ctm.api.model;
 
 import java.lang.reflect.Type;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
+import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
 

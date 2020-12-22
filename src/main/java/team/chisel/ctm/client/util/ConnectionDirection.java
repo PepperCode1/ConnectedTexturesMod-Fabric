@@ -18,25 +18,26 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.Direction.AxisDirection;
 import net.minecraft.world.BlockView;
+
 import team.chisel.ctm.api.util.NonnullType;
 import team.chisel.ctm.client.render.CTMLogic;
 
 /**
  * Think of this class as a "Two dimensional Direction, with diagonals".
- * <p>
- * It represents the eight different directions a face of a block can connect with CTM, and contains the logic for determining if a block is indeed connected in that direction.
- * <p>
- * Note that, for example, {@link #TOP_RIGHT} does not mean connected to the {@link #TOP} and {@link #RIGHT}, but connected in the diagonal direction represented by {@link #TOP_RIGHT}. This is used
+ *
+ * <p>It represents the eight different directions a face of a block can connect with CTM, and contains the logic for determining if a block is indeed connected in that direction.
+ *
+ * <p>Note that, for example, {@link #TOP_RIGHT} does not mean connected to the {@link #TOP} and {@link #RIGHT}, but connected in the diagonal direction represented by {@link #TOP_RIGHT}. This is used
  * for inner corner rendering.
  */
 public enum ConnectionDirection {
-	TOP(UP), 
+	TOP(UP),
 	TOP_RIGHT(UP, EAST),
-	RIGHT(EAST), 
-	BOTTOM_RIGHT(DOWN, EAST), 
-	BOTTOM(DOWN), 
-	BOTTOM_LEFT(DOWN, WEST), 
-	LEFT(WEST), 
+	RIGHT(EAST),
+	BOTTOM_RIGHT(DOWN, EAST),
+	BOTTOM(DOWN),
+	BOTTOM_LEFT(DOWN, WEST),
+	LEFT(WEST),
 	TOP_LEFT(UP, WEST);
 
 	/**
@@ -44,7 +45,7 @@ public enum ConnectionDirection {
 	 */
 	public static final ConnectionDirection[] VALUES = values();
 	private static final Direction NORMAL = SOUTH;
-	
+
 	static {
 		// Run after static init
 		for (ConnectionDirection dir : ConnectionDirection.VALUES) {
@@ -57,10 +58,10 @@ public enum ConnectionDirection {
 	@NonnullType
 	private BlockPos[] offsets = new BlockPos[6];
 
-	private ConnectionDirection(Direction... dirs) {
+	ConnectionDirection(Direction... dirs) {
 		this.dirs = dirs;
 	}
-	
+
 	private void buildCaches() {
 		// Fill normalized dirs
 		for (Direction normal : Direction.values()) {
@@ -105,15 +106,10 @@ public enum ConnectionDirection {
 
 	/**
 	 * Finds if this block is connected for the given side in this Dir.
-	 *
-	 * @param ctm
-	 *			The CTM instance to use for logic.
-	 * @param world
-	 *			The world the block is in.
-	 * @param pos
-	 *			The position of your block.
-	 * @param side
-	 *			The side of the current face.
+	 * @param ctm The CTM instance to use for logic.
+	 * @param world The world the block is in.
+	 * @param pos The position of your block.
+	 * @param side The side of the current face.
 	 * @return True if the block is connected in the given Dir, false otherwise.
 	 */
 	public boolean isConnected(CTMLogic ctm, BlockView world, BlockPos pos, Direction side) {
@@ -122,17 +118,11 @@ public enum ConnectionDirection {
 
 	/**
 	 * Finds if this block is connected for the given side in this Dir.
-	 *
-	 * @param ctm
-	 *			The CTM instance to use for logic.
-	 * @param world
-	 *			The world the block is in.
-	 * @param pos
-	 *			The position of your block.
-	 * @param side
-	 *			The side of the current face.
-	 * @param state
-	 *			The state to check for connection with.
+	 * @param ctm The CTM instance to use for logic.
+	 * @param world The world the block is in.
+	 * @param pos The position of your block.
+	 * @param side The side of the current face.
+	 * @param state The state to check for connection with.
 	 * @return True if the block is connected in the given Dir, false otherwise.
 	 */
 	public boolean isConnected(CTMLogic ctm, BlockView world, BlockPos pos, Direction side, BlockState state) {
@@ -141,7 +131,7 @@ public enum ConnectionDirection {
 
 	/**
 	 * Apply this Dir to the given BlockPos for the given Direction normal direction.
-	 * 
+	 *
 	 * @return The offset BlockPos
 	 */
 	@NotNull
@@ -150,6 +140,7 @@ public enum ConnectionDirection {
 	}
 
 	public ConnectionDirection relativize(Direction normal) {
+		throw new UnsupportedOperationException("Yell at tterrag to finish deserialization");
 		/*
 		if (normal == NORMAL) {
 			return this;
@@ -165,19 +156,18 @@ public enum ConnectionDirection {
 			}
 		}
 		*/
-		throw new UnsupportedOperationException("Yell at tterrag to finish deserialization");
 	}
-	
+
 	@NotNull
 	public BlockPos getOffset(Direction normal) {
 		return offsets[normal.ordinal()];
 	}
-	
+
 	public @Nullable ConnectionDirection getDirFor(Direction[] dirs) {
 		if (dirs == this.dirs) { // Short circuit for identical return from getNormalizedDirs
-			return this; 
+			return this;
 		}
-		
+
 		for (ConnectionDirection dir : VALUES) {
 			if (Arrays.equals(dir.dirs, dirs)) {
 				return dir;

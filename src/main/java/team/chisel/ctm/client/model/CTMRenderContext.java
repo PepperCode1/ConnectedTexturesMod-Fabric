@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
+
 import team.chisel.ctm.api.util.TextureContextList;
 
 public class CTMRenderContext {

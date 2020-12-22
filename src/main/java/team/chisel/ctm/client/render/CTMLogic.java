@@ -18,11 +18,12 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
+
 import team.chisel.ctm.api.Facade;
 import team.chisel.ctm.api.texture.Submap;
 import team.chisel.ctm.client.CTMClient;
-import team.chisel.ctm.client.util.ConnectionLocation;
 import team.chisel.ctm.client.util.ConnectionDirection;
+import team.chisel.ctm.client.util.ConnectionLocation;
 
 /**
  * The CTM renderer will draw the block's FACE using by assembling 4 quadrants from the 5 available block
@@ -48,8 +49,8 @@ import team.chisel.ctm.client.util.ConnectionDirection;
  *                     │ ═══════╧═══════╗ ─────┼───── ╔ │
  *                     └────────────────────────────────┘
  * </pre>
- * 
- * Combining { 18, 13,  9, 16 }, we can generate a texture connected to the right!
+ *
+ * <p>Combining { 18, 13,  9, 16 }, we can generate a texture connected to the right!
  * <pre>
  * ╔══════╤═══════
  * ║      │      │
@@ -60,7 +61,7 @@ import team.chisel.ctm.client.util.ConnectionDirection;
  * ╚══════╧═══════
  * </pre>
  *
- * Combining { 18, 13, 11,  2 }, we can generate a texture in the shape of an L (connected up and to the right).
+ * <p>Combining { 18, 13, 11,  2 }, we can generate a texture in the shape of an L (connected up and to the right).
  * <pre>
  * ║ ─────┼───── ╚
  * ║      │      │
@@ -71,7 +72,7 @@ import team.chisel.ctm.client.util.ConnectionDirection;
  * ╚══════╧═══════
  * </pre>
  *
- * HAVE FUN!
+ * <p>HAVE FUN!
  * -CptRageToaster-
  */
 public class CTMLogic {
@@ -107,10 +108,10 @@ public class CTMLogic {
 	}; // TODO TextureCTM only
 
 	/**
-	 * Some hardcoded offset values for the different corner indeces
+	 * Some hardcoded offset values for the different corner indeces.
 	 */
 	protected static int[] submapOffsets = {4, 5, 1, 0}; // TODO TextureCTM only
-	
+
 	public Optional<Boolean> disableObscuredFaceCheck = Optional.empty();
 	// Mapping the different corner indeces to their respective dirs
 	protected byte connectionMap;
@@ -143,11 +144,11 @@ public class CTMLogic {
 		BlockState state = getConnectionState(world, pos, side, pos);
 		// TODO this naive check doesn't work for models that have unculled faces.
 		// Perhaps a smarter optimization could be done eventually?
-//		if (state.shouldSideBeRendered(world, pos, side)) {
+		//if (state.shouldSideBeRendered(world, pos, side)) {
 		for (ConnectionDirection dir : ConnectionDirection.VALUES) {
 			setConnectedState(dir, dir.isConnected(this, world, pos, side, state));
 		}
-//		}
+		//}
 	}
 
 	public void buildConnectionMap(long data, Direction side) { // TODO never used. remove?
@@ -176,8 +177,7 @@ public class CTMLogic {
 	}
 
 	/**
-	 * @param dirs
-	 *			The directions to check connection in.
+	 * @param dirs The directions to check connection in.
 	 * @return True if the cached connectionMap holds a connection in <i><b>all</b></i> the given {@link ConnectionDirection directions}.
 	 */
 	public boolean connectedAnd(ConnectionDirection... dirs) {
@@ -190,8 +190,7 @@ public class CTMLogic {
 	}
 
 	/**
-	 * @param dirs
-	 *			The directions to check connection in.
+	 * @param dirs The directions to check connection in.
 	 * @return True if the cached connectionMap holds a connection in <i><b>one of</b></i> the given {@link ConnectionDirection directions}.
 	 */
 	public boolean connectedOr(ConnectionDirection... dirs) {
@@ -226,14 +225,10 @@ public class CTMLogic {
 
 	/**
 	 * A simple check for if the given block can connect to the given direction on the given side.
-	 * 
 	 * @param world
-	 * @param current
-	 *			The position of your block.
-	 * @param connection
-	 *			The position of the block to check against.
-	 * @param dir
-	 *			The {@link Direction side} of the block to check for connection status. This is <i>not</i> the direction to check in.
+	 * @param current The position of your block.
+	 * @param connection The position of the block to check against.
+	 * @param dir The {@link Direction side} of the block to check for connection status. This is <i>not</i> the direction to check in.
 	 * @return True if the given block can connect to the given location on the given side.
 	 */
 	public final boolean isConnected(BlockView world, BlockPos current, BlockPos connection, Direction dir) {
@@ -243,24 +238,19 @@ public class CTMLogic {
 
 	/**
 	 * A simple check for if the given block can connect to the given direction on the given side.
-	 * 
 	 * @param world
-	 * @param current
-	 *			The position of your block.
-	 * @param connection
-	 *			The position of the block to check against.
-	 * @param dir
-	 *			The {@link Direction side} of the block to check for connection status. This is <i>not</i> the direction to check in.
-	 * @param state
-	 *			The state to check against for connection.
+	 * @param current The position of your block.
+	 * @param connection The position of the block to check against.
+	 * @param dir The {@link Direction side} of the block to check for connection status. This is <i>not</i> the direction to check in.
+	 * @param state The state to check against for connection.
 	 * @return True if the given block can connect to the given location on the given side.
 	 */
 	public boolean isConnected(BlockView world, BlockPos current, BlockPos connection, Direction dir, BlockState state) {
-//		if (CTMLib.chiselLoaded() && connectionBlocked(world, x, y, z, dir.ordinal())) {
-//			return false;
-//		}
+		//if (CTMLib.chiselLoaded() && connectionBlocked(world, x, y, z, dir.ordinal())) {
+		//	return false;
+		//}
 		BlockPos obscuringPos = connection.offset(dir);
-		boolean disableObscured = disableObscuredFaceCheck.orElse(CTMClient.getConfig().connectInsideCTM);
+		boolean disableObscured = disableObscuredFaceCheck.orElse(CTMClient.getConfigManager().getConfig().connectInsideCTM);
 		BlockState con = getConnectionState(world, connection, dir, current);
 		BlockState obscuring = disableObscured ? null : getConnectionState(world, obscuringPos, dir, current);
 		// bad API user
@@ -281,13 +271,13 @@ public class CTMLogic {
 		return stateComparator.connects(this, from, to, dir);
 	}
 
-//	private boolean connectionBlocked(IBlockReader world, int x, int y, int z, int side) {
-//		Block block = world.getBlock(x, y, z);
-//		if (block instanceof IConnectable) {
-//			return !((IConnectable) block).canConnectCTM(world, x, y, z, side);
-//		}
-//		return false;
-//	}
+	//private boolean connectionBlocked(IBlockReader world, int x, int y, int z, int side) {
+	//	Block block = world.getBlock(x, y, z);
+	//	if (block instanceof IConnectable) {
+	//		return !((IConnectable) block).canConnectCTM(world, x, y, z, side);
+	//	}
+	//	return false;
+	//}
 
 	public BlockState getConnectionState(BlockView world, BlockPos pos, @Nullable Direction side, BlockPos connection) {
 		BlockState state = world.getBlockState(pos);
@@ -300,12 +290,11 @@ public class CTMLogic {
 	public long serialized() {
 		return Byte.toUnsignedLong(connectionMap);
 	}
-	
+
 	// start TODO move or delete this code as it's only used in TextureCTM (and TextureEdges)
 	/**
 	 * @return The indeces of the typical 4x4 submap to use for the given face at the given location.
-	 * 
-	 *		 Indeces are in counter-clockwise order starting at bottom left.
+	 * Indeces are in counter-clockwise order starting at bottom left.
 	 */
 	public int[] createSubmapIndices(@Nullable BlockView world, BlockPos pos, Direction side) {
 		if (world == null) {
@@ -362,8 +351,8 @@ public class CTMLogic {
 			return (byte) (map & ~(1 << dir.ordinal()));
 		}
 	}
-	
-	public static interface StateComparisonCallback {
+
+	public interface StateComparisonCallback {
 		StateComparisonCallback DEFAULT = (ctm, from, to, dir) -> ctm.ignoreStates ? from.getBlock() == to.getBlock() : from == to;
 
 		boolean connects(CTMLogic instance, BlockState from, BlockState to, Direction dir);

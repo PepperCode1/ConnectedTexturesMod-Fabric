@@ -2,10 +2,9 @@ package team.chisel.ctm.client.mixin;
 
 import java.util.Map;
 
+import com.mojang.datafixers.util.Either;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
-
-import com.mojang.datafixers.util.Either;
 
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
 import net.minecraft.client.util.SpriteIdentifier;

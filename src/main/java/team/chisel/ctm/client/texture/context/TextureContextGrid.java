@@ -2,14 +2,14 @@ package team.chisel.ctm.client.texture.context;
 
 import java.util.EnumMap;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.MathHelper;
+
 import team.chisel.ctm.client.texture.TextureMap;
 import team.chisel.ctm.client.util.FaceOffset;
 
@@ -45,7 +45,7 @@ public abstract class TextureContextGrid extends TextureContextPosition {
 	public long getCompressedData() {
 		return serialized;
 	}
-	
+
 	public static final class Point2i {
 		private final int x;
 		private final int y;

@@ -4,9 +4,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
+
 import net.minecraft.util.Identifier;
+
 import team.chisel.ctm.api.texture.CTMMetadataSection;
 import team.chisel.ctm.api.texture.TextureType;
 import team.chisel.ctm.api.texture.TextureTypeRegistry;
@@ -24,11 +25,11 @@ public class CTMMetadataSectionV1 implements CTMMetadataSection {
 	}
 
 	public static CTMMetadataSection fromJson(JsonObject obj) throws JsonParseException {
-		CTMMetadataSectionV1 ret = new CTMMetadataSectionV1();
+		CTMMetadataSectionV1 metadata = new CTMMetadataSectionV1();
 		if (obj.has("proxy")) {
 			JsonElement proxyEle = obj.get("proxy");
 			if (proxyEle.isJsonPrimitive() && proxyEle.getAsJsonPrimitive().isString()) {
-				ret.proxy = proxyEle.getAsString();
+				metadata.proxy = proxyEle.getAsString();
 			}
 			if (obj.entrySet().stream().filter(e -> e.getKey().equals("ctm_version")).count() > 1) {
 				throw new JsonParseException("Cannot define other fields when using proxy");
@@ -41,7 +42,7 @@ public class CTMMetadataSectionV1 implements CTMMetadataSection {
 				if (type == null) {
 					throw new JsonParseException("Invalid render type given: " + typeEle);
 				} else {
-					ret.type = type;
+					metadata.type = type;
 				}
 			}
 		}
@@ -49,7 +50,7 @@ public class CTMMetadataSectionV1 implements CTMMetadataSection {
 			JsonElement layerEle = obj.get("layer");
 			if (layerEle.isJsonPrimitive() && layerEle.getAsJsonPrimitive().isString()) {
 				try {
-					ret.blendMode = BlendMode.valueOf(layerEle.getAsString());
+					metadata.blendMode = BlendMode.valueOf(layerEle.getAsString());
 				} catch (IllegalArgumentException e) {
 					throw new JsonParseException("Invalid block layer given: " + layerEle);
 				}
@@ -59,24 +60,24 @@ public class CTMMetadataSectionV1 implements CTMMetadataSection {
 			JsonElement texturesEle = obj.get("textures");
 			if (texturesEle.isJsonArray()) {
 				JsonArray texturesArr = texturesEle.getAsJsonArray();
-				ret.additionalTextures = new Identifier[texturesArr.size()];
+				metadata.additionalTextures = new Identifier[texturesArr.size()];
 				for (int i = 0; i < texturesArr.size(); i++) {
 					JsonElement e = texturesArr.get(i);
 					if (e.isJsonPrimitive() && e.getAsJsonPrimitive().isString()) {
-						ret.additionalTextures[i] = new Identifier(e.getAsString());
+						metadata.additionalTextures[i] = new Identifier(e.getAsString());
 					}
 				}
 			}
 		}
 		if (obj.has("extra") && obj.get("extra").isJsonObject()) {
-			ret.extraData = obj.getAsJsonObject("extra");
+			metadata.extraData = obj.getAsJsonObject("extra");
 		}
-		return ret;
+		return metadata;
 	}
 
 	@Override
 	public String toString() {
-		return "IMetadataSectionCTM.V1(type=" + this.getType() + ", blendMode=" + this.getBlendMode() + ", proxy=" + this.getProxy() + ", additionalTextures=" + java.util.Arrays.deepToString(this.getAdditionalTextures()) + ", extraData=" + this.getExtraData() + ")";
+		return "CTMMetadataSectionV1(type=" + this.getType() + ", blendMode=" + this.getBlendMode() + ", proxy=" + this.getProxy() + ", additionalTextures=" + java.util.Arrays.deepToString(this.getAdditionalTextures()) + ", extraData=" + this.getExtraData() + ")";
 	}
 
 	@Override

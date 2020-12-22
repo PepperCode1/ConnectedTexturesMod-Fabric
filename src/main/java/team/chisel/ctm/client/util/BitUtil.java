@@ -7,7 +7,7 @@ public class BitUtil {
 	public static int bitIntCast(byte b) {
 		return ((int) b) & 0xFF;
 	}
-	
+
 	/**
 	 * Casts to int but keeps the bits the same.
 	 */

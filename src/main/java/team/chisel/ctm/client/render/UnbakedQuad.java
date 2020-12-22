@@ -4,9 +4,11 @@ import java.util.Arrays;
 
 import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+
 import team.chisel.ctm.api.texture.Renderable;
 import team.chisel.ctm.api.texture.Submap;
 import team.chisel.ctm.client.util.BitUtil;
@@ -20,17 +22,17 @@ public class UnbakedQuad implements Renderable, Cloneable {
 	public Direction nominalFace;
 	public RenderMaterial material;
 	public int colorIndex;
-	
+
 	public UnbakedQuad() {
 	}
-	
+
 	public UnbakedQuad(BakedQuad bakedQuad) {
 		int[] data = bakedQuad.getVertexData();
 		Vertex vertex;
 		int offset;
 		int color;
 		int light;
-//		int normal;
+		//int normal;
 		for (int vertexId = 0; vertexId < 4; vertexId++) {
 			offset = vertexId * 8;
 			vertex = new Vertex();
@@ -48,14 +50,14 @@ public class UnbakedQuad implements Renderable, Cloneable {
 			light = data[offset+6];
 			vertex.skyLight = (short) (light >> 16);
 			vertex.blockLight = (short) (light);
-//			normal = data[offset+7];
-//			vertex.normalX = ((normal >> 24) & 255) / 127.0f;
-//			vertex.normalY = ((normal >> 16) & 255) / 127.0f;
-//			vertex.normalZ = ((normal >> 8) & 255) / 127.0f;
+			//normal = data[offset+7];
+			//vertex.normalX = ((normal >> 24) & 255) / 127.0f;
+			//vertex.normalY = ((normal >> 16) & 255) / 127.0f;
+			//vertex.normalZ = ((normal >> 8) & 255) / 127.0f;
 		}
 		colorIndex = bakedQuad.getColorIndex();
 	}
-	
+
 	protected void basicInit() {
 		Vertex vertex;
 		for (int vertexId = 0; vertexId < 4; vertexId++) {
@@ -81,7 +83,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 			emitter.spriteColor(vertexId, 0, BitUtil.bitIntCast(vertex.alpha) << 24 | BitUtil.bitIntCast(vertex.red) << 16 | BitUtil.bitIntCast(vertex.green) << 8 | BitUtil.bitIntCast(vertex.blue));
 			emitter.sprite(vertexId, 0, vertex.u, vertex.v);
 			emitter.lightmap(vertexId, BitUtil.bitIntCast(vertex.skyLight) << 16 | BitUtil.bitIntCast(vertex.blockLight));
-//			emitter.normal(vertexId, vertex.normalX, vertex.normalY, vertex.normalZ);
+			//emitter.normal(vertexId, vertex.normalX, vertex.normalY, vertex.normalZ);
 		}
 		if (cullFace != null) {
 			emitter.cullFace(cullFace);
@@ -94,7 +96,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 		emitter.colorIndex(colorIndex);
 		emitter.emit();
 	}
-	
+
 	/**
 	 * Sets the color values for all vertexes.
 	 */
@@ -106,7 +108,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 			vertexes[vertexId].alpha = alpha;
 		}
 	}
-	
+
 	/**
 	 * Sets the color values for all vertexes.
 	 * @param red int 0-255
@@ -117,7 +119,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 	public void setColor(int red, int green, int blue, int alpha) {
 		setColor((byte) red, (byte) green, (byte) blue, (byte) alpha);
 	}
-	
+
 	/**
 	 * Sets the light values for all vertexes.
 	 * @param skyLight int 0-15
@@ -131,7 +133,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 			vertexes[vertexId].blockLight = blockLightS;
 		}
 	}
-	
+
 	/**
 	 * Sets new UV bounds relative the passed UV bounds.
 	 * Uses linear interpolation to let vertex UVs remain in the same position relative to the new bounds.
@@ -146,7 +148,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 			vertex.v = MathHelper.lerp((float) MathHelper.getLerpProgress(vertex.v, bounds[1], bounds[3]), newBounds[1], newBounds[3]);
 		}
 	}
-	
+
 	/**
 	 * Applies a submap to the passed bounds and sets them as the new bounds relative to the passed bounds.
 	 * @param bounds UV bounds in the form of float[] {minU, minV, maxU, maxV}.
@@ -163,7 +165,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 		newBounds[3] -= (1 - (normalizedSubmap.getYOffset() + normalizedSubmap.getHeight())) * height;
 		setUVBounds(bounds, newBounds);
 	}
-	
+
 	/**
 	 * Interpolates the passed bounds toward their center point by the specified amount and sets them as the new bounds relative to the passed bounds.
 	 * @param bounds UV bounds in the form of float[] {minU, minV, maxU, maxV}.
@@ -179,7 +181,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 		newBounds[3] = MathHelper.lerp(delta, newBounds[3], centerV);
 		setUVBounds(bounds, newBounds);
 	}
-	
+
 	/**
 	 * Rotates the UVs by 90 degree intervals counter-clockwise around the provided center point.
 	 * @param center A point in the form of float[] {u, v}.
@@ -192,16 +194,16 @@ public class UnbakedQuad implements Renderable, Cloneable {
 		}
 		boolean check1 = rotation / 2 == 1;
 		boolean check2 = rotation % 2 == 1;
-		
+
 		Vertex vertex;
 		float u;
 		float v;
 		for (int vertexId = 0; vertexId < 4; vertexId++) {
 			vertex = vertexes[vertexId];
-			
+
 			u = vertex.u - center[0];
 			v = vertex.v - center[1];
-			
+
 			if (check1) {
 				u *= -1;
 				v *= -1;
@@ -211,12 +213,12 @@ public class UnbakedQuad implements Renderable, Cloneable {
 				u = -v;
 				v = temp;
 			}
-			
+
 			vertex.u = u + center[0];
 			vertex.v = v + center[1];
 		}
 	}
-	
+
 	/**
 	 * Reflect the UVs across the provided center point.
 	 * @param center A point in the form of float[] {u, v}.
@@ -231,7 +233,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Untransforms the UVs so that they are not rotated or reflected.
 	 * @param center A point in the form of float[] {u, v}.
@@ -240,7 +242,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 		reflectUVs(center, getUVReflection());
 		rotateUVs(center, -getUVRotation());
 	}
-	
+
 	/**
 	 * <b>Does not take UV reflection into account. Use {@link #getAbsoluteUVRotation()} if UVs might be reflected.</b><br>
 	 * Calculates the UV rotation by checking which vertex has the smallest UVs by using {@code u*u+v*v}.
@@ -252,7 +254,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 		Vertex vertex;
 		for (int vertexId = 0; vertexId < 4; vertexId++) {
 			vertex = vertexes[vertexId];
-			double distance = vertex.u*vertex.u + vertex.v*vertex.v;
+			double distance = vertex.u * vertex.u + vertex.v * vertex.v;
 			if (distance < minDistance) {
 				minDistance = distance;
 				minVertex = vertexId;
@@ -260,7 +262,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 		}
 		return minVertex;
 	}
-	
+
 	/**
 	 * Calculates the UV reflection.
 	 * @return The UV reflection.
@@ -274,17 +276,17 @@ public class UnbakedQuad implements Renderable, Cloneable {
 		if (vertexes[0].v > vertexes[1].v && vertexes[3].v > vertexes[2].v) {
 			vertical = true;
 		}
-		
+
 		if (horizontal && !vertical) {
 			return Reflection.HORIZONTAL;
 		}
 		if (vertical && !horizontal) {
 			return Reflection.VERTICAL;
 		}
-		
+
 		return Reflection.NONE;
 	}
-	
+
 	/**
 	 * Calculates the absolute UV rotation by reflecting the result from {@link #getUVReflection()}.
 	 * @return The absolute UV rotation.
@@ -300,7 +302,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 		}
 		return rotation;
 	}
-	
+
 	/**
 	 * Calculates UV bounds that form the smallest rectangle that encompasses all vertex UVs.
 	 * @return UV bounds in the form of float[] {minU, minV, maxU, maxV}.
@@ -310,7 +312,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 		float minV = 2.0F;
 		float maxU = 0.0F;
 		float maxV = 0.0F;
-		
+
 		Vertex vertex;
 		for (int vertexId = 0; vertexId < 4; vertexId++) {
 			vertex = vertexes[vertexId];
@@ -325,10 +327,10 @@ public class UnbakedQuad implements Renderable, Cloneable {
 				maxV = vertex.v;
 			}
 		}
-		
+
 		return new float[] {minU, minV, maxU, maxV};
 	}
-	
+
 	/**
 	 * Divides this quad into two. Clones vertexes if the values don't change using {@link Vertex#clone()}.
 	 * @param delta float 0-1. Where to create new vertexes in relation to the current ones. For example {@code 0.5f} divides the quad in half.
@@ -339,26 +341,26 @@ public class UnbakedQuad implements Renderable, Cloneable {
 		UnbakedQuad quad1 = cloneProperties();
 		UnbakedQuad quad2 = cloneProperties();
 		UnbakedQuad[] quads = new UnbakedQuad[] {quad1, quad2};
-		
+
 		Vertex vertex1;
 		Vertex vertex2;
 		if (!shift) {
 			vertex1 = Vertex.lerp(vertexes[0], vertexes[1], delta);
 			vertex2 = Vertex.lerp(vertexes[3], vertexes[2], delta);
-			
+
 			quad1.vertexes = new Vertex[] {vertexes[0].clone(), vertex1, vertex2, vertexes[3].clone()};
 			quad2.vertexes = new Vertex[] {vertex1.clone(), vertexes[1].clone(), vertexes[2].clone(), vertex2.clone()};
 		} else {
 			vertex1 = Vertex.lerp(vertexes[0], vertexes[3], delta);
 			vertex2 = Vertex.lerp(vertexes[1], vertexes[2], delta);
-			
+
 			quad1.vertexes = new Vertex[] {vertexes[0].clone(), vertexes[1].clone(), vertex2, vertex1};
 			quad2.vertexes = new Vertex[] {vertex1.clone(), vertex2.clone(), vertexes[2].clone(), vertexes[3].clone()};
 		}
-		
+
 		return quads;
 	}
-	
+
 	/**
 	 * Divides this quad into four quads by using {@link #divide(float, boolean)} twice.
 	 * @return An UnbakedQuad[4]. The quad at each index will contain a vertex with the same values as the one at the same index in this quad.
@@ -376,7 +378,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 		quadrants[3] = quads[0];
 		return quadrants;
 	}
-	
+
 	/**
 	 * Creates a new UnbakedQuad, but only clones the properties from this quad to the new one.
 	 * This means that everything except vertexes is cloned.
@@ -390,22 +392,21 @@ public class UnbakedQuad implements Renderable, Cloneable {
 		quad.colorIndex = colorIndex;
 		return quad;
 	}
-	
+
 	@Override
 	public UnbakedQuad clone() {
 		UnbakedQuad quad = cloneProperties();
-		quad.vertexes = new Vertex[4];
 		for (int vertexId = 0; vertexId < 4; vertexId++) {
 			quad.vertexes[vertexId] = vertexes[vertexId].clone();
 		}
 		return quad;
 	}
-	
-	public static enum Reflection {
+
+	public enum Reflection {
 		HORIZONTAL,
 		VERTICAL,
 		NONE;
-		
+
 		public Reflection opposite() {
 			if (this == NONE) {
 				return this;
@@ -413,7 +414,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 			return this == HORIZONTAL ? VERTICAL : HORIZONTAL;
 		}
 	}
-	
+
 	public static class Vertex implements Cloneable {
 		public float x;
 		public float y;
@@ -429,31 +430,30 @@ public class UnbakedQuad implements Renderable, Cloneable {
 		public float normalX;
 		public float normalY;
 		public float normalZ;
-		
+
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof Vertex) {
 				Vertex other = (Vertex) obj;
 				return
-					other.x == x &&
-					other.y == y &&
-					other.z == z &&
-					other.red == red &&
-					other.green == green &&
-					other.blue == blue &&
-					other.alpha == alpha &&
-					other.u == u &&
-					other.v == v &&
-					other.skyLight == skyLight &&
-					other.blockLight == blockLight &&
-					other.normalX == normalX &&
-					other.normalY == normalY &&
-					other.normalZ == normalZ
-				;
+					other.x == x
+					&& other.y == y
+					&& other.z == z
+					&& other.red == red
+					&& other.green == green
+					&& other.blue == blue
+					&& other.alpha == alpha
+					&& other.u == u
+					&& other.v == v
+					&& other.skyLight == skyLight
+					&& other.blockLight == blockLight
+					&& other.normalX == normalX
+					&& other.normalY == normalY
+					&& other.normalZ == normalZ;
 			}
 			return super.equals(obj);
 		}
-		
+
 		@Override
 		public Vertex clone() {
 			Vertex newVertex = new Vertex();
@@ -473,7 +473,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 			newVertex.normalZ = normalZ;
 			return newVertex;
 		}
-		
+
 		public static Vertex lerp(Vertex min, Vertex max, float delta) {
 			Vertex newVertex = new Vertex();
 			newVertex.x = MathHelper.lerp(delta, min.x, max.x);

@@ -11,5 +11,5 @@ import net.minecraft.world.World;
  */
 public interface OffsetProvider {
 	@NotNull
-	public Vec3i getOffset(@NotNull World world, @NotNull BlockPos pos);
+	Vec3i getOffset(@NotNull World world, @NotNull BlockPos pos);
 }

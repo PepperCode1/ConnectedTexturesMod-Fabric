@@ -6,17 +6,18 @@ import java.util.List;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+
 import team.chisel.ctm.api.texture.OffsetProvider;
 import team.chisel.ctm.api.texture.OffsetProviderRegistry;
 
 public class OffsetProviderRegistryImpl implements OffsetProviderRegistry {
 	private List<OffsetProvider> providers = new ArrayList<>();
-	
+
 	@Override
 	public void register(OffsetProvider provider) {
 		this.providers.add(provider);
 	}
-	
+
 	@Override
 	public Vec3i getOffset(World world, BlockPos pos) {
 		int x = 0;

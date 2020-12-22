@@ -1,12 +1,13 @@
 package team.chisel.ctm.client.render;
 
 import net.minecraft.client.texture.Sprite;
+
 import team.chisel.ctm.api.texture.Submap;
 
 public class SubmapImpl implements Submap {
 	private static final float DIV3 = 16 / 3.0F;
 	private static final float FACTOR = 16.0F;
-	
+
 	public static final Submap X1 = new SubmapImpl(16, 16, 0, 0);
 	public static final Submap[][] X2 = new Submap[][] {
 		{new SubmapImpl(8, 8, 0, 0), new SubmapImpl(8, 8, 8, 0)},
@@ -23,12 +24,12 @@ public class SubmapImpl implements Submap {
 		{new SubmapImpl(4, 4, 0, 8), new SubmapImpl(4, 4, 4, 8), new SubmapImpl(4, 4, 8, 8), new SubmapImpl(4, 4, 12, 8)},
 		{new SubmapImpl(4, 4, 0, 12), new SubmapImpl(4, 4, 4, 12), new SubmapImpl(4, 4, 8, 12), new SubmapImpl(4, 4, 12, 12)}
 	};
-	
+
 	private final float width;
 	private final float height;
 	private final float xOffset;
 	private final float yOffset;
-	
+
 	private final NormalizedSubmap normalized = new NormalizedSubmap(this);
 
 	public SubmapImpl(final float width, final float height, final float xOffset, final float yOffset) {
@@ -82,7 +83,7 @@ public class SubmapImpl implements Submap {
 	public NormalizedSubmap getNormalized() {
 		return this.normalized;
 	}
-	
+
 	public SubmapImpl multiply(Submap submap) {
 		Submap normal = submap.normalize();
 		float newWidth = width * normal.getWidth();
@@ -94,6 +95,10 @@ public class SubmapImpl implements Submap {
 
 	private static class NormalizedSubmap implements Submap {
 		private final Submap parent;
+
+		NormalizedSubmap(final Submap parent) {
+			this.parent = parent;
+		}
 
 		@Override
 		public float getXOffset() {
@@ -138,10 +143,6 @@ public class SubmapImpl implements Submap {
 		@Override
 		public float[] toArray() {
 			return parent.toArray();
-		}
-
-		public NormalizedSubmap(final Submap parent) {
-			this.parent = parent;
 		}
 	}
 }

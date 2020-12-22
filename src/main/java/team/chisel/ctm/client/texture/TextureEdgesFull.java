@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.math.Direction;
+
 import team.chisel.ctm.api.texture.Renderable;
 import team.chisel.ctm.api.texture.Submap;
 import team.chisel.ctm.api.texture.TextureContext;
@@ -29,12 +30,12 @@ public class TextureEdgesFull extends TextureEdges {
 	@Override
 	public Renderable transformQuad(BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
-		
+
 		if (context == null) {
 			quad.setUVBounds(sprites[0]);
 			return quad;
 		}
-		
+
 		CTMLogicEdges logic = (CTMLogicEdges) ((TextureContextCTM) context).getCTM(bakedQuad.getFace());
 		Sprite sprite;
 		Submap submap = null;
@@ -44,10 +45,11 @@ public class TextureEdgesFull extends TextureEdges {
 			submap = SubmapImpl.X1;
 		} else {
 			sprite = sprites[1];
-			boolean top	    = logic.connected(ConnectionDirection.TOP)    || logic.connectedAnd(ConnectionDirection.TOP_LEFT, ConnectionDirection.TOP_RIGHT);
-			boolean right   = logic.connected(ConnectionDirection.RIGHT)  || logic.connectedAnd(ConnectionDirection.TOP_RIGHT, ConnectionDirection.BOTTOM_RIGHT);
-			boolean bottom  = logic.connected(ConnectionDirection.BOTTOM) || logic.connectedAnd(ConnectionDirection.BOTTOM_LEFT, ConnectionDirection.BOTTOM_RIGHT);
-			boolean left    = logic.connected(ConnectionDirection.LEFT)   || logic.connectedAnd(ConnectionDirection.TOP_LEFT, ConnectionDirection.BOTTOM_LEFT);
+			boolean top = logic.connected(ConnectionDirection.TOP) || logic.connectedAnd(ConnectionDirection.TOP_LEFT, ConnectionDirection.TOP_RIGHT);
+			boolean right = logic.connected(ConnectionDirection.RIGHT) || logic.connectedAnd(ConnectionDirection.TOP_RIGHT, ConnectionDirection.BOTTOM_RIGHT);
+			boolean bottom = logic.connected(ConnectionDirection.BOTTOM) || logic.connectedAnd(ConnectionDirection.BOTTOM_LEFT, ConnectionDirection.BOTTOM_RIGHT);
+			boolean left = logic.connected(ConnectionDirection.LEFT) || logic.connectedAnd(ConnectionDirection.TOP_LEFT, ConnectionDirection.BOTTOM_LEFT);
+
 			if (logic.isObscured() || (top && bottom) || (right && left)) {
 				submap = SubmapImpl.X4[2][1];
 			} else if (!(top || right || bottom || left) && logic.connectedAnd(ConnectionDirection.TOP_LEFT, ConnectionDirection.BOTTOM_RIGHT)) {
@@ -79,11 +81,12 @@ public class TextureEdgesFull extends TextureEdges {
 			} else if (logic.connected(ConnectionDirection.TOP_LEFT)) {
 				submap = SubmapImpl.X4[3][2];
 			}
+
 			if (submap == null) {
 				submap = SubmapImpl.X1;
 			}
 		}
-		
+
 		if (quadGoal == 1) {
 			quad.setUVBounds(sprite);
 			quad.applySubmap(submap);

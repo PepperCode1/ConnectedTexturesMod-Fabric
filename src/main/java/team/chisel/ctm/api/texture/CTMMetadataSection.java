@@ -5,16 +5,16 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.google.common.collect.ObjectArrays;
 import com.google.gson.JsonObject;
-
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.util.Identifier;
+
 import team.chisel.ctm.api.util.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.resource.CTMMetadataSectionV1;

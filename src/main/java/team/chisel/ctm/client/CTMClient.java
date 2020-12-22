@@ -1,9 +1,13 @@
 package team.chisel.ctm.client;
 
+import java.io.File;
+import java.nio.file.Path;
+
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.fabricmc.api.ClientModInitializer;
 import team.chisel.ctm.api.texture.TextureType;
 import team.chisel.ctm.api.texture.TextureTypeRegistry;
 import team.chisel.ctm.client.event.AtlasStitchCallback;
@@ -28,31 +32,36 @@ import team.chisel.ctm.client.texture.type.TextureTypeSCTM;
 public class CTMClient implements ClientModInitializer {
 	public static final String MOD_ID = "ctm";
 	public static final Logger LOGGER = LogManager.getLogger();
-	
+
 	private static CTMClient instance;
-	private static Config config;
-	
+	private static ConfigManager configManager;
+
 	public static CTMClient getInstance() {
 		return instance;
 	}
-	
-	public static Config getConfig() {
-		if (config == null) {
-			config = new Config();
+
+	public static ConfigManager getConfigManager() {
+		if (configManager == null) {
+			Path configPath = FabricLoader.getInstance().getConfigDir();
+			File configFile = new File(configPath.toFile(), "ctm.json");
+			configManager = new ConfigManager(configFile);
+			configManager.load();
 		}
-		return config;
+		return configManager;
 	}
-	
+
 	@Override
 	public void onInitializeClient() {
 		instance = this;
 		
-		WrappingCache modelCache = new WrappingCache();
-		DeserializeModelJsonCallback.EVENT.register(new CTMDeserializeModelJsonCallbackHandler(modelCache));
-		ModelsAddedCallback.EVENT.register(new CTMModelsAddedCallbackHandler(modelCache));
-		AtlasStitchCallback.EVENT.register(new CTMAtlasStitchCallbackHandler(modelCache));
-		ModelsLoadedCallback.EVENT.register(new CTMModelsLoadedCallbackHandler(modelCache));
-		
+		getConfigManager();
+
+		WrappingCache wrappingCache = new WrappingCache();
+		DeserializeModelJsonCallback.EVENT.register(new CTMDeserializeModelJsonCallbackHandler(wrappingCache));
+		ModelsAddedCallback.EVENT.register(new CTMModelsAddedCallbackHandler(wrappingCache));
+		AtlasStitchCallback.EVENT.register(new CTMAtlasStitchCallbackHandler(wrappingCache));
+		ModelsLoadedCallback.EVENT.register(new CTMModelsLoadedCallbackHandler(wrappingCache));
+
 		TextureType type;
 		TextureTypeRegistry.INSTANCE.register("ctm", new TextureTypeCTM());
 		TextureTypeRegistry.INSTANCE.register("edges", new TextureTypeEdges());

@@ -3,6 +3,7 @@ package team.chisel.ctm.client.texture.type;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
+
 import team.chisel.ctm.api.texture.CTMTexture;
 import team.chisel.ctm.api.texture.TextureContext;
 import team.chisel.ctm.api.texture.TextureType;
@@ -25,7 +26,7 @@ public class TextureTypeEldritch implements TextureType {
 	public CTMTexture<TextureTypeEldritch> makeTexture(TextureInfo info) {
 		return new TextureEldritch(this, info);
 	}
-	
+
 	public static class Context extends TextureContextPosition {
 		private final BlockPos wrappedPos;
 

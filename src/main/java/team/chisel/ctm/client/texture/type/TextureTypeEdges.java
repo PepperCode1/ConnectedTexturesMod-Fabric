@@ -6,6 +6,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
+
 import team.chisel.ctm.api.texture.CTMTexture;
 import team.chisel.ctm.api.util.TextureInfo;
 import team.chisel.ctm.client.render.CTMLogic;
@@ -38,7 +39,7 @@ public class TextureTypeEdges extends TextureTypeCTM {
 	public int requiredTextures() {
 		return 3;
 	}
-	
+
 	public static class CTMLogicEdges extends CTMLogic {
 		private boolean obscured;
 

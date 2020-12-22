@@ -11,18 +11,18 @@ public class ProfileUtil {
 		if (Thread.currentThread().getId() == 1) {
 			return MinecraftClient.getInstance().getProfiler();
 		} else {
-			return DummyProfiler.INSTANCE;			
+			return DummyProfiler.INSTANCE;
 		}
 	});
-	
+
 	public static void push(@NotNull String section) {
 		profiler.get().push(section);
 	}
-	
+
 	public static void pop() {
 		profiler.get().pop();
 	}
-	
+
 	public static void swap(@NotNull String section) {
 		profiler.get().swap(section);
 	}

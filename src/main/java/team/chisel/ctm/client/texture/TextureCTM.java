@@ -6,14 +6,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 
-import org.jetbrains.annotations.Nullable;
-
 import it.unimi.dsi.fastutil.objects.Object2ByteMap;
 import it.unimi.dsi.fastutil.objects.Object2ByteOpenCustomHashMap;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.Direction;
+
 import team.chisel.ctm.api.texture.Renderable;
 import team.chisel.ctm.api.texture.Submap;
 import team.chisel.ctm.api.texture.TextureContext;
@@ -32,7 +33,7 @@ import team.chisel.ctm.client.util.ParseUtil;
 
 public class TextureCTM<T extends TextureTypeCTM> extends AbstractTexture<T> {
 	private static final BlockstatePredicateParser PREDICATE_PARSER = new BlockstatePredicateParser();
-	
+
 	private final Optional<Boolean> connectInside;
 	private final boolean ignoreStates;
 	private final boolean untransform;
@@ -66,31 +67,31 @@ public class TextureCTM<T extends TextureTypeCTM> extends AbstractTexture<T> {
 	@Override
 	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
-		
-		if (context == null || CTMClient.getConfig().disableCTM) {
+
+		if (context == null || CTMClient.getConfigManager().getConfig().disableCTM) {
 			quad.setUVBounds(sprites[0]);
 			return quad;
 		}
-		
+
 		int[] submapIndexes = ((TextureContextCTM) context).getCTM(bakedQuad.getFace()).getSubmapIndices();
 		SpriteUnbakedQuad[] quads = quad.toQuadrants();
 		for (int i = 0; i < quads.length; i++) {
 			if (quads[i] != null) {
-				int quadrant = (i+3)%4;
+				int quadrant = (i + 3) % 4;
 				int submapIndex = submapIndexes[quadrant];
-				
+
 				int id = submapIndex / 2;
 				id = id < 8 ? (((id < 4) ? 0 : 2) + (id % 2 == 0 ? 0 : 1)) : 4;
 				Submap submap = getSubmap(id, quad.getAbsoluteUVRotation());
-				
+
 				quads[i].setUVBounds(sprites[submapIndex > 15 ? 0 : 1]);
 				quads[i].applySubmap(submap);
 			}
 		}
-		
+
 		return new RenderableList(List.of(quads));
 	}
-	
+
 	@Override
 	protected SpriteUnbakedQuad unbake(BakedQuad bakedQuad, Direction cullFace) {
 		SpriteUnbakedQuad quad = super.unbake(bakedQuad, cullFace);
@@ -99,7 +100,7 @@ public class TextureCTM<T extends TextureTypeCTM> extends AbstractTexture<T> {
 		}
 		return quad;
 	}
-	
+
 	protected Submap getSubmap(int id, int rotation) {
 		if (id == 4) {
 			return SubmapImpl.X1;
@@ -111,7 +112,7 @@ public class TextureCTM<T extends TextureTypeCTM> extends AbstractTexture<T> {
 				id = 1;
 			}
 		}
-		return SubmapImpl.X2[id/2][id%2];
+		return SubmapImpl.X2[id / 2][id % 2];
 	}
 
 	public Optional<Boolean> connectInside() {
@@ -121,12 +122,12 @@ public class TextureCTM<T extends TextureTypeCTM> extends AbstractTexture<T> {
 	public boolean ignoreStates() {
 		return this.ignoreStates;
 	}
-	
+
 	private static final class CacheKey {
 		private final BlockState from;
 		private final Direction dir;
-		
-		public CacheKey(final BlockState from, final Direction dir) {
+
+		CacheKey(final BlockState from, final Direction dir) {
 			this.from = from;
 			this.dir = dir;
 		}

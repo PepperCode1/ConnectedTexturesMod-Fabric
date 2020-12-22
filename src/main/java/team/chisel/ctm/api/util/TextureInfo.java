@@ -3,10 +3,12 @@ package team.chisel.ctm.api.util;
 import java.util.Optional;
 
 import com.google.gson.JsonObject;
-
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
+
 import net.minecraft.client.texture.Sprite;
+
 import team.chisel.ctm.api.texture.CTMTexture;
+import team.chisel.ctm.api.texture.TextureType;
 
 /**
  * Bean to hold information that the {@link TextureType} should use to make a {@link CTMTexture}.
@@ -40,7 +42,7 @@ public class TextureInfo {
 	/**
 	 * Returns the BlendMode for this texture.
 	 */
-	public BlendMode getBlendMode(){
+	public BlendMode getBlendMode() {
 		return this.blendMode;
 	}
 }

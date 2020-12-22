@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
+
 import team.chisel.ctm.api.texture.Renderable;
 import team.chisel.ctm.api.texture.Submap;
 import team.chisel.ctm.api.texture.TextureContext;
@@ -52,7 +53,7 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 		Direction nominalFace = bakedQuad.getFace();
 		ConnectionData data = ((TextureContextPillar) context).getData();
 		Connections cons = data.getConnections();
-		
+
 		// This is the order of operations for connections
 		EnumSet<Direction> realConnections = EnumSet.copyOf(data.getConnections().getConnections());
 		if (cons.connectedOr(UP, DOWN)) {
@@ -107,7 +108,7 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 		if (cons.getConnections().isEmpty() && nominalFace.getAxis().isHorizontal()) {
 			connected = true;
 		}
-		
+
 		quad.rotateUVs(rotation);
 		if (connected) {
 			quad.setUVBounds(sprites[1]);

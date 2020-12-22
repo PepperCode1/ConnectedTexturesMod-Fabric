@@ -9,6 +9,7 @@ import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.render.model.ModelLoader;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.profiler.Profiler;
+
 import team.chisel.ctm.client.event.ModelsLoadedCallback;
 
 @Mixin(BakedModelManager.class)

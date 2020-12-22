@@ -6,20 +6,20 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
 import net.fabricmc.fabric.api.renderer.v1.material.MaterialFinder;
 import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+
 import team.chisel.ctm.api.texture.CTMTexture;
 import team.chisel.ctm.api.texture.TextureType;
 import team.chisel.ctm.api.util.NonnullType;
@@ -32,7 +32,7 @@ import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 public abstract class AbstractTexture<T extends TextureType> implements CTMTexture<T> {
 	protected static final ThreadLocal<MaterialFinder> FINDER = ThreadLocal.withInitial(() -> RendererAccess.INSTANCE.getRenderer().materialFinder());
 	protected static final Map<BlendMode, RenderMaterial> BLEND_MODE_CACHE = new ConcurrentHashMap<>();
-	
+
 	protected T type;
 	protected BlendMode blendMode;
 	@NonnullType
@@ -61,7 +61,7 @@ public abstract class AbstractTexture<T extends TextureType> implements CTMTextu
 		}
 	}
 
-	private static final int parseLightValue(@Nullable JsonElement data) {
+	private static int parseLightValue(@Nullable JsonElement data) {
 		if (data != null && data.isJsonPrimitive() && data.getAsJsonPrimitive().isNumber()) {
 			return MathHelper.clamp(data.getAsInt(), 0, 15);
 		}

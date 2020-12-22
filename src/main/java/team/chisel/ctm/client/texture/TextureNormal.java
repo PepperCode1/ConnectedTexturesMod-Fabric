@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.Direction;
+
 import team.chisel.ctm.api.texture.Renderable;
 import team.chisel.ctm.api.texture.TextureContext;
 import team.chisel.ctm.api.util.TextureInfo;
@@ -14,10 +15,10 @@ import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 import team.chisel.ctm.client.texture.type.TextureTypeNormal;
 
 /**
- * CTM texture for a normal texture
+ * CTM texture for a normal texture.
  */
 public class TextureNormal extends AbstractTexture<TextureTypeNormal> {
-	public TextureNormal(TextureTypeNormal type, TextureInfo info){
+	public TextureNormal(TextureTypeNormal type, TextureInfo info) {
 		super(type, info);
 	}
 

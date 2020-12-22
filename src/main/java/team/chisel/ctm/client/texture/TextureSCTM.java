@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.Direction;
+
 import team.chisel.ctm.api.texture.Renderable;
 import team.chisel.ctm.api.texture.TextureContext;
 import team.chisel.ctm.api.util.TextureInfo;

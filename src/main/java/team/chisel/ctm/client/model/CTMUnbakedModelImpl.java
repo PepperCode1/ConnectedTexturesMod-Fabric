@@ -13,8 +13,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
@@ -23,10 +21,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
-
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.ModelBakeSettings;
 import net.minecraft.client.render.model.ModelLoader;
@@ -37,6 +36,7 @@ import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.util.Identifier;
+
 import team.chisel.ctm.api.model.CTMUnbakedModel;
 import team.chisel.ctm.api.texture.CTMMetadataSection;
 import team.chisel.ctm.api.texture.CTMTexture;
@@ -45,19 +45,18 @@ import team.chisel.ctm.client.mixin.JsonUnbakedModelAccessor;
 import team.chisel.ctm.client.resource.CTMMetadataReader;
 import team.chisel.ctm.client.texture.TextureNormal;
 import team.chisel.ctm.client.texture.type.TextureTypeNormal;
-//import team.chisel.ctm.client.util.CTMPackReloadListener;
 import team.chisel.ctm.client.util.ResourceUtil;
 
 public class CTMUnbakedModelImpl implements CTMUnbakedModel {
-//	private static final ItemModelGenerator ITEM_MODEL_GENERATOR = new ItemModelGenerator();
-	
+	//private static final ItemModelGenerator ITEM_MODEL_GENERATOR = new ItemModelGenerator();
+
 	private final UnbakedModel parent;
 	private final @Nullable JsonUnbakedModel jsonParent;
 
 	// Populated from overrides data during construction
 	private final Int2ObjectMap<JsonElement> overrides;
 	protected final Int2ObjectMap<CTMMetadataSection> metaOverrides = new Int2ObjectArrayMap<>();
-	
+
 	// Populated during bake with real texture data
 	protected Int2ObjectMap<Sprite> spriteOverrides;
 	protected Map<Pair<Integer, Identifier>, CTMTexture<?>> textureOverrides;
@@ -65,14 +64,14 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 	private final Collection<Identifier> textureDependencies;
 
 	private Map<Identifier, CTMTexture<?>> textures = new HashMap<>();
-	
+
 	public CTMUnbakedModelImpl(UnbakedModel parent) {
 		this.parent = parent;
 		this.jsonParent = null;
 		this.overrides = new Int2ObjectOpenHashMap<>();
 		this.textureDependencies = new HashSet<>();
 	}
-	
+
 	public CTMUnbakedModelImpl(JsonUnbakedModel parent, Int2ObjectMap<JsonElement> overrides) throws IOException {
 		this.parent = parent;
 		this.jsonParent = parent;
@@ -97,10 +96,10 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 				textureDependencies.addAll(Arrays.asList(metadata.getAdditionalTextures()));
 			}
 		}
-		
+
 		this.textureDependencies.removeIf(rl -> rl.getPath().startsWith("#"));
 	}
-	
+
 	@Override
 	public Collection<Identifier> getModelDependencies() {
 		return Collections.emptyList();
@@ -132,31 +131,33 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 	@Override
 	public BakedModel bake(ModelLoader loader, Function<SpriteIdentifier, Sprite> spriteGetter, ModelBakeSettings settings, Identifier modelLocation) {
 		BakedModel bakedParent;
-//		if (jsonUnbakedModel != null && jsonUnbakedModel.getRootModel() == ModelLoader.GENERATION_MARKER) { // Apply same special case that ModelLoader does
-//			return ITEM_MODEL_GENERATOR.create(spriteGetter, jsonUnbakedModel).bake(loader, jsonUnbakedModel, spriteGetter, settings, modelLocation, false);
-//		} else if (unbakedModel instanceof JsonUnbakedModel && ((JsonUnbakedModel) unbakedModel).getRootModel() == ModelLoader.GENERATION_MARKER) {
-//			return ITEM_MODEL_GENERATOR.create(spriteGetter, ((JsonUnbakedModel) unbakedModel)).bake(loader, ((JsonUnbakedModel) unbakedModel), spriteGetter, settings, modelLocation, false);
-//		} else {
-			bakedParent = parent.bake(loader, spriteGetter, settings, modelLocation);
-//		}
+		//if (jsonUnbakedModel != null && jsonUnbakedModel.getRootModel() == ModelLoader.GENERATION_MARKER) { // Apply same special case that ModelLoader does
+		//	return ITEM_MODEL_GENERATOR.create(spriteGetter, jsonUnbakedModel).bake(loader, jsonUnbakedModel, spriteGetter, settings, modelLocation, false);
+		//} else if (unbakedModel instanceof JsonUnbakedModel && ((JsonUnbakedModel) unbakedModel).getRootModel() == ModelLoader.GENERATION_MARKER) {
+		//	return ITEM_MODEL_GENERATOR.create(spriteGetter, ((JsonUnbakedModel) unbakedModel)).bake(loader, ((JsonUnbakedModel) unbakedModel), spriteGetter, settings, modelLocation, false);
+		//} else {
+		bakedParent = parent.bake(loader, spriteGetter, settings, modelLocation);
+		//}
 		initializeTextures(loader, spriteGetter);
 		return new CTMBakedModel(this, bakedParent);
 	}
-	
+
 	public void initializeTextures(ModelLoader loader, Function<SpriteIdentifier, Sprite> spriteGetter) {
 		for (SpriteIdentifier m : getTextureDependencies(loader::getOrLoadModel, new HashSet<>())) {
 			Sprite sprite = spriteGetter.apply(m);
-			CTMMetadataSection chiselmeta = null;
+			CTMMetadataSection metadata = null;
 			try {
-				chiselmeta = ResourceUtil.getMetadata(sprite);
-			} catch (IOException e) {}
-			final CTMMetadataSection meta = chiselmeta;
+				metadata = ResourceUtil.getMetadata(sprite);
+			} catch (IOException e) {
+				//
+			}
+			final CTMMetadataSection metadata1 = metadata;
 			textures.computeIfAbsent(sprite.getId(), s -> {
 				CTMTexture<?> texture;
-				if (meta == null) {
+				if (metadata1 == null) {
 					texture = new TextureNormal(TextureTypeNormal.INSTANCE, new TextureInfo(new Sprite[] { sprite }, Optional.empty(), null));
 				} else {
-					texture = meta.makeTexture(sprite, spriteGetter);
+					texture = metadata1.makeTexture(sprite, spriteGetter);
 				}
 				return texture;
 			});
@@ -195,7 +196,7 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 	public Collection<CTMTexture<?>> getCTMTextures() {
 		return ImmutableList.<CTMTexture<?>>builder().addAll(textures.values()).addAll(textureOverrides.values()).build();
 	}
-	
+
 	@Override
 	public CTMTexture<?> getTexture(Identifier id) {
 		return textures.get(id);
@@ -206,7 +207,7 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 	public Sprite getOverrideSprite(int tintIndex) {
 		return spriteOverrides.get(tintIndex);
 	}
-	
+
 	@Override
 	@Nullable
 	public CTMTexture<?> getOverrideTexture(int tintIndex, Identifier id) {

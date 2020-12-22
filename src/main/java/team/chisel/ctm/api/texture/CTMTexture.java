@@ -2,9 +2,9 @@ package team.chisel.ctm.api.texture;
 
 import java.util.Collection;
 
+import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
 import org.jetbrains.annotations.Nullable;
 
-import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.Identifier;
@@ -22,7 +22,7 @@ public interface CTMTexture<T extends TextureType> {
 	Renderable transformQuad(BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace);
 
 	Collection<Identifier> getTextures();
-	
+
 	/**
 	 * Gets the TextureType of this texture.
 	 * @return The TextureType of this texture.
@@ -30,7 +30,7 @@ public interface CTMTexture<T extends TextureType> {
 	T getType();
 
 	/**
-	 * Gets the sprite for the particle
+	 * Gets the sprite for the particle.
 	 * @return The sprite for the particle.
 	 */
 	Sprite getParticle();

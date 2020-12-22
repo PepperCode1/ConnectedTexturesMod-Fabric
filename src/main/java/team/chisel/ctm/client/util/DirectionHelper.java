@@ -10,8 +10,8 @@ import static net.minecraft.util.math.Direction.WEST;
 import net.minecraft.util.math.Direction;
 
 /**
- * A bunch of methods that got stripped out of Direction in 1.15
- * 
+ * A bunch of methods that got stripped out of Direction in 1.15.
+ *
  * @author Mojang
  */
 public class DirectionHelper {

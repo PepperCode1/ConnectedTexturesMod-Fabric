@@ -8,17 +8,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
-
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -35,6 +34,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockRenderView;
+
 import team.chisel.ctm.api.model.CTMUnbakedModel;
 import team.chisel.ctm.api.texture.CTMTexture;
 import team.chisel.ctm.api.util.TextureContextList;
@@ -49,7 +49,7 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	private final CTMUnbakedModel unbakedModel;
 	@NotNull
 	private final BakedModel parent;
-	
+
 	public AbstractCTMBakedModel(@NotNull final CTMUnbakedModel unbakedModel, @NotNull final BakedModel parent) {
 		if (unbakedModel == null) {
 			throw new NullPointerException("unbakedModel is marked non-null but is null");
@@ -75,9 +75,10 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	public BakedModel getParent() {
 		return this.parent;
 	}
-	
+
 	@Override
 	public List<BakedQuad> getQuads(BlockState state, Direction face, Random random) {
+		//ModelHelper.toQuadLists(mesh);
 		return parent.getQuads(state, face, random);
 	}
 
@@ -195,7 +196,7 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 		ProfileUtil.pop();
 		return mesh;
 	}
-	
+
 	public Mesh getItemMesh(Item item, Random random) {
 		ProfileUtil.push("ctm_models");
 		Mesh mesh = null;
@@ -213,18 +214,18 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 		ProfileUtil.pop();
 		return mesh;
 	}
-	
+
 	@Override
 	public boolean isVanillaAdapter() {
 		return false;
 	}
-	
+
 	@Override
 	public void emitBlockQuads(BlockRenderView blockView, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, RenderContext context) {
 		CTMRenderContext ctmContext = new CTMRenderContext(blockView, pos);
 		context.meshConsumer().accept(getBlockMesh(state, randomSupplier.get(), ctmContext));
 	}
-	
+
 	@Override
 	public void emitItemQuads(ItemStack stack, Supplier<Random> randomSupplier, RenderContext context) {
 		context.meshConsumer().accept(getItemMesh(stack.getItem(), randomSupplier.get()));
@@ -242,6 +243,18 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 		private final Object2LongMap<CTMTexture<?>> serializedContext;
 		@NotNull
 		private final BakedModel parent;
+
+		State(@NotNull final BlockState cleanState, @Nullable final Object2LongMap<CTMTexture<?>> serializedContext, @NotNull final BakedModel parent) {
+			if (cleanState == null) {
+				throw new NullPointerException("cleanState is marked non-null but is null");
+			}
+			if (parent == null) {
+				throw new NullPointerException("parent is marked non-null but is null");
+			}
+			this.cleanState = cleanState;
+			this.serializedContext = serializedContext;
+			this.parent = parent;
+		}
 
 		@Override
 		public boolean equals(Object obj) {
@@ -289,18 +302,6 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 		@NotNull
 		public BakedModel getParent() {
 			return this.parent;
-		}
-
-		public State(@NotNull final BlockState cleanState, @Nullable final Object2LongMap<CTMTexture<?>> serializedContext, @NotNull final BakedModel parent) {
-			if (cleanState == null) {
-				throw new NullPointerException("cleanState is marked non-null but is null");
-			}
-			if (parent == null) {
-				throw new NullPointerException("parent is marked non-null but is null");
-			}
-			this.cleanState = cleanState;
-			this.serializedContext = serializedContext;
-			this.parent = parent;
 		}
 
 		@Override

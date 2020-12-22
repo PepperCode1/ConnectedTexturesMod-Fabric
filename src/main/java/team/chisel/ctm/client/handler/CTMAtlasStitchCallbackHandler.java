@@ -7,22 +7,23 @@ import java.util.Set;
 
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.util.Identifier;
+
 import team.chisel.ctm.api.texture.CTMMetadataSection;
 import team.chisel.ctm.client.event.AtlasStitchCallback;
 import team.chisel.ctm.client.util.ResourceUtil;
 
 public class CTMAtlasStitchCallbackHandler implements AtlasStitchCallback {
-	private WrappingCache modelCache;
-	
-	public CTMAtlasStitchCallbackHandler(WrappingCache modelCache) {
-		this.modelCache = modelCache;
+	private WrappingCache wrappingCache;
+
+	public CTMAtlasStitchCallbackHandler(WrappingCache wrappingCache) {
+		this.wrappingCache = wrappingCache;
 	}
-	
+
 	@Override
 	public void onAtlasStitch(SpriteAtlasTexture atlas, Set<Identifier> sprites) {
-		Set<Identifier> registeredTextures = modelCache.registeredTextures;
+		Set<Identifier> registeredTextures = wrappingCache.registeredTextures;
 		Set<Identifier> newSprites = new HashSet<>();
-		
+
 		for (Identifier identifier : sprites) {
 			try {
 				identifier = new Identifier(identifier.getNamespace(), "textures/" + identifier.getPath() + ".png");
@@ -55,7 +56,7 @@ public class CTMAtlasStitchCallbackHandler implements AtlasStitchCallback {
 				e.printStackTrace();
 			}
 		}
-		
+
 		sprites.addAll(newSprites);
 	}
 }

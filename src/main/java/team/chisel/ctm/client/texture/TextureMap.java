@@ -2,15 +2,15 @@ package team.chisel.ctm.client.texture;
 
 import java.util.List;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+
 import team.chisel.ctm.api.texture.Renderable;
 import team.chisel.ctm.api.texture.Submap;
 import team.chisel.ctm.api.texture.TextureContext;
@@ -86,8 +86,8 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 	public int getYOffset() {
 		return this.yOffset;
 	}
-	
-	public static enum MapType {
+
+	public enum MapType {
 		RANDOM {
 			@Override
 			protected Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace) {

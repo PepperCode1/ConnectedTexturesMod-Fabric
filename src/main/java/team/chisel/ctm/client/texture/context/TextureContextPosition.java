@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
+
 import team.chisel.ctm.api.texture.OffsetProviderRegistry;
 import team.chisel.ctm.api.texture.TextureContext;
 
@@ -18,7 +19,7 @@ public class TextureContextPosition implements TextureContext {
 	public TextureContextPosition(int x, int y, int z) {
 		this(new BlockPos(x, y, z));
 	}
-	
+
 	@SuppressWarnings("resource")
 	public TextureContextPosition applyOffset() {
 		this.position = position.add(OffsetProviderRegistry.INSTANCE.getOffset(MinecraftClient.getInstance().world, position));

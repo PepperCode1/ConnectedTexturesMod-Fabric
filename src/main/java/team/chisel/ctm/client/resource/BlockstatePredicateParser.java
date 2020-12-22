@@ -16,9 +16,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
@@ -29,6 +26,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -40,8 +39,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
 
 public class BlockstatePredicateParser {
-	private static final Type MAP_TYPE = new TypeToken<EnumMap<Direction, Predicate<BlockState>>>() {}.getType();
-	private static final Type PREDICATE_TYPE = new TypeToken<Predicate<BlockState>>() {}.getType();
+	private static final Type MAP_TYPE = new TypeToken<EnumMap<Direction, Predicate<BlockState>>>() { } .getType();
+	private static final Type PREDICATE_TYPE = new TypeToken<Predicate<BlockState>>() { } .getType();
 	private final PredicateDeserializer predicateDeserializer = new PredicateDeserializer();
 	private final Gson GSON = new GsonBuilder().registerTypeAdapter(PREDICATE_TYPE, predicateDeserializer).registerTypeAdapter(ComparisonType.class, new ComparisonType.Deserializer()).registerTypeAdapter(MAP_TYPE, (InstanceCreator<?>) type -> new EnumMap<>(Direction.class)).registerTypeAdapter(PredicateMap.class, new MapDeserializer()).create();
 
@@ -49,13 +48,24 @@ public class BlockstatePredicateParser {
 	public BiPredicate<Direction, BlockState> parse(JsonElement json) {
 		return GSON.fromJson(json, PredicateMap.class);
 	}
-	
-	private static enum ComparisonType {
-		EQUAL("=", i -> i == 0), NOT_EQUAL("!=", i -> i != 0), GREATER_THAN(">", i -> i > 0), LESS_THAN("<", i -> i < 0), GREATER_THAN_EQ(">=", i -> i >= 0), LESS_THAN_EQ("<=", i -> i <= 0);
+
+	private enum ComparisonType {
+		EQUAL("=", i -> i == 0),
+		NOT_EQUAL("!=", i -> i != 0),
+		GREATER_THAN(">", i -> i > 0),
+		LESS_THAN("<", i -> i < 0),
+		GREATER_THAN_EQ(">=", i -> i >= 0),
+		LESS_THAN_EQ("<=", i -> i <= 0);
+
 		private final String key;
 		private final IntPredicate compareFunc;
 
-		static class Deserializer implements JsonDeserializer<ComparisonType> {
+		ComparisonType(final String key, final IntPredicate compareFunc) {
+			this.key = key;
+			this.compareFunc = compareFunc;
+		}
+
+		private static class Deserializer implements JsonDeserializer<ComparisonType> {
 			@Override
 			public ComparisonType deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 				if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isString()) {
@@ -68,18 +78,15 @@ public class BlockstatePredicateParser {
 				throw new JsonSyntaxException("ComparisonType must be a String");
 			}
 		}
-
-		private ComparisonType(final String key, final IntPredicate compareFunc) {
-			this.key = key;
-			this.compareFunc = compareFunc;
-		}
 	}
 
-	private static enum Composition {
-		AND(Predicate::and), OR(Predicate::or);
+	private enum Composition {
+		AND(Predicate::and),
+		OR(Predicate::or);
+
 		private final BiFunction<Predicate<BlockState>, Predicate<BlockState>, Predicate<BlockState>> composer;
 
-		private Composition(final BiFunction<Predicate<BlockState>, Predicate<BlockState>, Predicate<BlockState>> composer) {
+		Composition(final BiFunction<Predicate<BlockState>, Predicate<BlockState>, Predicate<BlockState>> composer) {
 			this.composer = composer;
 		}
 	}
@@ -90,7 +97,7 @@ public class BlockstatePredicateParser {
 		private final T value;
 		private final ComparisonType type;
 
-		public PropertyPredicate(final Block block, final Property<T> prop, final T value, final ComparisonType type) {
+		PropertyPredicate(final Block block, final Property<T> prop, final T value, final ComparisonType type) {
 			this.block = block;
 			this.prop = prop;
 			this.value = value;
@@ -164,35 +171,30 @@ public class BlockstatePredicateParser {
 		private final Property<T> prop;
 		private final Set<T> validValues;
 
-		@Override
-		public boolean test(BlockState t) {
-			return t.getBlock() == block && validValues.contains(t.get(prop));
-		}
-
-		@SuppressWarnings("all")
-		public MultiPropertyPredicate(final Block block, final Property<T> prop, final Set<T> validValues) {
+		MultiPropertyPredicate(final Block block, final Property<T> prop, final Set<T> validValues) {
 			this.block = block;
 			this.prop = prop;
 			this.validValues = validValues;
 		}
 
-		@SuppressWarnings("all")
+		@Override
+		public boolean test(BlockState t) {
+			return t.getBlock() == block && validValues.contains(t.get(prop));
+		}
+
 		public Block getBlock() {
 			return this.block;
 		}
 
-		@SuppressWarnings("all")
 		public Property<T> getProp() {
 			return this.prop;
 		}
 
-		@SuppressWarnings("all")
 		public Set<T> getValidValues() {
 			return this.validValues;
 		}
 
 		@Override
-		@SuppressWarnings("all")
 		public boolean equals(final Object o) {
 			if (o == this) return true;
 			if (!(o instanceof BlockstatePredicateParser.MultiPropertyPredicate)) return false;
@@ -210,7 +212,6 @@ public class BlockstatePredicateParser {
 		}
 
 		@Override
-		@SuppressWarnings("all")
 		public int hashCode() {
 			final int PRIME = 59;
 			int result = 1;
@@ -224,7 +225,6 @@ public class BlockstatePredicateParser {
 		}
 
 		@Override
-		@SuppressWarnings("all")
 		public String toString() {
 			return "BlockstatePredicateParser.MultiPropertyPredicate(block=" + this.getBlock() + ", prop=" + this.getProp() + ", validValues=" + this.getValidValues() + ")";
 		}
@@ -233,7 +233,7 @@ public class BlockstatePredicateParser {
 	private static final class BlockPredicate implements Predicate<BlockState> {
 		private final Block block;
 
-		public BlockPredicate(final Block block) {
+		BlockPredicate(final Block block) {
 			this.block = block;
 		}
 
@@ -276,7 +276,7 @@ public class BlockstatePredicateParser {
 		private final Composition type;
 		private final List<Predicate<BlockState>> composed;
 
-		public PredicateComposition(final Composition type, final List<Predicate<BlockState>> composed) {
+		PredicateComposition(final Composition type, final List<Predicate<BlockState>> composed) {
 			this.type = type;
 			this.composed = composed;
 		}
