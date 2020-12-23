@@ -135,36 +135,36 @@ public class TextureContextPillar implements TextureContext {
 
 		@Override
 		public String toString() {
-			return "TextureContextCTMV.Connections(connections=" + this.getConnections() + ")";
+			return "TextureContextPillar.Connections(connections=" + this.getConnections() + ")";
 		}
 	}
 
 	public static class ConnectionData {
 		private Connections connections;
-		private Map<Direction, Connections> connectionConnections = new EnumMap<>(Direction.class);
+		private Map<Direction, Connections> connectionsMap = new EnumMap<>(Direction.class);
 
 		public ConnectionData(BlockView world, BlockPos pos) {
 			connections = Connections.forPos(world, pos);
 			BlockState state = world.getBlockState(pos);
-			for (Direction f : Direction.values()) {
-				connectionConnections.put(f, Connections.forPos(world, state, pos.offset(f)));
+			for (Direction facing : Direction.values()) {
+				connectionsMap.put(facing, Connections.forPos(world, state, pos.offset(facing)));
 			}
 		}
 
 		public ConnectionData(long data) {
 			connections = Connections.forData(data, null);
-			for (Direction f : Direction.values()) {
-				connectionConnections.put(f, Connections.forData(data, f));
+			for (Direction facing : Direction.values()) {
+				connectionsMap.put(facing, Connections.forData(data, facing));
 			}
 		}
 
 		public Connections getConnections(Direction facing) {
-			return connectionConnections.get(facing);
+			return connectionsMap.get(facing);
 		}
 
 		@Override
 		public String toString() {
-			return "TextureContextCTMV.ConnectionData(connections=" + this.getConnections() + ", connectionConnections=" + this.connectionConnections + ")";
+			return "TextureContextPillar.ConnectionData(connections=" + this.getConnections() + ", connectionConnections=" + this.connectionsMap + ")";
 		}
 
 		public Connections getConnections() {

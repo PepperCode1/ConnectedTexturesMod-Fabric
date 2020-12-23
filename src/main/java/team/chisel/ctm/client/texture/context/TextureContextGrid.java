@@ -17,25 +17,25 @@ public abstract class TextureContextGrid extends TextureContextPosition {
 	private final EnumMap<Direction, Point2i> textureCoords = new EnumMap<>(Direction.class);
 	private final long serialized;
 
-	public TextureContextGrid(BlockPos pos, TextureMap tex, boolean applyOffset) {
+	public TextureContextGrid(BlockPos pos, TextureMap texture, boolean applyOffset) {
 		super(pos);
 		// Since we can only return a long, we must limit to 10 bits of data per face = 60 bits
-		Preconditions.checkArgument(tex.getXSize() * tex.getYSize() < 1024, "V* Texture size too large for texture %s", tex.getParticle());
+		Preconditions.checkArgument(texture.getXSize() * texture.getYSize() < 1024, "V* Texture size too large for texture %s", texture.getParticle());
 		if (applyOffset) {
 			applyOffset();
 		}
 		long serialized = 0;
 		for (@NotNull Direction side : Direction.values()) {
-			BlockPos modifiedPosition = position.add(FaceOffset.getBlockPosOffsetFromFaceOffset(side, tex.getXOffset(), tex.getYOffset()));
-			Point2i coords = calculateTextureCoord(modifiedPosition, tex.getXSize(), tex.getYSize(), side);
+			BlockPos modifiedPosition = position.add(FaceOffset.getBlockPosOffsetFromFaceOffset(side, texture.getXOffset(), texture.getYOffset()));
+			Point2i coords = calculateTextureCoord(modifiedPosition, texture.getXSize(), texture.getYSize(), side);
 			textureCoords.put(side, coords);
 			// Calculate a unique index for a submap (x + (y * x-size)), then shift it left by the max bit storage (10 bits = 1024 unique indices)
-			serialized |= (coords.x + (coords.y * tex.getXSize())) << (10 * side.ordinal());
+			serialized |= (coords.x + (coords.y * texture.getXSize())) << (10 * side.ordinal());
 		}
 		this.serialized = serialized;
 	}
 
-	protected abstract Point2i calculateTextureCoord(BlockPos pos, int w, int h, Direction side);
+	protected abstract Point2i calculateTextureCoord(BlockPos pos, int width, int height, Direction side);
 
 	public Point2i getTextureCoords(Direction side) {
 		return textureCoords.get(side);
@@ -89,12 +89,12 @@ public abstract class TextureContextGrid extends TextureContextPosition {
 	}
 
 	public static class Patterned extends TextureContextGrid {
-		public Patterned(BlockPos pos, TextureMap tex, boolean applyOffset) {
-			super(pos, tex, applyOffset);
+		public Patterned(BlockPos pos, TextureMap texture, boolean applyOffset) {
+			super(pos, texture, applyOffset);
 		}
 
 		@Override
-		protected Point2i calculateTextureCoord(BlockPos pos, int w, int h, Direction side) {
+		protected Point2i calculateTextureCoord(BlockPos pos, int width, int height, Direction side) {
 			int x = pos.getX();
 			int y = pos.getY();
 			int z = pos.getZ();
@@ -104,27 +104,27 @@ public abstract class TextureContextGrid extends TextureContextPosition {
 			// Negate the y coordinate when calculating non-vertical directions, otherwise it is reverse order
 			if (side.getAxis().isVertical()) {
 				// DOWN || UP
-				tx = x % w;
-				ty = (side.getOffsetY() * z + 1) % h;
+				tx = x % width;
+				ty = (side.getOffsetY() * z + 1) % height;
 			} else if (side.getAxis() == Axis.Z) {
 				// NORTH || SOUTH
-				tx = x % w;
-				ty = -y % h;
+				tx = x % width;
+				ty = -y % height;
 			} else {
 				// WEST || EAST
-				tx = (z + 1) % w;
-				ty = -y % h;
+				tx = (z + 1) % width;
+				ty = -y % height;
 			}
 			// Reverse x order for north and east
 			if (side == Direction.NORTH || side == Direction.EAST) {
-				tx = (w - tx - 1) % w;
+				tx = (width - tx - 1) % width;
 			}
 			// Remainder can produce negative values, so wrap around
 			if (tx < 0) {
-				tx += w;
+				tx += width;
 			}
 			if (ty < 0) {
-				ty += h;
+				ty += height;
 			}
 			return new Point2i(tx, ty);
 		}
@@ -133,16 +133,16 @@ public abstract class TextureContextGrid extends TextureContextPosition {
 	public static class Random extends TextureContextGrid {
 		private static final java.util.Random RANDOM = new java.util.Random();
 
-		public Random(BlockPos pos, TextureMap tex, boolean applyOffset) {
-			super(pos, tex, applyOffset);
+		public Random(BlockPos pos, TextureMap texture, boolean applyOffset) {
+			super(pos, texture, applyOffset);
 		}
 
 		@Override
-		protected Point2i calculateTextureCoord(BlockPos pos, int w, int h, Direction side) {
+		protected Point2i calculateTextureCoord(BlockPos pos, int width, int height, Direction side) {
 			RANDOM.setSeed(MathHelper.hashCode(pos) + side.ordinal());
 			RANDOM.nextBoolean();
-			int tx = RANDOM.nextInt(w) + 1;
-			int ty = RANDOM.nextInt(h) + 1;
+			int tx = RANDOM.nextInt(width) + 1;
+			int ty = RANDOM.nextInt(height) + 1;
 			return new Point2i(tx, ty);
 		}
 	}

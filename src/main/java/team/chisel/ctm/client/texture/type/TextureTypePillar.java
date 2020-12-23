@@ -18,7 +18,7 @@ public class TextureTypePillar implements TextureType {
 	}
 
 	@Override
-	public TextureContextPillar getTextureContext(BlockState state, BlockView world, BlockPos pos, CTMTexture<?> tex) {
+	public TextureContextPillar getTextureContext(BlockState state, BlockView world, BlockPos pos, CTMTexture<?> texture) {
 		return new TextureContextPillar(world, pos);
 	}
 

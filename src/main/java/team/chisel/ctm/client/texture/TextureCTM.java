@@ -25,43 +25,31 @@ import team.chisel.ctm.client.render.CTMLogic.StateComparisonCallback;
 import team.chisel.ctm.client.render.RenderableList;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 import team.chisel.ctm.client.render.SubmapImpl;
-import team.chisel.ctm.client.resource.BlockstatePredicateParser;
+import team.chisel.ctm.client.resource.BlockStatePredicateParser;
 import team.chisel.ctm.client.texture.context.TextureContextCTM;
 import team.chisel.ctm.client.texture.type.TextureTypeCTM;
 import team.chisel.ctm.client.util.IdentityStrategy;
 import team.chisel.ctm.client.util.ParseUtil;
 
 public class TextureCTM<T extends TextureTypeCTM> extends AbstractTexture<T> {
-	private static final BlockstatePredicateParser PREDICATE_PARSER = new BlockstatePredicateParser();
+	private static final BlockStatePredicateParser PREDICATE_PARSER = new BlockStatePredicateParser();
 
 	private final Optional<Boolean> connectInside;
 	private final boolean ignoreStates;
 	private final boolean untransform;
+
 	@Nullable
 	private final BiPredicate<Direction, BlockState> connectionChecks;
 	private final Map<CacheKey, Object2ByteMap<BlockState>> connectionCache = new HashMap<>();
 
 	public TextureCTM(T type, TextureInfo info) {
 		super(type, info);
+
 		this.connectInside = info.getInfo().flatMap(obj -> ParseUtil.getBoolean(obj, "connect_inside"));
 		this.ignoreStates = info.getInfo().map(obj -> JsonHelper.getBoolean(obj, "ignore_states", false)).orElse(false);
 		this.untransform = info.getInfo().map(obj -> JsonHelper.getBoolean(obj, "untransform", false)).orElse(false);
-		this.connectionChecks = info.getInfo().map(obj -> PREDICATE_PARSER.parse(obj.get("connect_to"))).orElse(null);
-	}
 
-	public boolean connectTo(CTMLogic logic, BlockState from, BlockState to, Direction dir) {
-		synchronized (connectionCache) {
-			Object2ByteMap<BlockState> sidecache = connectionCache.computeIfAbsent(new CacheKey(from, dir), k -> {
-				Object2ByteMap<BlockState> map = new Object2ByteOpenCustomHashMap<>(new IdentityStrategy<>());
-				map.defaultReturnValue((byte) -1);
-				return map;
-			});
-			byte cached = sidecache.getByte(to);
-			if (cached == -1) {
-				sidecache.put(to, cached = (byte) ((connectionChecks == null ? StateComparisonCallback.DEFAULT.connects(logic, from, to, dir) : connectionChecks.test(dir, to)) ? 1 : 0));
-			}
-			return cached == 1;
-		}
+		this.connectionChecks = info.getInfo().map(obj -> PREDICATE_PARSER.parse(obj.get("connect_to"))).orElse(null);
 	}
 
 	@Override
@@ -73,7 +61,7 @@ public class TextureCTM<T extends TextureTypeCTM> extends AbstractTexture<T> {
 			return quad;
 		}
 
-		int[] submapIndexes = ((TextureContextCTM) context).getCTM(bakedQuad.getFace()).getSubmapIndices();
+		int[] submapIndexes = ((TextureContextCTM) context).getLogic(bakedQuad.getFace()).getSubmapIndices();
 		SpriteUnbakedQuad[] quads = quad.toQuadrants();
 		for (int i = 0; i < quads.length; i++) {
 			if (quads[i] != null) {
@@ -121,6 +109,21 @@ public class TextureCTM<T extends TextureTypeCTM> extends AbstractTexture<T> {
 
 	public boolean ignoreStates() {
 		return this.ignoreStates;
+	}
+
+	public boolean connectTo(CTMLogic logic, BlockState from, BlockState to, Direction dir) {
+		synchronized (connectionCache) {
+			Object2ByteMap<BlockState> sidecache = connectionCache.computeIfAbsent(new CacheKey(from, dir), k -> {
+				Object2ByteMap<BlockState> map = new Object2ByteOpenCustomHashMap<>(new IdentityStrategy<>());
+				map.defaultReturnValue((byte) -1);
+				return map;
+			});
+			byte cached = sidecache.getByte(to);
+			if (cached == -1) {
+				sidecache.put(to, cached = (byte) ((connectionChecks == null ? StateComparisonCallback.DEFAULT.connects(logic, from, to, dir) : connectionChecks.test(dir, to)) ? 1 : 0));
+			}
+			return cached == 1;
+		}
 	}
 
 	private static final class CacheKey {

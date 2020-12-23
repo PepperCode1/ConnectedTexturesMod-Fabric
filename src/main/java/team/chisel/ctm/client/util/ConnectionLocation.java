@@ -60,30 +60,30 @@ public enum ConnectionLocation {
 	 */
 	private final Direction normal;
 	@Nullable
-	private final ConnectionDirection dir;
+	private final ConnectionDirection direction;
 	private boolean offset;
 
-	ConnectionLocation(@Nullable ConnectionDirection dir) {
-		this(Direction.SOUTH, dir);
+	ConnectionLocation(@Nullable ConnectionDirection direction) {
+		this(Direction.SOUTH, direction);
 	}
 
-	ConnectionLocation(@Nullable ConnectionDirection dir, boolean offset) {
-		this(Direction.SOUTH, dir, offset);
+	ConnectionLocation(@Nullable ConnectionDirection direction, boolean offset) {
+		this(Direction.SOUTH, direction, offset);
 	}
 
-	ConnectionLocation(Direction normal, @Nullable ConnectionDirection dir) {
-		this(normal, dir, false);
+	ConnectionLocation(Direction normal, @Nullable ConnectionDirection direction) {
+		this(normal, direction, false);
 	}
 
-	ConnectionLocation(Direction normal, @Nullable ConnectionDirection dir, boolean offset) {
+	ConnectionLocation(Direction normal, @Nullable ConnectionDirection direction, boolean offset) {
 		this.normal = normal;
-		this.dir = dir;
+		this.direction = direction;
 		this.offset = offset;
 	}
 
 	@Nullable
-	public ConnectionDirection getDirForSide(Direction facing) {
-		return dir == null ? null : dir.relativize(facing);
+	public ConnectionDirection getDirectionForSide(Direction facing) {
+		return direction == null ? null : direction.relativize(facing);
 	}
 
 	@Nullable
@@ -100,8 +100,8 @@ public enum ConnectionLocation {
 	}
 
 	public BlockPos transform(BlockPos pos) {
-		if (dir != null) {
-			pos = pos.add(dir.getOffset(normal));
+		if (direction != null) {
+			pos = pos.add(direction.getOffset(normal));
 		} else {
 			pos = pos.offset(normal);
 		}
@@ -131,8 +131,8 @@ public enum ConnectionLocation {
 		}
 	}
 
-	public static Direction toFacing(ConnectionLocation loc) {
-		switch (loc) {
+	public static Direction toFacing(ConnectionLocation location) {
+		switch (location) {
 		case NORTH:
 			return Direction.NORTH;
 		case SOUTH:

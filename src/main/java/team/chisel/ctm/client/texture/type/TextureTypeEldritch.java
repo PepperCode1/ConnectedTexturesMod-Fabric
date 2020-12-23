@@ -13,24 +13,24 @@ import team.chisel.ctm.client.texture.context.TextureContextPosition;
 
 public class TextureTypeEldritch implements TextureType {
 	@Override
-	public TextureContext getTextureContext(BlockState state, BlockView world, BlockPos pos, CTMTexture<?> tex) {
-		return new Context(pos);
-	}
-
-	@Override
-	public TextureContext getContextFromData(long data) {
-		return new Context(BlockPos.fromLong(data));
-	}
-
-	@Override
 	public CTMTexture<TextureTypeEldritch> makeTexture(TextureInfo info) {
 		return new TextureEldritch(this, info);
 	}
 
-	public static class Context extends TextureContextPosition {
+	@Override
+	public TextureContext getTextureContext(BlockState state, BlockView world, BlockPos pos, CTMTexture<?> texture) {
+		return new TextureContextEldritch(pos);
+	}
+
+	@Override
+	public TextureContext getContextFromData(long data) {
+		return new TextureContextEldritch(BlockPos.fromLong(data));
+	}
+
+	public static class TextureContextEldritch extends TextureContextPosition {
 		private final BlockPos wrappedPos;
 
-		public Context(BlockPos pos) {
+		public TextureContextEldritch(BlockPos pos) {
 			super(pos);
 			wrappedPos = new BlockPos(pos.getX() & 7, pos.getY() & 7, pos.getZ() & 7);
 		}

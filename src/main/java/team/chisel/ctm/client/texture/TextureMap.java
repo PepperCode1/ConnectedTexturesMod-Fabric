@@ -67,7 +67,7 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace) {
+	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
 		return map.transformQuad(this, bakedQuad, context, quadGoal, cullFace);
 	}
 

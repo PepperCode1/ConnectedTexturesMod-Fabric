@@ -2,8 +2,6 @@ package team.chisel.ctm.client.texture;
 
 import java.util.List;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.Direction;
 
@@ -23,7 +21,7 @@ public class TextureNormal extends AbstractTexture<TextureTypeNormal> {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace) {
+	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 		quad.setUVBounds(sprites[0]);
 		if (quadGoal == 4) {

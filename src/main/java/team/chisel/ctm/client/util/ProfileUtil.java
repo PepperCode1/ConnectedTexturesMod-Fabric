@@ -7,7 +7,7 @@ import net.minecraft.util.profiler.DummyProfiler;
 import net.minecraft.util.profiler.Profiler;
 
 public class ProfileUtil {
-	private static ThreadLocal<Profiler> profiler = ThreadLocal.withInitial(() -> {
+	private static final ThreadLocal<Profiler> PROFILER = ThreadLocal.withInitial(() -> {
 		if (Thread.currentThread().getId() == 1) {
 			return MinecraftClient.getInstance().getProfiler();
 		} else {
@@ -16,14 +16,14 @@ public class ProfileUtil {
 	});
 
 	public static void push(@NotNull String section) {
-		profiler.get().push(section);
+		PROFILER.get().push(section);
 	}
 
 	public static void pop() {
-		profiler.get().pop();
+		PROFILER.get().pop();
 	}
 
 	public static void swap(@NotNull String section) {
-		profiler.get().swap(section);
+		PROFILER.get().swap(section);
 	}
 }

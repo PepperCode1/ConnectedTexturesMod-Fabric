@@ -3,8 +3,6 @@ package team.chisel.ctm.client.texture;
 import java.util.List;
 import java.util.Random;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -27,7 +25,7 @@ public class TextureEldritch extends AbstractTexture<TextureTypeEldritch> {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace) {
+	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
 		UnbakedQuad quad = unbake(bakedQuad, cullFace);
 
 		float[] bounds = quad.getSmallestUVBounds();
@@ -43,16 +41,15 @@ public class TextureEldritch extends AbstractTexture<TextureTypeEldritch> {
 		UnbakedQuad[] quads = quad.toQuadrants();
 		for (int i = 0; i < quads.length; i++) {
 			UnbakedQuad quadrant = quads[i];
-			for (int j = 0; quadrant != null && j < 4; j++) {
-				Vec2f uv = new Vec2f(quadrant.vertexes[j].u, quadrant.vertexes[j].v);
-				if (uv.x != min.x && uv.x != max.x && uv.y != min.y && uv.y != max.y) {
-					float xinterp = (float) MathHelper.getLerpProgress(uv.x, min.x, max.x);
-					float yinterp = (float) MathHelper.getLerpProgress(uv.y, min.y, max.y);
-					xinterp += xOffset;
-					yinterp += yOffset;
-					uv = new Vec2f(MathHelper.lerp(xinterp, min.x, max.x), MathHelper.lerp(yinterp, min.y, max.y));
-					quadrant.vertexes[j].u = uv.x;
-					quadrant.vertexes[j].v = uv.y;
+			if (quadrant != null) {
+				for (int j = 0; j < 4; j++) {
+					Vec2f uv = new Vec2f(quadrant.vertexes[j].u, quadrant.vertexes[j].v);
+					if (uv.x != min.x && uv.x != max.x && uv.y != min.y && uv.y != max.y) {
+						float xInterp = (float) MathHelper.getLerpProgress(uv.x, min.x, max.x) + xOffset;
+						float yInterp = (float) MathHelper.getLerpProgress(uv.y, min.y, max.y) + yOffset;
+						quadrant.vertexes[j].u = MathHelper.lerp(xInterp, min.x, max.x);
+						quadrant.vertexes[j].v = MathHelper.lerp(yInterp, min.y, max.y);
+					}
 				}
 			}
 		}
@@ -60,7 +57,7 @@ public class TextureEldritch extends AbstractTexture<TextureTypeEldritch> {
 		return new RenderableList(List.of(quads));
 	}
 
-	private float getRandomOffset() {
+	private static float getRandomOffset() {
 		return (float) RANDOM.nextGaussian() * 0.08f;
 	}
 }

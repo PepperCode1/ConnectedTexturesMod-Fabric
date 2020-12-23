@@ -24,60 +24,55 @@ public class CTMMetadataSectionV1 implements CTMMetadataSection {
 		return 1;
 	}
 
-	public static CTMMetadataSection fromJson(JsonObject obj) throws JsonParseException {
+	public static CTMMetadataSection fromJson(JsonObject jsonObject) throws JsonParseException {
 		CTMMetadataSectionV1 metadata = new CTMMetadataSectionV1();
-		if (obj.has("proxy")) {
-			JsonElement proxyEle = obj.get("proxy");
-			if (proxyEle.isJsonPrimitive() && proxyEle.getAsJsonPrimitive().isString()) {
-				metadata.proxy = proxyEle.getAsString();
+		if (jsonObject.has("proxy")) {
+			JsonElement proxyElement = jsonObject.get("proxy");
+			if (proxyElement.isJsonPrimitive() && proxyElement.getAsJsonPrimitive().isString()) {
+				metadata.proxy = proxyElement.getAsString();
 			}
-			if (obj.entrySet().stream().filter(e -> e.getKey().equals("ctm_version")).count() > 1) {
+			if (jsonObject.entrySet().stream().filter(e -> e.getKey().equals("ctm_version")).count() > 1) {
 				throw new JsonParseException("Cannot define other fields when using proxy");
 			}
 		}
-		if (obj.has("type")) {
-			JsonElement typeEle = obj.get("type");
-			if (typeEle.isJsonPrimitive() && typeEle.getAsJsonPrimitive().isString()) {
-				TextureType type = TextureTypeRegistry.INSTANCE.getType(typeEle.getAsString());
+		if (jsonObject.has("type")) {
+			JsonElement typeElement = jsonObject.get("type");
+			if (typeElement.isJsonPrimitive() && typeElement.getAsJsonPrimitive().isString()) {
+				TextureType type = TextureTypeRegistry.INSTANCE.getType(typeElement.getAsString());
 				if (type == null) {
-					throw new JsonParseException("Invalid render type given: " + typeEle);
+					throw new JsonParseException("Invalid render type given: " + typeElement);
 				} else {
 					metadata.type = type;
 				}
 			}
 		}
-		if (obj.has("layer")) {
-			JsonElement layerEle = obj.get("layer");
-			if (layerEle.isJsonPrimitive() && layerEle.getAsJsonPrimitive().isString()) {
+		if (jsonObject.has("layer")) {
+			JsonElement layerElement = jsonObject.get("layer");
+			if (layerElement.isJsonPrimitive() && layerElement.getAsJsonPrimitive().isString()) {
 				try {
-					metadata.blendMode = BlendMode.valueOf(layerEle.getAsString());
+					metadata.blendMode = BlendMode.valueOf(layerElement.getAsString());
 				} catch (IllegalArgumentException e) {
-					throw new JsonParseException("Invalid block layer given: " + layerEle);
+					throw new JsonParseException("Invalid block layer given: " + layerElement);
 				}
 			}
 		}
-		if (obj.has("textures")) {
-			JsonElement texturesEle = obj.get("textures");
-			if (texturesEle.isJsonArray()) {
-				JsonArray texturesArr = texturesEle.getAsJsonArray();
-				metadata.additionalTextures = new Identifier[texturesArr.size()];
-				for (int i = 0; i < texturesArr.size(); i++) {
-					JsonElement e = texturesArr.get(i);
+		if (jsonObject.has("textures")) {
+			JsonElement texturesElement = jsonObject.get("textures");
+			if (texturesElement.isJsonArray()) {
+				JsonArray texturesArray = texturesElement.getAsJsonArray();
+				metadata.additionalTextures = new Identifier[texturesArray.size()];
+				for (int i = 0; i < texturesArray.size(); i++) {
+					JsonElement e = texturesArray.get(i);
 					if (e.isJsonPrimitive() && e.getAsJsonPrimitive().isString()) {
 						metadata.additionalTextures[i] = new Identifier(e.getAsString());
 					}
 				}
 			}
 		}
-		if (obj.has("extra") && obj.get("extra").isJsonObject()) {
-			metadata.extraData = obj.getAsJsonObject("extra");
+		if (jsonObject.has("extra") && jsonObject.get("extra").isJsonObject()) {
+			metadata.extraData = jsonObject.getAsJsonObject("extra");
 		}
 		return metadata;
-	}
-
-	@Override
-	public String toString() {
-		return "CTMMetadataSectionV1(type=" + this.getType() + ", blendMode=" + this.getBlendMode() + ", proxy=" + this.getProxy() + ", additionalTextures=" + java.util.Arrays.deepToString(this.getAdditionalTextures()) + ", extraData=" + this.getExtraData() + ")";
 	}
 
 	@Override
@@ -103,5 +98,10 @@ public class CTMMetadataSectionV1 implements CTMMetadataSection {
 	@Override
 	public JsonObject getExtraData() {
 		return this.extraData;
+	}
+
+	@Override
+	public String toString() {
+		return "CTMMetadataSectionV1(type=" + this.getType() + ", blendMode=" + this.getBlendMode() + ", proxy=" + this.getProxy() + ", additionalTextures=" + java.util.Arrays.deepToString(this.getAdditionalTextures()) + ", extraData=" + this.getExtraData() + ")";
 	}
 }

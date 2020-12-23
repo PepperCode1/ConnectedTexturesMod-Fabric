@@ -21,16 +21,16 @@ public class TextureTypeEdges extends TextureTypeCTM {
 	}
 
 	@Override
-	public TextureContextCTM getTextureContext(BlockState state, BlockView world, BlockPos pos, CTMTexture<?> tex) {
-		return new TextureContextCTM(state, world, pos, (TextureEdges) tex) {
+	public TextureContextCTM getTextureContext(BlockState state, BlockView world, BlockPos pos, CTMTexture<?> texture) {
+		return new TextureContextCTM(state, world, pos, (TextureEdges) texture) {
 			@Override
 			protected CTMLogic createCTM(BlockState state) {
 				CTMLogic parent = super.createCTM(state);
 				// FIXME
-				CTMLogic ret = new CTMLogicEdges();
-				ret.ignoreStates(parent.ignoreStates()).stateComparator(parent.stateComparator());
-				ret.disableObscuredFaceCheck = parent.disableObscuredFaceCheck;
-				return ret;
+				CTMLogic logic = new CTMLogicEdges();
+				logic.ignoreStates(parent.ignoreStates()).stateComparator(parent.stateComparator());
+				logic.disableObscuredFaceCheck = parent.disableObscuredFaceCheck;
+				return logic;
 			}
 		};
 	}
@@ -52,37 +52,37 @@ public class TextureTypeEdges extends TextureTypeCTM {
 		}
 
 		@Override
-		public boolean isConnected(BlockView world, BlockPos current, BlockPos connection, Direction dir, BlockState state) {
+		public boolean isConnected(BlockView world, BlockPos current, BlockPos connection, Direction direction, BlockState state) {
 			if (isObscured()) {
 				return false;
 			}
-			BlockState obscuring = getConnectionState(world, current.offset(dir), dir, current);
-			if (stateComparator(state, obscuring, dir)) {
+			BlockState obscuring = getConnectionState(world, current.offset(direction), direction, current);
+			if (stateComparator(state, obscuring, direction)) {
 				setObscured(true);
 				return false;
 			}
-			BlockState con = getConnectionState(world, connection, dir, current);
-			BlockState obscuringcon = getConnectionState(world, connection.offset(dir), dir, current);
-			if (stateComparator(state, con, dir) || stateComparator(state, obscuringcon, dir)) {
+			BlockState connectionState = getConnectionState(world, connection, direction, current);
+			BlockState obscuringcon = getConnectionState(world, connection.offset(direction), direction, current);
+			if (stateComparator(state, connectionState, direction) || stateComparator(state, obscuringcon, direction)) {
 				Vec3d difference = Vec3d.of(connection.subtract(current));
 				if (difference.lengthSquared() > 1) {
 					difference = difference.normalize();
-					if (dir.getAxis() == Axis.Z) {
+					if (direction.getAxis() == Axis.Z) {
 						difference = difference.rotateY((float) (-Math.PI / 2));
 					}
-					float ang = (float) Math.PI / 4;
+					float angle = (float) Math.PI / 4;
 					Vec3d vA;
 					Vec3d vB;
-					if (dir.getAxis().isVertical()) {
-						vA = difference.rotateY(ang);
-						vB = difference.rotateY(-ang);
+					if (direction.getAxis().isVertical()) {
+						vA = difference.rotateY(angle);
+						vB = difference.rotateY(-angle);
 					} else {
-						vA = difference.rotateX(ang);
-						vB = difference.rotateX(-ang);
+						vA = difference.rotateX(angle);
+						vB = difference.rotateX(-angle);
 					}
 					BlockPos posA = new BlockPos(vA).add(current);
 					BlockPos posB = new BlockPos(vB).add(current);
-					return (getConnectionState(world, posA, dir, current) == state && !stateComparator(state, getConnectionState(world, posA.offset(dir), dir, current), dir)) || (getConnectionState(world, posB, dir, current) == state && !stateComparator(state, getConnectionState(world, posB.offset(dir), dir, current), dir));
+					return (getConnectionState(world, posA, direction, current) == state && !stateComparator(state, getConnectionState(world, posA.offset(direction), direction, current), direction)) || (getConnectionState(world, posB, direction, current) == state && !stateComparator(state, getConnectionState(world, posB.offset(direction), direction, current), direction));
 				} else {
 					return true;
 				}
@@ -91,12 +91,12 @@ public class TextureTypeEdges extends TextureTypeCTM {
 		}
 
 		@Override
-		protected void fillSubmaps(int idx) {
-			ConnectionDirection[] dirs = SUBMAP_MAP[idx];
-			if (!connectedOr(dirs[0], dirs[1]) && connected(dirs[2])) {
-				submapCache[idx] = submapOffsets[idx];
+		protected void fillSubmaps(int index) {
+			ConnectionDirection[] directions = SUBMAP_MAP[index];
+			if (!connectedOr(directions[0], directions[1]) && connected(directions[2])) {
+				submapCache[index] = submapOffsets[index];
 			} else {
-				super.fillSubmaps(idx);
+				super.fillSubmaps(index);
 			}
 		}
 

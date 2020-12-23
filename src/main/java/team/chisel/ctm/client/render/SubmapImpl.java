@@ -39,31 +39,6 @@ public class SubmapImpl implements Submap {
 		this.yOffset = yOffset;
 	}
 
-	@Override
-	public float getInterpolatedU(Sprite sprite, float u) {
-		return sprite.getFrameU(getXOffset() + u / getWidth());
-	}
-
-	@Override
-	public float getInterpolatedV(Sprite sprite, float v) {
-		return sprite.getFrameV(getYOffset() + v / getWidth());
-	}
-
-	@Override
-	public float[] toArray() {
-		return new float[] {getXOffset(), getYOffset(), getXOffset() + getWidth(), getYOffset() + getHeight()};
-	}
-
-	@Override
-	public NormalizedSubmap normalize() {
-		return normalized;
-	}
-
-	@Override
-	public Submap relativize() {
-		return this;
-	}
-
 	public float getWidth() {
 		return this.width;
 	}
@@ -78,6 +53,31 @@ public class SubmapImpl implements Submap {
 
 	public float getYOffset() {
 		return this.yOffset;
+	}
+
+	@Override
+	public NormalizedSubmap normalize() {
+		return normalized;
+	}
+
+	@Override
+	public Submap relativize() {
+		return this;
+	}
+
+	@Override
+	public float getInterpolatedU(Sprite sprite, float u) {
+		return sprite.getFrameU(getXOffset() + u / getWidth());
+	}
+
+	@Override
+	public float getInterpolatedV(Sprite sprite, float v) {
+		return sprite.getFrameV(getYOffset() + v / getWidth());
+	}
+
+	@Override
+	public float[] toArray() {
+		return new float[] {getXOffset(), getYOffset(), getXOffset() + getWidth(), getYOffset() + getHeight()};
 	}
 
 	public NormalizedSubmap getNormalized() {
@@ -101,16 +101,6 @@ public class SubmapImpl implements Submap {
 		}
 
 		@Override
-		public float getXOffset() {
-			return parent.getXOffset() / FACTOR;
-		}
-
-		@Override
-		public float getYOffset() {
-			return parent.getYOffset() / FACTOR;
-		}
-
-		@Override
 		public float getWidth() {
 			return parent.getWidth() / FACTOR;
 		}
@@ -121,13 +111,23 @@ public class SubmapImpl implements Submap {
 		}
 
 		@Override
-		public Submap relativize() {
-			return parent;
+		public float getXOffset() {
+			return parent.getXOffset() / FACTOR;
+		}
+
+		@Override
+		public float getYOffset() {
+			return parent.getYOffset() / FACTOR;
 		}
 
 		@Override
 		public Submap normalize() {
 			return this;
+		}
+
+		@Override
+		public Submap relativize() {
+			return parent;
 		}
 
 		@Override

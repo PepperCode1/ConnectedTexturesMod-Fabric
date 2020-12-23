@@ -37,9 +37,9 @@ public class RegionCache implements BlockView {
 	}
 
 	private BlockView getPassthrough() {
-		BlockView ret = passthrough.get();
-		Preconditions.checkNotNull(ret);
-		return ret;
+		BlockView blockView = passthrough.get();
+		Preconditions.checkNotNull(blockView);
+		return blockView;
 	}
 
 	@NotNull
@@ -61,11 +61,12 @@ public class RegionCache implements BlockView {
 	@Override
 	public BlockState getBlockState(BlockPos pos) {
 		long address = pos.asLong();
-		BlockState ret = stateCache.get(address);
-		if (ret == null) {
-			stateCache.put(address, ret = getPassthrough().getBlockState(pos));
+		BlockState state = stateCache.get(address);
+		if (state == null) {
+			state = getPassthrough().getBlockState(pos);
+			stateCache.put(address, state);
 		}
-		return ret;
+		return state;
 	}
 
 	@Override

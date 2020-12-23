@@ -24,23 +24,23 @@ public class ResourceUtil {
 		return getResource(spriteToAbsolute(sprite.getId()));
 	}
 
-	public static Identifier spriteToAbsolute(Identifier sprite) {
-		if (!sprite.getPath().startsWith("textures/")) {
-			sprite = new Identifier(sprite.getNamespace(), "textures/" + sprite.getPath());
+	public static Identifier spriteToAbsolute(Identifier identifier) {
+		if (!identifier.getPath().startsWith("textures/")) {
+			identifier = new Identifier(identifier.getNamespace(), "textures/" + identifier.getPath());
 		}
-		if (!sprite.getPath().endsWith(".png")) {
-			sprite = new Identifier(sprite.getNamespace(), sprite.getPath() + ".png");
+		if (!identifier.getPath().endsWith(".png")) {
+			identifier = new Identifier(identifier.getNamespace(), identifier.getPath() + ".png");
 		}
-		return sprite;
+		return identifier;
 	}
 
-	public static Resource getResource(Identifier res) throws IOException {
-		return MinecraftClient.getInstance().getResourceManager().getResource(res);
+	public static Resource getResource(Identifier identifier) throws IOException {
+		return MinecraftClient.getInstance().getResourceManager().getResource(identifier);
 	}
 
-	public static Resource getResourceUnsafe(Identifier res) {
+	public static Resource getResourceUnsafe(Identifier identifier) {
 		try {
-			return getResource(res);
+			return getResource(identifier);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

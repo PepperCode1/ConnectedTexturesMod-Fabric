@@ -42,8 +42,8 @@ import team.chisel.ctm.client.mixinterface.WeightedBakedModelExtension;
 import team.chisel.ctm.client.util.ProfileUtil;
 
 public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedModel {
-	private static final Cache<Item, Mesh> ITEM_CACHE = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).<Item, Mesh>build();
 	private static final Cache<State, Mesh> STATE_CACHE = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).maximumSize(5000).<State, Mesh>build();
+	private static final Cache<Item, Mesh> ITEM_CACHE = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).<Item, Mesh>build();
 
 	@NotNull
 	private final CTMUnbakedModel unbakedModel;
@@ -88,7 +88,6 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	}
 
 	@Override
-	@NotNull
 	public ModelOverrideList getOverrides() {
 		return ModelOverrideList.EMPTY;
 	}
@@ -110,7 +109,6 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	}
 
 	@Override
-	@NotNull
 	public ModelTransformation getTransformation() {
 		return parent.getTransformation();
 	}
@@ -173,17 +171,17 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	}
 
 	@SuppressWarnings("resource")
-	public Mesh getBlockMesh(BlockState state, Random random, CTMRenderContext ctmContext) {
-		BakedModel parent = getParent(random);
+	public Mesh getBlockMesh(BlockState state, Random random, CTMRenderContext renderContext) {
 		ProfileUtil.push("ctm_models");
+		BakedModel parent = getParent(random);
 		Mesh mesh = null;
 		try {
-			if (MinecraftClient.getInstance().world != null && ctmContext != null) {
+			if (MinecraftClient.getInstance().world != null && renderContext != null) {
 				ProfileUtil.push("state_creation");
-				TextureContextList ctxList = ctmContext.getContextList(state, this);
-				Object2LongMap<CTMTexture<?>> serialized = ctxList.serialized();
+				TextureContextList contextList = renderContext.getContextList(state, this);
+				Object2LongMap<CTMTexture<?>> serialized = contextList.serialized();
 				ProfileUtil.swap("model_creation");
-				mesh = STATE_CACHE.get(new State(state, serialized, parent), () -> createMesh(state, unbakedModel, parent, ctxList, random));
+				mesh = STATE_CACHE.get(new State(state, serialized, parent), () -> createMesh(state, unbakedModel, parent, contextList, random));
 				ProfileUtil.pop();
 			} else if (state != null) {
 				ProfileUtil.push("model_creation");
@@ -197,8 +195,9 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 		return mesh;
 	}
 
-	public Mesh getItemMesh(Item item, Random random) {
+	public Mesh getItemMesh(ItemStack itemStack, Random random) {
 		ProfileUtil.push("ctm_models");
+		Item item = itemStack.getItem();
 		Mesh mesh = null;
 		try {
 			mesh = ITEM_CACHE.get(item, () -> {
@@ -216,19 +215,18 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	}
 
 	@Override
-	public boolean isVanillaAdapter() {
-		return false;
-	}
-
-	@Override
 	public void emitBlockQuads(BlockRenderView blockView, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, RenderContext context) {
-		CTMRenderContext ctmContext = new CTMRenderContext(blockView, pos);
-		context.meshConsumer().accept(getBlockMesh(state, randomSupplier.get(), ctmContext));
+		context.meshConsumer().accept(getBlockMesh(state, randomSupplier.get(), new CTMRenderContext(blockView, pos)));
 	}
 
 	@Override
 	public void emitItemQuads(ItemStack stack, Supplier<Random> randomSupplier, RenderContext context) {
-		context.meshConsumer().accept(getItemMesh(stack.getItem(), randomSupplier.get()));
+		context.meshConsumer().accept(getItemMesh(stack, randomSupplier.get()));
+	}
+
+	@Override
+	public boolean isVanillaAdapter() {
+		return false;
 	}
 
 	/**
@@ -305,7 +303,6 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 		}
 
 		@Override
-		@SuppressWarnings("all")
 		public String toString() {
 			return "AbstractCTMBakedModel.State(cleanState=" + this.getCleanState() + ", serializedContext=" + this.getSerializedContext() + ", parent=" + this.getParent() + ")";
 		}

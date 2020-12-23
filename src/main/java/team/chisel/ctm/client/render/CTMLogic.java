@@ -155,8 +155,8 @@ public class CTMLogic {
 		connectionMap = 0; // Clear all connections
 		List<ConnectionLocation> connections = ConnectionLocation.decode(data);
 		for (ConnectionLocation loc : connections) {
-			if (loc.getDirForSide(side) != null) {
-				ConnectionDirection dir = loc.getDirForSide(side);
+			if (loc.getDirectionForSide(side) != null) {
+				ConnectionDirection dir = loc.getDirectionForSide(side);
 				if (dir != null) {
 					setConnectedState(dir, true);
 				}
@@ -241,37 +241,37 @@ public class CTMLogic {
 	 * @param world
 	 * @param current The position of your block.
 	 * @param connection The position of the block to check against.
-	 * @param dir The {@link Direction side} of the block to check for connection status. This is <i>not</i> the direction to check in.
+	 * @param direction The {@link Direction side} of the block to check for connection status. This is <i>not</i> the direction to check in.
 	 * @param state The state to check against for connection.
 	 * @return True if the given block can connect to the given location on the given side.
 	 */
-	public boolean isConnected(BlockView world, BlockPos current, BlockPos connection, Direction dir, BlockState state) {
+	public boolean isConnected(BlockView world, BlockPos current, BlockPos connection, Direction direction, BlockState state) {
 		//if (CTMLib.chiselLoaded() && connectionBlocked(world, x, y, z, dir.ordinal())) {
 		//	return false;
 		//}
-		BlockPos obscuringPos = connection.offset(dir);
+		BlockPos obscuringPos = connection.offset(direction);
 		boolean disableObscured = disableObscuredFaceCheck.orElse(CTMClient.getConfigManager().getConfig().connectInsideCTM);
-		BlockState con = getConnectionState(world, connection, dir, current);
-		BlockState obscuring = disableObscured ? null : getConnectionState(world, obscuringPos, dir, current);
+		BlockState connectionState = getConnectionState(world, connection, direction, current);
+		BlockState obscuring = disableObscured ? null : getConnectionState(world, obscuringPos, direction, current);
 		// bad API user
-		if (con == null) {
+		if (connectionState == null) {
 			throw new IllegalStateException("Error: received null blockstate as facade from block " + world.getBlockState(connection));
 		}
-		boolean ret = stateComparator(state, con, dir);
+		boolean connected = stateComparator(state, connectionState, direction);
 		// no block obscuring this face
 		if (obscuring == null) {
-			return ret;
+			return connected;
 		}
 		// check that we aren't already connected outwards from this side
-		ret &= !stateComparator(state, obscuring, dir);
-		return ret;
+		connected &= !stateComparator(state, obscuring, direction);
+		return connected;
 	}
 
-	protected boolean stateComparator(BlockState from, BlockState to, Direction dir) {
-		return stateComparator.connects(this, from, to, dir);
+	protected boolean stateComparator(BlockState from, BlockState to, Direction direction) {
+		return stateComparator.connects(this, from, to, direction);
 	}
 
-	//private boolean connectionBlocked(IBlockReader world, int x, int y, int z, int side) {
+	//private boolean connectionBlocked(BlockView world, int x, int y, int z, int side) {
 	//	Block block = world.getBlock(x, y, z);
 	//	if (block instanceof IConnectable) {
 	//		return !((IConnectable) block).canConnectCTM(world, x, y, z, side);
@@ -318,19 +318,19 @@ public class CTMLogic {
 		return submapCache;
 	}
 
-	protected void fillSubmaps(int idx) {
-		ConnectionDirection[] dirs = SUBMAP_MAP[idx];
-		if (connectedOr(dirs[0], dirs[1])) {
-			if (connectedAnd(dirs)) {
+	protected void fillSubmaps(int index) {
+		ConnectionDirection[] directions = SUBMAP_MAP[index];
+		if (connectedOr(directions[0], directions[1])) {
+			if (connectedAnd(directions)) {
 				// If all dirs are connected, we use the fully connected face,
 				// the base offset value.
-				submapCache[idx] = submapOffsets[idx];
+				submapCache[index] = submapOffsets[index];
 			} else {
 				// This is a bit magic-y, but basically the array is ordered so
 				// the first dir requires an offset of 2, and the second dir
 				// requires an offset of 8, plus the initial offset for the
 				// corner.
-				submapCache[idx] = submapOffsets[idx] + (connected(dirs[0]) ? 2 : 0) + (connected(dirs[1]) ? 8 : 0);
+				submapCache[index] = submapOffsets[index] + (connected(directions[0]) ? 2 : 0) + (connected(directions[1]) ? 8 : 0);
 			}
 		}
 	}
@@ -344,17 +344,17 @@ public class CTMLogic {
 	}
 	// end
 
-	private static byte setConnectedState(byte map, ConnectionDirection dir, boolean connected) {
+	private static byte setConnectedState(byte map, ConnectionDirection direction, boolean connected) {
 		if (connected) {
-			return (byte) (map | (1 << dir.ordinal()));
+			return (byte) (map | (1 << direction.ordinal()));
 		} else {
-			return (byte) (map & ~(1 << dir.ordinal()));
+			return (byte) (map & ~(1 << direction.ordinal()));
 		}
 	}
 
 	public interface StateComparisonCallback {
-		StateComparisonCallback DEFAULT = (ctm, from, to, dir) -> ctm.ignoreStates ? from.getBlock() == to.getBlock() : from == to;
+		StateComparisonCallback DEFAULT = (logic, from, to, direction) -> logic.ignoreStates ? from.getBlock() == to.getBlock() : from == to;
 
-		boolean connects(CTMLogic instance, BlockState from, BlockState to, Direction dir);
+		boolean connects(CTMLogic logic, BlockState from, BlockState to, Direction direction);
 	}
 }

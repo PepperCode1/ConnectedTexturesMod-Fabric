@@ -19,8 +19,8 @@ public class TextureTypeCTM implements TextureType {
 	}
 
 	@Override
-	public TextureContextCTM getTextureContext(BlockState state, BlockView world, BlockPos pos, CTMTexture<?> tex) {
-		return new TextureContextCTM(state, world, pos, (TextureCTM<?>) tex);
+	public TextureContextCTM getTextureContext(BlockState state, BlockView world, BlockPos pos, CTMTexture<?> texture) {
+		return new TextureContextCTM(state, world, pos, (TextureCTM<?>) texture);
 	}
 
 	@Override

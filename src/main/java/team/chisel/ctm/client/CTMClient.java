@@ -53,7 +53,7 @@ public class CTMClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		instance = this;
-		
+
 		getConfigManager();
 
 		WrappingCache wrappingCache = new WrappingCache();

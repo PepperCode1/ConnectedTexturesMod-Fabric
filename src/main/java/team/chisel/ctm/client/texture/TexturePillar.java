@@ -9,8 +9,6 @@ import static net.minecraft.util.math.Direction.WEST;
 
 import java.util.EnumSet;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
@@ -34,7 +32,7 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace) {
+	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
 		if (context == null) {
 			SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 			if (bakedQuad.getFace() != null && bakedQuad.getFace().getAxis().isVertical()) {
@@ -52,14 +50,14 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 		Direction nominalFace = bakedQuad.getFace();
 		ConnectionData data = ((TextureContextPillar) context).getData();
-		Connections cons = data.getConnections();
+		Connections connections = data.getConnections();
 
 		// This is the order of operations for connections
 		EnumSet<Direction> realConnections = EnumSet.copyOf(data.getConnections().getConnections());
-		if (cons.connectedOr(UP, DOWN)) {
+		if (connections.connectedOr(UP, DOWN)) {
 			// If connected up or down, ignore all other connections
 			realConnections.removeIf(f -> f.getAxis().isHorizontal());
-		} else if (cons.connectedOr(EAST, WEST)) {
+		} else if (connections.connectedOr(EAST, WEST)) {
 			// If connected east or west, ignore any north/south connections, and any connections that are already connected up or down
 			realConnections.removeIf(f -> f == NORTH || f == SOUTH);
 			realConnections.removeIf(f -> blockConnectionZ(f, data));
@@ -69,26 +67,26 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 		}
 
 		// Replace our initial connection data with the new info
-		cons = new Connections(realConnections);
+		connections = new Connections(realConnections);
 
 		int rotation = 0;
 		Submap submap = SubmapImpl.X2[0][0];
-		if (nominalFace.getAxis().isHorizontal() && cons.connectedOr(UP, DOWN)) {
-			submap = getSubmap(UP, DOWN, cons);
-		} else if (cons.connectedOr(EAST, WEST)) {
+		if (nominalFace.getAxis().isHorizontal() && connections.connectedOr(UP, DOWN)) {
+			submap = getSubmap(UP, DOWN, connections);
+		} else if (connections.connectedOr(EAST, WEST)) {
 			rotation = 1;
-			submap = getSubmap(EAST, WEST, cons);
-		} else if (cons.connectedOr(NORTH, SOUTH)) {
-			submap = getSubmap(NORTH, SOUTH, cons);
+			submap = getSubmap(EAST, WEST, connections);
+		} else if (connections.connectedOr(NORTH, SOUTH)) {
+			submap = getSubmap(NORTH, SOUTH, connections);
 			if (nominalFace == DOWN) {
 				rotation += 2;
 			}
 		}
 
-		boolean connected = !cons.getConnections().isEmpty();
+		boolean connected = !connections.getConnections().isEmpty();
 
 		// Side textures need to be rotated to look correct
-		if (connected && !cons.connectedOr(UP, DOWN)) {
+		if (connected && !connections.connectedOr(UP, DOWN)) {
 			if (nominalFace == EAST) {
 				rotation += 1;
 			}
@@ -101,11 +99,11 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 		}
 
 		// If there is a connection opposite this side, it is an end-cap, so render as unconnected
-		if (cons.connected(nominalFace.getOpposite())) {
+		if (connections.connected(nominalFace.getOpposite())) {
 			connected = false;
 		}
 		// If there are no connections at all, and this is not the top or bottom, render the "short" column texture
-		if (cons.getConnections().isEmpty() && nominalFace.getAxis().isHorizontal()) {
+		if (connections.getConnections().isEmpty() && nominalFace.getAxis().isHorizontal()) {
 			connected = true;
 		}
 
@@ -119,30 +117,30 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 		return quad;
 	}
 
-	private Submap getSubmap(Direction face1, Direction face2, Connections cons) {
-		Submap uvs;
-		if (cons.connectedAnd(face1, face2)) {
-			uvs = SubmapImpl.X2[1][0];
+	private Submap getSubmap(Direction face1, Direction face2, Connections connections) {
+		Submap submap;
+		if (connections.connectedAnd(face1, face2)) {
+			submap = SubmapImpl.X2[1][0];
 		} else {
-			if (cons.connected(face1)) {
-				uvs = SubmapImpl.X2[1][1];
+			if (connections.connected(face1)) {
+				submap = SubmapImpl.X2[1][1];
 			} else {
-				uvs = SubmapImpl.X2[0][1];
+				submap = SubmapImpl.X2[0][1];
 			}
 		}
-		return uvs;
+		return submap;
 	}
 
-	private boolean blockConnectionY(Direction dir, ConnectionData data) {
-		return blockConnection(dir, Axis.Y, data) || blockConnection(dir, dir.rotateYClockwise().getAxis(), data);
+	private boolean blockConnectionY(Direction direction, ConnectionData data) {
+		return blockConnection(direction, Axis.Y, data) || blockConnection(direction, direction.rotateYClockwise().getAxis(), data);
 	}
 
-	private boolean blockConnectionZ(Direction dir, ConnectionData data) {
-		return blockConnection(dir, Axis.Z, data);
+	private boolean blockConnectionZ(Direction direction, ConnectionData data) {
+		return blockConnection(direction, Axis.Z, data);
 	}
 
-	private boolean blockConnection(Direction dir, Axis axis, ConnectionData data) {
-		Direction rot = DirectionHelper.rotateAround(dir, axis);
-		return data.getConnections(dir).connectedOr(rot, rot.getOpposite());
+	private boolean blockConnection(Direction direction, Axis axis, ConnectionData data) {
+		Direction rot = DirectionHelper.rotateAround(direction, axis);
+		return data.getConnections(direction).connectedOr(rot, rot.getOpposite());
 	}
 }

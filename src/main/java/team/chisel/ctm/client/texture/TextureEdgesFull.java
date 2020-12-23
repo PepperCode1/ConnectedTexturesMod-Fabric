@@ -3,8 +3,6 @@ package team.chisel.ctm.client.texture;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.math.Direction;
@@ -13,6 +11,7 @@ import team.chisel.ctm.api.texture.Renderable;
 import team.chisel.ctm.api.texture.Submap;
 import team.chisel.ctm.api.texture.TextureContext;
 import team.chisel.ctm.api.util.TextureInfo;
+import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.render.RenderableList;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 import team.chisel.ctm.client.render.SubmapImpl;
@@ -28,15 +27,15 @@ public class TextureEdgesFull extends TextureEdges {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace) {
+	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 
-		if (context == null) {
+		if (context == null || CTMClient.getConfigManager().getConfig().disableCTM) {
 			quad.setUVBounds(sprites[0]);
 			return quad;
 		}
 
-		CTMLogicEdges logic = (CTMLogicEdges) ((TextureContextCTM) context).getCTM(bakedQuad.getFace());
+		CTMLogicEdges logic = (CTMLogicEdges) ((TextureContextCTM) context).getLogic(bakedQuad.getFace());
 		Sprite sprite;
 		Submap submap = null;
 		// Short circuit zero connections, as this is almost always the most common case

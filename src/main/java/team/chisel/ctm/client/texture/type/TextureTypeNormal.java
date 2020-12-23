@@ -23,7 +23,7 @@ public class TextureTypeNormal implements TextureType {
 	}
 
 	@Override
-	public TextureContext getTextureContext(BlockState state, BlockView world, BlockPos pos, CTMTexture<?> tex) {
+	public TextureContext getTextureContext(BlockState state, BlockView world, BlockPos pos, CTMTexture<?> texture) {
 		return EMPTY_CONTEXT;
 	}
 

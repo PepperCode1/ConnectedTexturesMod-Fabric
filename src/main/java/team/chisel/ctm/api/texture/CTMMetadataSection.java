@@ -37,10 +37,10 @@ public interface CTMMetadataSection {
 	JsonObject getExtraData();
 
 	// TODO move elsewhere
-	default CTMTexture<?> makeTexture(Sprite sprite, Function<SpriteIdentifier, Sprite> bakedTextureGetter) {
+	default CTMTexture<?> makeTexture(Sprite sprite, Function<SpriteIdentifier, Sprite> spriteGetter) {
 		CTMMetadataSection meta = this;
 		if (getProxy() != null) {
-			Sprite proxySprite = bakedTextureGetter.apply(new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(getProxy())));
+			Sprite proxySprite = spriteGetter.apply(new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(getProxy())));
 			try {
 				meta = ResourceUtil.getMetadata(proxySprite);
 				if (meta == null) {
@@ -52,6 +52,6 @@ public interface CTMMetadataSection {
 				meta = this;
 			}
 		}
-		return meta.getType().makeTexture(new TextureInfo(Arrays.stream(ObjectArrays.concat(sprite.getId(), meta.getAdditionalTextures())).map(rl -> new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, rl)).map(bakedTextureGetter::apply).toArray(Sprite[]::new), Optional.of(meta.getExtraData()), meta.getBlendMode()));
+		return meta.getType().makeTexture(new TextureInfo(Arrays.stream(ObjectArrays.concat(sprite.getId(), meta.getAdditionalTextures())).map(rl -> new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, rl)).map(spriteGetter::apply).toArray(Sprite[]::new), Optional.of(meta.getExtraData()), meta.getBlendMode()));
 	}
 }

@@ -11,7 +11,6 @@ import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MeshBuilder;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.BlockState;
@@ -83,7 +82,6 @@ public class CTMBakedModel extends AbstractCTMBakedModel {
 	}
 
 	@Override
-	@NotNull
 	public Sprite getSprite() {
 		CTMTexture<?> texture = getUnbakedModel().getTexture(getParent().getSprite().getId());
 		if (texture != null) {

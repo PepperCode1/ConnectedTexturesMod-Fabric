@@ -48,18 +48,18 @@ public enum ConnectionDirection {
 
 	static {
 		// Run after static init
-		for (ConnectionDirection dir : ConnectionDirection.VALUES) {
-			dir.buildCaches();
+		for (ConnectionDirection direction : ConnectionDirection.VALUES) {
+			direction.buildCaches();
 		}
 	}
 
 	@NonnullType
-	private Direction[] dirs;
+	private Direction[] directions;
 	@NonnullType
 	private BlockPos[] offsets = new BlockPos[6];
 
-	ConnectionDirection(Direction... dirs) {
-		this.dirs = dirs;
+	ConnectionDirection(Direction... directions) {
+		this.directions = directions;
 	}
 
 	private void buildCaches() {
@@ -67,14 +67,14 @@ public enum ConnectionDirection {
 		for (Direction normal : Direction.values()) {
 			@NonnullType Direction[] normalized;
 			if (normal == NORMAL) {
-				normalized = dirs;
+				normalized = directions;
 			} else if (normal == NORMAL.getOpposite()) {
 				// If this is the opposite direction of the default normal, we
 				// need to mirror the dirs
 				// A mirror version does not affect y+ and y- so we ignore those
-				Direction[] ret = new Direction[dirs.length];
+				Direction[] ret = new Direction[directions.length];
 				for (int i = 0; i < ret.length; i++) {
-					ret[i] = dirs[i].getOffsetY() != 0 ? dirs[i] : dirs[i].getOpposite();
+					ret[i] = directions[i].getOffsetY() != 0 ? directions[i] : directions[i].getOpposite();
 				}
 				normalized = ret;
 			} else {
@@ -89,10 +89,10 @@ public enum ConnectionDirection {
 					// If it is up/down, pick either the up or down rotation.
 					axis = normal == UP ? NORMAL.rotateYCounterclockwise() : NORMAL.rotateYClockwise();
 				}
-				Direction[] ret = new Direction[dirs.length];
+				Direction[] ret = new Direction[directions.length];
 				// Finally apply all the rotations
 				for (int i = 0; i < ret.length; i++) {
-					ret[i] = rotate(dirs[i], axis);
+					ret[i] = rotate(directions[i], axis);
 				}
 				normalized = ret;
 			}
@@ -105,34 +105,33 @@ public enum ConnectionDirection {
 	}
 
 	/**
-	 * Finds if this block is connected for the given side in this Dir.
-	 * @param ctm The CTM instance to use for logic.
+	 * Finds if this block is connected for the given side in this ConnectionDirection.
+	 * @param logic The CTM instance to use for logic.
 	 * @param world The world the block is in.
-	 * @param pos The position of your block.
+	 * @param pos The position of the block.
 	 * @param side The side of the current face.
-	 * @return True if the block is connected in the given Dir, false otherwise.
+	 * @return True if the block is connected in the given ConnectionDirection, false otherwise.
 	 */
-	public boolean isConnected(CTMLogic ctm, BlockView world, BlockPos pos, Direction side) {
-		return ctm.isConnected(world, pos, applyConnection(pos, side), side);
+	public boolean isConnected(CTMLogic logic, BlockView world, BlockPos pos, Direction side) {
+		return logic.isConnected(world, pos, applyConnection(pos, side), side);
 	}
 
 	/**
-	 * Finds if this block is connected for the given side in this Dir.
-	 * @param ctm The CTM instance to use for logic.
+	 * Finds if this block is connected for the given side in this ConnectionDirection.
+	 * @param logic The CTM instance to use for logic.
 	 * @param world The world the block is in.
-	 * @param pos The position of your block.
+	 * @param pos The position of the block.
 	 * @param side The side of the current face.
 	 * @param state The state to check for connection with.
-	 * @return True if the block is connected in the given Dir, false otherwise.
+	 * @return True if the block is connected in the given ConnectionDirection, false otherwise.
 	 */
-	public boolean isConnected(CTMLogic ctm, BlockView world, BlockPos pos, Direction side, BlockState state) {
-		return ctm.isConnected(world, pos, applyConnection(pos, side), side, state);
+	public boolean isConnected(CTMLogic logic, BlockView world, BlockPos pos, Direction side, BlockState state) {
+		return logic.isConnected(world, pos, applyConnection(pos, side), side, state);
 	}
 
 	/**
-	 * Apply this Dir to the given BlockPos for the given Direction normal direction.
-	 *
-	 * @return The offset BlockPos
+	 * Apply this ConnectionDirection to the given BlockPos for the given Direction normal direction.
+	 * @return The offset BlockPos.
 	 */
 	@NotNull
 	public BlockPos applyConnection(BlockPos pos, Direction side) {
@@ -163,14 +162,14 @@ public enum ConnectionDirection {
 		return offsets[normal.ordinal()];
 	}
 
-	public @Nullable ConnectionDirection getDirFor(Direction[] dirs) {
-		if (dirs == this.dirs) { // Short circuit for identical return from getNormalizedDirs
+	public @Nullable ConnectionDirection getDirFor(Direction[] directions) {
+		if (directions == this.directions) { // Short circuit for identical return from getNormalizedDirs
 			return this;
 		}
 
-		for (ConnectionDirection dir : VALUES) {
-			if (Arrays.equals(dir.dirs, dirs)) {
-				return dir;
+		for (ConnectionDirection direction : VALUES) {
+			if (Arrays.equals(direction.directions, directions)) {
+				return direction;
 			}
 		}
 		return null;
@@ -178,9 +177,9 @@ public enum ConnectionDirection {
 
 	private Direction rotate(Direction facing, Direction axisFacing) {
 		Axis axis = axisFacing.getAxis();
-		AxisDirection axisDir = axisFacing.getDirection();
+		AxisDirection axisDirection = axisFacing.getDirection();
 
-		if (axisDir == AxisDirection.POSITIVE) {
+		if (axisDirection == AxisDirection.POSITIVE) {
 			return DirectionHelper.rotateAround(facing, axis);
 		}
 

@@ -2,8 +2,6 @@ package team.chisel.ctm.client.texture;
 
 import java.util.List;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.Direction;
 
@@ -23,7 +21,7 @@ public class TextureEdges extends TextureCTM<TextureTypeEdges> {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace) {
+	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 
 		if (context == null || CTMClient.getConfigManager().getConfig().disableCTM) {
@@ -31,7 +29,7 @@ public class TextureEdges extends TextureCTM<TextureTypeEdges> {
 			return quad;
 		}
 
-		CTMLogicEdges logic = (CTMLogicEdges) ((TextureContextCTM) context).getCTM(bakedQuad.getFace());
+		CTMLogicEdges logic = (CTMLogicEdges) ((TextureContextCTM) context).getLogic(bakedQuad.getFace());
 		if (logic.isObscured()) {
 			quad.setUVBounds(sprites[2]);
 			return new RenderableList(List.of(quad.toQuadrants()));

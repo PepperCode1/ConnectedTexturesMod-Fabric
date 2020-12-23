@@ -1,5 +1,6 @@
 package team.chisel.ctm.client.resource;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class ModelParserV1 implements ModelParser {
 				replacements.put(index, entry.getValue());
 			}
 			return new CTMUnbakedModelImpl(jsonModel, replacements);
-		} catch (final Throwable e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}

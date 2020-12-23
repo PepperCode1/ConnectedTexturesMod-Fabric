@@ -15,7 +15,7 @@ import team.chisel.ctm.client.texture.TextureCTM;
 
 public class TextureContextCTM implements TextureContext {
 	protected final TextureCTM<?> texture;
-	private EnumMap<Direction, CTMLogic> ctmData = new EnumMap<>(Direction.class);
+	private EnumMap<Direction, CTMLogic> logicMap = new EnumMap<>(Direction.class);
 	private long data;
 
 	public TextureContextCTM(@NotNull BlockState state, BlockView world, BlockPos pos, TextureCTM<?> texture) {
@@ -24,7 +24,7 @@ public class TextureContextCTM implements TextureContext {
 		for (Direction face : Direction.values()) {
 			CTMLogic logic = createCTM(state);
 			logic.createSubmapIndices(world, pos, face);
-			ctmData.put(face, logic);
+			logicMap.put(face, logic);
 			this.data |= logic.serialized() << (face.ordinal() * 10);
 		}
 	}
@@ -37,8 +37,8 @@ public class TextureContextCTM implements TextureContext {
 		return logic;
 	}
 
-	public CTMLogic getCTM(Direction face) {
-		return ctmData.get(face);
+	public CTMLogic getLogic(Direction face) {
+		return logicMap.get(face);
 	}
 
 	@Override

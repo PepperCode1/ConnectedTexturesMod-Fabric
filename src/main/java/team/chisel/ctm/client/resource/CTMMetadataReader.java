@@ -13,15 +13,14 @@ import team.chisel.ctm.api.texture.CTMMetadataSection;
 public class CTMMetadataReader implements ResourceMetadataReader<CTMMetadataSection> {
 	@Override
 	@Nullable
-	public CTMMetadataSection fromJson(@Nullable JsonObject json) throws JsonParseException {
-		if (json != null && json.isJsonObject()) {
-			JsonObject obj = json.getAsJsonObject();
-			if (obj.has("ctm_version")) {
-				JsonElement version = obj.get("ctm_version");
+	public CTMMetadataSection fromJson(@Nullable JsonObject jsonObject) throws JsonParseException {
+		if (jsonObject != null) {
+			if (jsonObject.has("ctm_version")) {
+				JsonElement version = jsonObject.get("ctm_version");
 				if (version.isJsonPrimitive() && version.getAsJsonPrimitive().isNumber()) {
 					switch (version.getAsInt()) {
 					case 1:
-						return CTMMetadataSectionV1.fromJson(obj);
+						return CTMMetadataSectionV1.fromJson(jsonObject);
 					}
 				}
 			} else {

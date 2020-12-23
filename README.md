@@ -12,7 +12,7 @@ CTMF's setup is quite basic and therefore does not need any special procedure to
 
 Loom adds the `runClient` Gradle task, which runs the mod on the client side, but since CTMF itself doesn't add any resources, this task is not very useful. A test mod has been added to this project to test some of the mod's functionality. It can be run using the `runTestmodClient` Gradle task.
 
-A checkstyle has been added to make sure the code style is consistent. It is based on the checkstyle from [Fabric API](https://github.com/FabricMC/fabric).
+A checkstyle has been added to make sure the code style is consistent. It is based on the checkstyle from [Fabric API](https://github.com/FabricMC/fabric). To validate the code's style, run the `check` Gradle task.
 
 #### Links
 
