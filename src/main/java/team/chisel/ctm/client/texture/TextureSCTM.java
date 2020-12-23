@@ -24,18 +24,13 @@ public class TextureSCTM extends TextureCTM<TextureTypeSCTM> {
 	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 
-		if (context == null || CTMClient.getConfigManager().getConfig().disableCTM) {
-			quad.setUVBounds(sprites[0]);
-			return quad;
-		}
-
-		CTMLogic logic = null;
-		if (context instanceof TextureContextCTM) {
-			logic = ((TextureContextCTM) context).getLogic(bakedQuad.getFace());
+		int submapId = 0;
+		if (!CTMClient.getConfigManager().getConfig().disableCTM && context instanceof TextureContextCTM) {
+			submapId = getSubmapId(((TextureContextCTM) context).getLogic(bakedQuad.getFace()));
 		}
 
 		quad.setUVBounds(sprites[0]);
-		quad.applySubmap(getSubmap(getSubmapId(logic), quad.getAbsoluteUVRotation()));
+		quad.applySubmap(getSubmap(submapId, quad.getAbsoluteUVRotation()));
 		return quad;
 	}
 

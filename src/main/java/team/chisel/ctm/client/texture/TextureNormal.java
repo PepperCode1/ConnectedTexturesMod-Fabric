@@ -1,14 +1,12 @@
 package team.chisel.ctm.client.texture;
 
-import java.util.List;
-
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.Direction;
 
 import team.chisel.ctm.api.texture.Renderable;
 import team.chisel.ctm.api.texture.TextureContext;
 import team.chisel.ctm.api.util.TextureInfo;
-import team.chisel.ctm.client.render.RenderableList;
+import team.chisel.ctm.client.render.RenderableArray;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 import team.chisel.ctm.client.texture.type.TextureTypeNormal;
 
@@ -25,7 +23,7 @@ public class TextureNormal extends AbstractTexture<TextureTypeNormal> {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 		quad.setUVBounds(sprites[0]);
 		if (quadGoal == 4) {
-			return new RenderableList(List.of(quad.toQuadrants()));
+			return new RenderableArray(quad.toQuadrants());
 		}
 		return quad;
 	}

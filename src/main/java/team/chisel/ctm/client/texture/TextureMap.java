@@ -1,7 +1,5 @@
 package team.chisel.ctm.client.texture;
 
-import java.util.List;
-
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +13,7 @@ import team.chisel.ctm.api.texture.Renderable;
 import team.chisel.ctm.api.texture.Submap;
 import team.chisel.ctm.api.texture.TextureContext;
 import team.chisel.ctm.api.util.TextureInfo;
-import team.chisel.ctm.client.render.RenderableList;
+import team.chisel.ctm.client.render.RenderableArray;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 import team.chisel.ctm.client.render.SubmapImpl;
 import team.chisel.ctm.client.texture.context.TextureContextGrid;
@@ -107,7 +105,7 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 							quads[i].applySubmap(submap);
 						}
 					}
-					return new RenderableList(List.of(quads));
+					return new RenderableArray(quads);
 				} else {
 					quad.setUVBounds(texture.sprites[0]);
 					quad.applySubmap(submap);
@@ -139,7 +137,7 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 							quads[i].applySubmap(submap);
 						}
 					}
-					return new RenderableList(List.of(quads));
+					return new RenderableArray(quads);
 				} else {
 					quad.setUVBounds(texture.sprites[0]);
 					quad.applySubmap(submap);

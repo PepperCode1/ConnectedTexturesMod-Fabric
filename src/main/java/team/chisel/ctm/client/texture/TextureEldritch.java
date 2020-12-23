@@ -1,6 +1,5 @@
 package team.chisel.ctm.client.texture;
 
-import java.util.List;
 import java.util.Random;
 
 import net.minecraft.client.render.model.BakedQuad;
@@ -12,7 +11,7 @@ import net.minecraft.util.math.Vec2f;
 import team.chisel.ctm.api.texture.Renderable;
 import team.chisel.ctm.api.texture.TextureContext;
 import team.chisel.ctm.api.util.TextureInfo;
-import team.chisel.ctm.client.render.RenderableList;
+import team.chisel.ctm.client.render.RenderableArray;
 import team.chisel.ctm.client.render.UnbakedQuad;
 import team.chisel.ctm.client.texture.context.TextureContextPosition;
 import team.chisel.ctm.client.texture.type.TextureTypeEldritch;
@@ -54,7 +53,7 @@ public class TextureEldritch extends AbstractTexture<TextureTypeEldritch> {
 			}
 		}
 
-		return new RenderableList(List.of(quads));
+		return new RenderableArray(quads);
 	}
 
 	private static float getRandomOffset() {

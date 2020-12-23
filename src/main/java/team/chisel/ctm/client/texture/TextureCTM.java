@@ -1,7 +1,6 @@
 package team.chisel.ctm.client.texture;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
@@ -22,7 +21,7 @@ import team.chisel.ctm.api.util.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.render.CTMLogic;
 import team.chisel.ctm.client.render.CTMLogic.StateComparisonCallback;
-import team.chisel.ctm.client.render.RenderableList;
+import team.chisel.ctm.client.render.RenderableArray;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 import team.chisel.ctm.client.render.SubmapImpl;
 import team.chisel.ctm.client.resource.BlockStatePredicateParser;
@@ -77,7 +76,7 @@ public class TextureCTM<T extends TextureTypeCTM> extends AbstractTexture<T> {
 			}
 		}
 
-		return new RenderableList(List.of(quads));
+		return new RenderableArray(quads);
 	}
 
 	@Override

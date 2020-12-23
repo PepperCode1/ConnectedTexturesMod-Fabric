@@ -1,8 +1,5 @@
 package team.chisel.ctm.client.texture;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.math.Direction;
@@ -12,10 +9,9 @@ import team.chisel.ctm.api.texture.Submap;
 import team.chisel.ctm.api.texture.TextureContext;
 import team.chisel.ctm.api.util.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
-import team.chisel.ctm.client.render.RenderableList;
+import team.chisel.ctm.client.render.RenderableArray;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 import team.chisel.ctm.client.render.SubmapImpl;
-import team.chisel.ctm.client.render.UnbakedQuad;
 import team.chisel.ctm.client.texture.context.TextureContextCTM;
 import team.chisel.ctm.client.texture.type.TextureTypeEdges;
 import team.chisel.ctm.client.texture.type.TextureTypeEdges.CTMLogicEdges;
@@ -91,15 +87,14 @@ public class TextureEdgesFull extends TextureEdges {
 			quad.applySubmap(submap);
 			return quad;
 		} else {
-			List<UnbakedQuad> quads = new ArrayList<>();
-			for (SpriteUnbakedQuad quad1 : quad.toQuadrants()) {
+			SpriteUnbakedQuad[] quads = quad.toQuadrants();
+			for (SpriteUnbakedQuad quad1 : quads) {
 				if (quad1 != null) {
 					quad1.setUVBounds(sprite);
 					quad1.applySubmap(submap);
-					quads.add(quad1);
 				}
 			}
-			return new RenderableList(quads);
+			return new RenderableArray(quads);
 		}
 	}
 }

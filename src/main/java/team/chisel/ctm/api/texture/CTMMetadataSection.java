@@ -52,6 +52,6 @@ public interface CTMMetadataSection {
 				meta = this;
 			}
 		}
-		return meta.getType().makeTexture(new TextureInfo(Arrays.stream(ObjectArrays.concat(sprite.getId(), meta.getAdditionalTextures())).map(rl -> new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, rl)).map(spriteGetter::apply).toArray(Sprite[]::new), Optional.of(meta.getExtraData()), meta.getBlendMode()));
+		return meta.getType().makeTexture(new TextureInfo(Arrays.stream(ObjectArrays.concat(sprite.getId(), meta.getAdditionalTextures())).map(identifier -> new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, identifier)).map(spriteGetter::apply).toArray(Sprite[]::new), Optional.of(meta.getExtraData()), meta.getBlendMode()));
 	}
 }

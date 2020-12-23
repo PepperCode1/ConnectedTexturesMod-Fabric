@@ -6,6 +6,7 @@ import net.minecraft.util.math.Direction;
 import team.chisel.ctm.api.texture.Renderable;
 import team.chisel.ctm.api.texture.TextureContext;
 import team.chisel.ctm.api.util.TextureInfo;
+import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.render.CTMLogic;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 import team.chisel.ctm.client.texture.context.TextureContextCTM;
@@ -24,13 +25,13 @@ public class TexturePlane extends TextureCTM<TextureTypePlane> {
 	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 
-		CTMLogic logic = null;
-		if (context instanceof TextureContextCTM) {
-			logic = ((TextureContextCTM) context).getLogic(bakedQuad.getFace());
+		int submapId = 0;
+		if (!CTMClient.getConfigManager().getConfig().disableCTM && context instanceof TextureContextCTM) {
+			submapId = getSubmapId(((TextureContextCTM) context).getLogic(bakedQuad.getFace()));
 		}
 
 		quad.setUVBounds(sprites[0]);
-		quad.applySubmap(getSubmap(getSubmapId(logic), quad.getAbsoluteUVRotation()));
+		quad.applySubmap(getSubmap(submapId, 0));
 		return quad;
 	}
 
