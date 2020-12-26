@@ -9,12 +9,12 @@ import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
-import team.chisel.ctm.api.texture.Renderable;
-import team.chisel.ctm.api.texture.Submap;
-import team.chisel.ctm.api.texture.TextureContext;
-import team.chisel.ctm.api.util.TextureInfo;
+import team.chisel.ctm.api.client.Renderable;
+import team.chisel.ctm.api.client.TextureContext;
+import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.render.RenderableArray;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
+import team.chisel.ctm.client.render.Submap;
 import team.chisel.ctm.client.render.SubmapImpl;
 import team.chisel.ctm.client.texture.context.TextureContextGrid;
 import team.chisel.ctm.client.texture.context.TextureContextGrid.Point2i;
@@ -30,32 +30,32 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 
 	public TextureMap(TextureTypeMap type, TextureInfo info) {
 		super(type, info);
-		this.map = type.getMapType();
+		map = type.getType();
 		if (info.getInfo().isPresent()) {
-			JsonObject object = info.getInfo().get();
-			if (object.has("width") && object.has("height")) {
-				Preconditions.checkArgument(object.get("width").isJsonPrimitive() && object.get("width").getAsJsonPrimitive().isNumber(), "width must be a number!");
-				Preconditions.checkArgument(object.get("height").isJsonPrimitive() && object.get("height").getAsJsonPrimitive().isNumber(), "height must be a number!");
-				this.xSize = object.get("width").getAsInt();
-				this.ySize = object.get("height").getAsInt();
-			} else if (object.has("size")) {
-				Preconditions.checkArgument(object.get("size").isJsonPrimitive() && object.get("size").getAsJsonPrimitive().isNumber(), "size must be a number!");
-				this.xSize = object.get("size").getAsInt();
-				this.ySize = object.get("size").getAsInt();
+			JsonObject jsonObject = info.getInfo().get();
+			if (jsonObject.has("width") && jsonObject.has("height")) {
+				Preconditions.checkArgument(jsonObject.get("width").isJsonPrimitive() && jsonObject.get("width").getAsJsonPrimitive().isNumber(), "width must be a number!");
+				Preconditions.checkArgument(jsonObject.get("height").isJsonPrimitive() && jsonObject.get("height").getAsJsonPrimitive().isNumber(), "height must be a number!");
+				xSize = jsonObject.get("width").getAsInt();
+				ySize = jsonObject.get("height").getAsInt();
+			} else if (jsonObject.has("size")) {
+				Preconditions.checkArgument(jsonObject.get("size").isJsonPrimitive() && jsonObject.get("size").getAsJsonPrimitive().isNumber(), "size must be a number!");
+				xSize = jsonObject.get("size").getAsInt();
+				ySize = jsonObject.get("size").getAsInt();
 			} else {
 				xSize = ySize = 2;
 			}
-			if (object.has("x_offset")) {
-				Preconditions.checkArgument(object.get("x_offset").isJsonPrimitive() && object.get("x_offset").getAsJsonPrimitive().isNumber(), "x_offset must be a number!");
-				this.xOffset = object.get("x_offset").getAsInt();
+			if (jsonObject.has("x_offset")) {
+				Preconditions.checkArgument(jsonObject.get("x_offset").isJsonPrimitive() && jsonObject.get("x_offset").getAsJsonPrimitive().isNumber(), "x_offset must be a number!");
+				xOffset = jsonObject.get("x_offset").getAsInt();
 			} else {
-				this.xOffset = 0;
+				xOffset = 0;
 			}
-			if (object.has("y_offset")) {
-				Preconditions.checkArgument(object.get("y_offset").isJsonPrimitive() && object.get("y_offset").getAsJsonPrimitive().isNumber(), "y_offset must be a number!");
-				this.yOffset = object.get("y_offset").getAsInt();
+			if (jsonObject.has("y_offset")) {
+				Preconditions.checkArgument(jsonObject.get("y_offset").isJsonPrimitive() && jsonObject.get("y_offset").getAsJsonPrimitive().isNumber(), "y_offset must be a number!");
+				yOffset = jsonObject.get("y_offset").getAsInt();
 			} else {
-				this.yOffset = 0;
+				yOffset = 0;
 			}
 		} else {
 			xOffset = yOffset = 0;
@@ -70,19 +70,19 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 	}
 
 	public int getXSize() {
-		return this.xSize;
+		return xSize;
 	}
 
 	public int getYSize() {
-		return this.ySize;
+		return ySize;
 	}
 
 	public int getXOffset() {
-		return this.xOffset;
+		return xOffset;
 	}
 
 	public int getYOffset() {
-		return this.yOffset;
+		return yOffset;
 	}
 
 	public enum MapType {
@@ -115,7 +115,7 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 
 			@Override
 			public TextureContext getContext(@NotNull BlockPos pos, @NotNull TextureMap tex) {
-				return new TextureContextGrid.Random(pos, tex, true);
+				return new TextureContextGrid.TextureContextRandom(pos, tex, true);
 			}
 		},
 		PATTERNED {
@@ -147,7 +147,7 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 
 			@Override
 			public TextureContext getContext(@NotNull BlockPos pos, @NotNull TextureMap texture) {
-				return new TextureContextGrid.Patterned(pos, texture, true);
+				return new TextureContextGrid.TextureContextPatterned(pos, texture, true);
 			}
 		};
 

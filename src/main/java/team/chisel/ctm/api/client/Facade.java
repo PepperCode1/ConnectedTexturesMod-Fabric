@@ -1,4 +1,4 @@
-package team.chisel.ctm.api;
+package team.chisel.ctm.api.client;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,8 +16,7 @@ public interface Facade {
 	 * Gets the BlockState this facade appears as.
 	 * @param world The World.
 	 * @param pos The Block's position.
-	 * @param side The side being rendered, <b>not</b> the side being connected from.<br>
-	 * This value can be null if no side is specified. Make sure this is handled appropriately.
+	 * @param side The side being rendered, <b>not</b> the side being connected from. This value can be null if no side is specified. Make sure this is handled appropriately.
 	 * @param connection The position of the block being connected to.
 	 * @return The BlockState which the block appears as.
 	 */

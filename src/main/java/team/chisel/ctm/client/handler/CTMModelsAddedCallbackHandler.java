@@ -18,10 +18,10 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
 
-import team.chisel.ctm.api.model.CTMUnbakedModel;
-import team.chisel.ctm.api.texture.CTMMetadataSection;
 import team.chisel.ctm.client.event.ModelsAddedCallback;
+import team.chisel.ctm.client.model.CTMUnbakedModel;
 import team.chisel.ctm.client.model.CTMUnbakedModelImpl;
+import team.chisel.ctm.client.resource.CTMMetadataSection;
 import team.chisel.ctm.client.util.ResourceUtil;
 
 public class CTMModelsAddedCallbackHandler implements ModelsAddedCallback {

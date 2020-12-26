@@ -1,4 +1,4 @@
-package team.chisel.ctm.api.texture;
+package team.chisel.ctm.client.resource;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -15,14 +15,13 @@ import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.util.Identifier;
 
-import team.chisel.ctm.api.util.TextureInfo;
+import team.chisel.ctm.api.client.CTMTexture;
+import team.chisel.ctm.api.client.TextureInfo;
+import team.chisel.ctm.api.client.TextureType;
 import team.chisel.ctm.client.CTMClient;
-import team.chisel.ctm.client.resource.CTMMetadataSectionV1;
 import team.chisel.ctm.client.util.ResourceUtil;
 
 public interface CTMMetadataSection {
-	String SECTION_NAME = "ctm";
-
 	int getVersion();
 
 	TextureType getType();
@@ -32,7 +31,7 @@ public interface CTMMetadataSection {
 	Identifier[] getAdditionalTextures();
 
 	@Nullable
-	String getProxy();
+	Identifier getProxy();
 
 	JsonObject getExtraData();
 
@@ -40,7 +39,7 @@ public interface CTMMetadataSection {
 	default CTMTexture<?> makeTexture(Sprite sprite, Function<SpriteIdentifier, Sprite> spriteGetter) {
 		CTMMetadataSection meta = this;
 		if (getProxy() != null) {
-			Sprite proxySprite = spriteGetter.apply(new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(getProxy())));
+			Sprite proxySprite = spriteGetter.apply(new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, getProxy()));
 			try {
 				meta = ResourceUtil.getMetadata(proxySprite);
 				if (meta == null) {
@@ -48,10 +47,10 @@ public interface CTMMetadataSection {
 				}
 				sprite = proxySprite;
 			} catch (IOException e) {
-				CTMClient.LOGGER.error("Could not parse metadata of proxy, ignoring proxy and using base texture." + getProxy(), e);
+				CTMClient.LOGGER.error("Could not parse metadata of proxy. Ignoring proxy and using base texture. " + getProxy(), e);
 				meta = this;
 			}
 		}
-		return meta.getType().makeTexture(new TextureInfo(Arrays.stream(ObjectArrays.concat(sprite.getId(), meta.getAdditionalTextures())).map(identifier -> new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, identifier)).map(spriteGetter::apply).toArray(Sprite[]::new), Optional.of(meta.getExtraData()), meta.getBlendMode()));
+		return meta.getType().makeTexture(new TextureInfo(Arrays.stream(ObjectArrays.concat(sprite.getId(), meta.getAdditionalTextures())).map(identifier -> new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, identifier)).map(spriteGetter::apply).toArray(Sprite[]::new), meta.getBlendMode(), Optional.of(meta.getExtraData())));
 	}
 }

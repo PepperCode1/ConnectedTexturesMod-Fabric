@@ -19,8 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 
-import team.chisel.ctm.api.Facade;
-import team.chisel.ctm.api.texture.Submap;
+import team.chisel.ctm.api.client.Facade;
 import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.util.ConnectionDirection;
 import team.chisel.ctm.client.util.ConnectionLocation;
@@ -120,11 +119,11 @@ public class CTMLogic {
 	protected StateComparisonCallback stateComparator = StateComparisonCallback.DEFAULT;
 
 	public boolean ignoreStates() {
-		return this.ignoreStates;
+		return ignoreStates;
 	}
 
 	public StateComparisonCallback stateComparator() {
-		return this.stateComparator;
+		return stateComparator;
 	}
 
 	public CTMLogic ignoreStates(final boolean ignoreStates) {
@@ -216,7 +215,7 @@ public class CTMLogic {
 		for (ConnectionDirection dir : dirs) {
 			map = setConnectedState(map, dir, true);
 		}
-		return map == this.connectionMap;
+		return map == connectionMap;
 	}
 
 	public int numConnections() {

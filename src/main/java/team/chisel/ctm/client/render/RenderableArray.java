@@ -2,7 +2,7 @@ package team.chisel.ctm.client.render;
 
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 
-import team.chisel.ctm.api.texture.Renderable;
+import team.chisel.ctm.api.client.Renderable;
 
 public class RenderableArray implements Renderable {
 	private Renderable[] array;

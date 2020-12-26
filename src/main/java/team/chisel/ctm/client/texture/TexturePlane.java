@@ -3,9 +3,9 @@ package team.chisel.ctm.client.texture;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.Direction;
 
-import team.chisel.ctm.api.texture.Renderable;
-import team.chisel.ctm.api.texture.TextureContext;
-import team.chisel.ctm.api.util.TextureInfo;
+import team.chisel.ctm.api.client.Renderable;
+import team.chisel.ctm.api.client.TextureContext;
+import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.render.CTMLogic;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
@@ -18,7 +18,7 @@ public class TexturePlane extends TextureCTM<TextureTypePlane> {
 
 	public TexturePlane(TextureTypePlane type, TextureInfo info) {
 		super(type, info);
-		this.plane = type.getPlane();
+		plane = type.getPlane();
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class TexturePlane extends TextureCTM<TextureTypePlane> {
 		}
 		int u;
 		int v;
-		if (this.plane == Direction.Type.VERTICAL) {
+		if (plane == Direction.Type.VERTICAL) {
 			boolean top = logic.connected(ConnectionDirection.TOP);
 			u = (top == logic.connected(ConnectionDirection.BOTTOM)) ? 0 : 1;
 			v = top ? 1 : 0;

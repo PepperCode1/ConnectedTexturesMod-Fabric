@@ -1,4 +1,4 @@
-package team.chisel.ctm.api.util;
+package team.chisel.ctm.client.model;
 
 import java.util.Collection;
 import java.util.Map;
@@ -13,9 +13,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 
-import team.chisel.ctm.api.texture.CTMTexture;
-import team.chisel.ctm.api.texture.TextureContext;
-import team.chisel.ctm.api.texture.TextureType;
+import team.chisel.ctm.api.client.CTMTexture;
+import team.chisel.ctm.api.client.TextureContext;
+import team.chisel.ctm.api.client.TextureType;
 import team.chisel.ctm.client.util.IdentityStrategy;
 import team.chisel.ctm.client.util.ProfileUtil;
 import team.chisel.ctm.client.util.RegionCache;
@@ -31,27 +31,28 @@ public class TextureContextList {
 		BlockView cachedWorld = REGION_CACHE.get().updateWorld(world);
 
 		ProfileUtil.swap("ctm_context_gather");
-		for (CTMTexture<?> tex : textures) {
-			TextureType type = tex.getType();
-			TextureContext ctx = type.getTextureContext(state, cachedWorld, pos, tex);
+		for (CTMTexture<?> texture : textures) {
+			TextureType type = texture.getType();
+			TextureContext ctx = type.getTextureContext(state, cachedWorld, pos, texture);
 			if (ctx != null) {
-				contextMap.put(tex, ctx);
+				contextMap.put(texture, ctx);
 			}
 		}
 
 		ProfileUtil.swap("ctm_context_serialize");
-		for (Entry<CTMTexture<?>, TextureContext> e : contextMap.entrySet()) {
-			serialized.put(e.getKey(), e.getValue().getCompressedData());
+		for (Entry<CTMTexture<?>, TextureContext> entry : contextMap.entrySet()) {
+			serialized.put(entry.getKey(), entry.getValue().getCompressedData());
 		}
 		ProfileUtil.pop();
 	}
 
-	public @Nullable TextureContext getTextureContext(CTMTexture<?> tex) {
-		return this.contextMap.get(tex);
+	@Nullable
+	public TextureContext getTextureContext(CTMTexture<?> texture) {
+		return contextMap.get(texture);
 	}
 
-	public boolean contains(CTMTexture<?> tex) {
-		return getTextureContext(tex) != null;
+	public boolean contains(CTMTexture<?> texture) {
+		return getTextureContext(texture) != null;
 	}
 
 	public Object2LongMap<CTMTexture<?>> serialized() {

@@ -37,13 +37,11 @@ import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.util.Identifier;
 
-import team.chisel.ctm.api.model.CTMUnbakedModel;
-import team.chisel.ctm.api.texture.CTMMetadataSection;
-import team.chisel.ctm.api.texture.CTMTexture;
-import team.chisel.ctm.api.util.TextureInfo;
+import team.chisel.ctm.api.client.CTMTexture;
+import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.mixin.JsonUnbakedModelAccessor;
 import team.chisel.ctm.client.resource.CTMMetadataReader;
-import team.chisel.ctm.client.texture.TextureNormal;
+import team.chisel.ctm.client.resource.CTMMetadataSection;
 import team.chisel.ctm.client.texture.type.TextureTypeNormal;
 import team.chisel.ctm.client.util.ResourceUtil;
 
@@ -67,13 +65,13 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 
 	public CTMUnbakedModelImpl(UnbakedModel parent) {
 		this.parent = parent;
-		this.jsonParent = null;
-		this.overrides = new Int2ObjectOpenHashMap<>();
+		jsonParent = null;
+		overrides = new Int2ObjectOpenHashMap<>();
 	}
 
 	public CTMUnbakedModelImpl(JsonUnbakedModel parent, Int2ObjectMap<JsonElement> overrides) throws IOException {
 		this.parent = parent;
-		this.jsonParent = parent;
+		jsonParent = parent;
 		this.overrides = overrides;
 
 		for (Int2ObjectMap.Entry<JsonElement> entry : this.overrides.int2ObjectEntrySet()) {
@@ -88,7 +86,7 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 					// This model can only be version 1, TODO improve this
 					jsonObject.add("ctm_version", new JsonPrimitive(1));
 				}
-				metadata = new CTMMetadataReader().fromJson(jsonObject);
+				metadata = CTMMetadataReader.INSTANCE.fromJson(jsonObject);
 			}
 			if (metadata != null) {
 				metaOverrides.put(entry.getIntKey(), metadata);
@@ -96,7 +94,7 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 			}
 		}
 
-		this.textureDependencies.removeIf(identifier -> identifier.getPath().startsWith("#"));
+		textureDependencies.removeIf(identifier -> identifier.getPath().startsWith("#"));
 	}
 
 	@Override
@@ -116,11 +114,11 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 			try {
 				metadata = ResourceUtil.getMetadata(ResourceUtil.spriteToAbsolute(identifier.getTextureId()));
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				throw new RuntimeException("Failed to get metadata for texture " + identifier.getTextureId(), e);
 			}
 			if (metadata != null) {
 				if (metadata.getType().requiredTextures() != metadata.getAdditionalTextures().length + 1) {
-					throw new IllegalArgumentException(String.format("Texture type %s requires exactly %d textures. %d were provided.", metadata.getType(), metadata.getType().requiredTextures(), metadata.getAdditionalTextures().length + 1));
+					throw new IllegalArgumentException(String.format("Texture type %s requires exactly %d textures, but %d were provided. " + identifier.getTextureId(), metadata.getType(), metadata.getType().requiredTextures(), metadata.getAdditionalTextures().length + 1));
 				}
 			}
 		}
@@ -151,10 +149,10 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 				//
 			}
 			final CTMMetadataSection metadata1 = metadata;
-			textures.computeIfAbsent(sprite.getId(), s -> {
+			textures.computeIfAbsent(sprite.getId(), id -> {
 				CTMTexture<?> texture;
 				if (metadata1 == null) {
-					texture = new TextureNormal(TextureTypeNormal.INSTANCE, new TextureInfo(new Sprite[] { sprite }, Optional.empty(), null));
+					texture = TextureTypeNormal.INSTANCE.makeTexture(new TextureInfo(new Sprite[] { sprite }, null, Optional.empty()));
 				} else {
 					texture = metadata1.makeTexture(sprite, spriteGetter);
 				}
@@ -197,19 +195,19 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 	}
 
 	@Override
-	public CTMTexture<?> getTexture(Identifier id) {
-		return textures.get(id);
+	public CTMTexture<?> getTexture(Identifier identifier) {
+		return textures.get(identifier);
 	}
 
 	@Override
 	@Nullable
-	public Sprite getOverrideSprite(int tintIndex) {
-		return spriteOverrides.get(tintIndex);
+	public Sprite getOverrideSprite(int colorIndex) {
+		return spriteOverrides.get(colorIndex);
 	}
 
 	@Override
 	@Nullable
-	public CTMTexture<?> getOverrideTexture(int tintIndex, Identifier id) {
-		return textureOverrides.get(Pair.of(tintIndex, id));
+	public CTMTexture<?> getOverrideTexture(int colorIndex, Identifier identifier) {
+		return textureOverrides.get(Pair.of(colorIndex, identifier));
 	}
 }

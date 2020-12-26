@@ -1,4 +1,4 @@
-package team.chisel.ctm.api.texture;
+package team.chisel.ctm.api.client;
 
 import java.util.Collection;
 

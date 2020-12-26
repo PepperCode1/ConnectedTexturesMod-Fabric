@@ -14,15 +14,15 @@ import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.Direction;
 
-import team.chisel.ctm.api.texture.Renderable;
-import team.chisel.ctm.api.texture.Submap;
-import team.chisel.ctm.api.texture.TextureContext;
-import team.chisel.ctm.api.util.TextureInfo;
+import team.chisel.ctm.api.client.Renderable;
+import team.chisel.ctm.api.client.TextureContext;
+import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.render.CTMLogic;
 import team.chisel.ctm.client.render.CTMLogic.StateComparisonCallback;
 import team.chisel.ctm.client.render.RenderableArray;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
+import team.chisel.ctm.client.render.Submap;
 import team.chisel.ctm.client.render.SubmapImpl;
 import team.chisel.ctm.client.resource.BlockStatePredicateParser;
 import team.chisel.ctm.client.texture.context.TextureContextCTM;
@@ -31,8 +31,6 @@ import team.chisel.ctm.client.util.IdentityStrategy;
 import team.chisel.ctm.client.util.ParseUtil;
 
 public class TextureCTM<T extends TextureTypeCTM> extends AbstractTexture<T> {
-	private static final BlockStatePredicateParser PREDICATE_PARSER = new BlockStatePredicateParser();
-
 	private final Optional<Boolean> connectInside;
 	private final boolean ignoreStates;
 	private final boolean untransform;
@@ -48,7 +46,7 @@ public class TextureCTM<T extends TextureTypeCTM> extends AbstractTexture<T> {
 		this.ignoreStates = info.getInfo().map(obj -> JsonHelper.getBoolean(obj, "ignore_states", false)).orElse(false);
 		this.untransform = info.getInfo().map(obj -> JsonHelper.getBoolean(obj, "untransform", false)).orElse(false);
 
-		this.connectionChecks = info.getInfo().map(obj -> PREDICATE_PARSER.parse(obj.get("connect_to"))).orElse(null);
+		this.connectionChecks = info.getInfo().map(obj -> BlockStatePredicateParser.INSTANCE.parse(obj.get("connect_to"))).orElse(null);
 	}
 
 	@Override
@@ -103,11 +101,11 @@ public class TextureCTM<T extends TextureTypeCTM> extends AbstractTexture<T> {
 	}
 
 	public Optional<Boolean> connectInside() {
-		return this.connectInside;
+		return connectInside;
 	}
 
 	public boolean ignoreStates() {
-		return this.ignoreStates;
+		return ignoreStates;
 	}
 
 	public boolean connectTo(CTMLogic logic, BlockState from, BlockState to, Direction dir) {

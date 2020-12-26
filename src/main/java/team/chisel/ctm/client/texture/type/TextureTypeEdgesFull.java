@@ -1,7 +1,7 @@
 package team.chisel.ctm.client.texture.type;
 
-import team.chisel.ctm.api.texture.CTMTexture;
-import team.chisel.ctm.api.util.TextureInfo;
+import team.chisel.ctm.api.client.CTMTexture;
+import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.texture.TextureEdgesFull;
 
 public class TextureTypeEdgesFull extends TextureTypeEdges {

@@ -3,7 +3,6 @@ package team.chisel.ctm.client.render;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.texture.Sprite;
 
-import team.chisel.ctm.api.texture.Submap;
 import team.chisel.ctm.client.mixin.BakedQuadAccessor;
 
 public class SpriteUnbakedQuad extends UnbakedQuad {

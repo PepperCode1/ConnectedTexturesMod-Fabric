@@ -5,15 +5,15 @@ import org.jetbrains.annotations.NotNull;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 
-import team.chisel.ctm.api.texture.OffsetProviderRegistry;
-import team.chisel.ctm.api.texture.TextureContext;
+import team.chisel.ctm.api.client.OffsetProviderRegistry;
+import team.chisel.ctm.api.client.TextureContext;
 
 public class TextureContextPosition implements TextureContext {
 	@NotNull
-	protected BlockPos position;
+	protected BlockPos pos;
 
 	public TextureContextPosition(@NotNull BlockPos pos) {
-		this.position = pos;
+		this.pos = pos;
 	}
 
 	public TextureContextPosition(int x, int y, int z) {
@@ -22,12 +22,13 @@ public class TextureContextPosition implements TextureContext {
 
 	@SuppressWarnings("resource")
 	public TextureContextPosition applyOffset() {
-		this.position = position.add(OffsetProviderRegistry.INSTANCE.getOffset(MinecraftClient.getInstance().world, position));
+		pos = pos.add(OffsetProviderRegistry.INSTANCE.getOffset(MinecraftClient.getInstance().world, pos));
 		return this;
 	}
 
-	public @NotNull BlockPos getPosition() {
-		return position;
+	@NotNull
+	public BlockPos getPosition() {
+		return pos;
 	}
 
 	@Override

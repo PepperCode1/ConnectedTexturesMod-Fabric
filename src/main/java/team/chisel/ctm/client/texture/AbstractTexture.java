@@ -20,10 +20,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 
-import team.chisel.ctm.api.texture.CTMTexture;
-import team.chisel.ctm.api.texture.TextureType;
-import team.chisel.ctm.api.util.NonnullType;
-import team.chisel.ctm.api.util.TextureInfo;
+import team.chisel.ctm.api.client.CTMTexture;
+import team.chisel.ctm.api.client.TextureInfo;
+import team.chisel.ctm.api.client.TextureType;
+import team.chisel.ctm.api.client.util.NotNullType;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 
 /**
@@ -35,7 +35,7 @@ public abstract class AbstractTexture<T extends TextureType> implements CTMTextu
 
 	protected T type;
 	protected BlendMode blendMode;
-	@NonnullType
+	@NotNullType
 	protected Sprite[] sprites;
 	protected boolean hasLight;
 	protected int skyLight;
@@ -79,11 +79,11 @@ public abstract class AbstractTexture<T extends TextureType> implements CTMTextu
 	}
 
 	public T getType() {
-		return this.type;
+		return type;
 	}
 
 	public BlendMode getBlendMode() {
-		return this.blendMode;
+		return blendMode;
 	}
 
 	protected SpriteUnbakedQuad unbake(BakedQuad bakedQuad, Direction cullFace) {

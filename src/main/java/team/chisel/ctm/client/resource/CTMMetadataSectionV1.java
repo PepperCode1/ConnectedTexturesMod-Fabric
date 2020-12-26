@@ -1,5 +1,8 @@
 package team.chisel.ctm.client.resource;
 
+import java.util.Arrays;
+import java.util.Locale;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -7,29 +10,30 @@ import com.google.gson.JsonParseException;
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
 
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 
-import team.chisel.ctm.api.texture.CTMMetadataSection;
-import team.chisel.ctm.api.texture.TextureType;
-import team.chisel.ctm.api.texture.TextureTypeRegistry;
+import team.chisel.ctm.api.client.TextureType;
+import team.chisel.ctm.api.client.TextureTypeRegistry;
+import team.chisel.ctm.client.texture.type.TextureTypeNormal;
 
 public class CTMMetadataSectionV1 implements CTMMetadataSection {
-	private TextureType type = TextureTypeRegistry.INSTANCE.getType("NORMAL");
+	private TextureType type = TextureTypeNormal.INSTANCE;
 	private BlendMode blendMode;
-	private String proxy;
+	private Identifier proxy;
 	private Identifier[] additionalTextures = new Identifier[0];
 	private JsonObject extraData = new JsonObject();
-
-	@Override
-	public int getVersion() {
-		return 1;
-	}
 
 	public static CTMMetadataSection fromJson(JsonObject jsonObject) throws JsonParseException {
 		CTMMetadataSectionV1 metadata = new CTMMetadataSectionV1();
 		if (jsonObject.has("proxy")) {
 			JsonElement proxyElement = jsonObject.get("proxy");
 			if (proxyElement.isJsonPrimitive() && proxyElement.getAsJsonPrimitive().isString()) {
-				metadata.proxy = proxyElement.getAsString();
+				String proxyString = proxyElement.getAsString();
+				try {
+					metadata.proxy = new Identifier(proxyString);
+				} catch (InvalidIdentifierException e) {
+					throw new JsonParseException("Invalid proxy identifier provided: " + proxyString);
+				}
 			}
 			if (jsonObject.entrySet().stream().filter(e -> e.getKey().equals("ctm_version")).count() > 1) {
 				throw new JsonParseException("Cannot define other fields when using proxy");
@@ -40,7 +44,7 @@ public class CTMMetadataSectionV1 implements CTMMetadataSection {
 			if (typeElement.isJsonPrimitive() && typeElement.getAsJsonPrimitive().isString()) {
 				TextureType type = TextureTypeRegistry.INSTANCE.getType(typeElement.getAsString());
 				if (type == null) {
-					throw new JsonParseException("Invalid render type given: " + typeElement);
+					throw new JsonParseException("Invalid texture type provided: " + typeElement);
 				} else {
 					metadata.type = type;
 				}
@@ -50,9 +54,9 @@ public class CTMMetadataSectionV1 implements CTMMetadataSection {
 			JsonElement layerElement = jsonObject.get("layer");
 			if (layerElement.isJsonPrimitive() && layerElement.getAsJsonPrimitive().isString()) {
 				try {
-					metadata.blendMode = BlendMode.valueOf(layerElement.getAsString());
+					metadata.blendMode = BlendMode.valueOf(layerElement.getAsString().toUpperCase(Locale.ROOT));
 				} catch (IllegalArgumentException e) {
-					throw new JsonParseException("Invalid block layer given: " + layerElement);
+					throw new JsonParseException("Invalid render layer provided: " + layerElement);
 				}
 			}
 		}
@@ -76,32 +80,37 @@ public class CTMMetadataSectionV1 implements CTMMetadataSection {
 	}
 
 	@Override
+	public int getVersion() {
+		return 1;
+	}
+
+	@Override
 	public TextureType getType() {
-		return this.type;
+		return type;
 	}
 
 	@Override
 	public BlendMode getBlendMode() {
-		return this.blendMode;
+		return blendMode;
 	}
 
 	@Override
-	public String getProxy() {
-		return this.proxy;
+	public Identifier getProxy() {
+		return proxy;
 	}
 
 	@Override
 	public Identifier[] getAdditionalTextures() {
-		return this.additionalTextures;
+		return additionalTextures;
 	}
 
 	@Override
 	public JsonObject getExtraData() {
-		return this.extraData;
+		return extraData;
 	}
 
 	@Override
 	public String toString() {
-		return "CTMMetadataSectionV1(type=" + this.getType() + ", blendMode=" + this.getBlendMode() + ", proxy=" + this.getProxy() + ", additionalTextures=" + java.util.Arrays.deepToString(this.getAdditionalTextures()) + ", extraData=" + this.getExtraData() + ")";
+		return "CTMMetadataSectionV1(type=" + getType() + ", blendMode=" + getBlendMode() + ", proxy=" + getProxy() + ", additionalTextures=" + Arrays.deepToString(getAdditionalTextures()) + ", extraData=" + getExtraData() + ")";
 	}
 }

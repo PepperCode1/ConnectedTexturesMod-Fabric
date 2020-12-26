@@ -13,12 +13,11 @@ import net.minecraft.client.texture.Sprite;
 import net.minecraft.resource.Resource;
 import net.minecraft.util.Identifier;
 
-import team.chisel.ctm.api.texture.CTMMetadataSection;
 import team.chisel.ctm.client.resource.CTMMetadataReader;
+import team.chisel.ctm.client.resource.CTMMetadataSection;
 
 public class ResourceUtil {
 	private static final Map<Identifier, CTMMetadataSection> METADATA_CACHE = new HashMap<>();
-	private static final CTMMetadataReader READER = new CTMMetadataReader();
 
 	public static Resource getResource(Sprite sprite) throws IOException {
 		return getResource(spriteToAbsolute(sprite.getId()));
@@ -54,7 +53,7 @@ public class ResourceUtil {
 		}
 		CTMMetadataSection metadata;
 		try (Resource resource = getResource(identifier)) {
-			metadata = resource.getMetadata(READER);
+			metadata = resource.getMetadata(CTMMetadataReader.INSTANCE);
 		} catch (FileNotFoundException e) {
 			metadata = null;
 		} catch (JsonParseException e) {

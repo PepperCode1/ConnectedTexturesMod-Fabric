@@ -1,4 +1,4 @@
-package team.chisel.ctm.api.util;
+package team.chisel.ctm.api.client.util;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -12,5 +12,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.TYPE_PARAMETER, ElementType.TYPE_USE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface NonnullType {
+public @interface NotNullType {
 }

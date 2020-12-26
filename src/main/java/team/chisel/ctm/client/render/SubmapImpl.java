@@ -2,8 +2,6 @@ package team.chisel.ctm.client.render;
 
 import net.minecraft.client.texture.Sprite;
 
-import team.chisel.ctm.api.texture.Submap;
-
 public class SubmapImpl implements Submap {
 	private static final float DIV3 = 16 / 3.0F;
 	private static final float FACTOR = 16.0F;
@@ -40,19 +38,19 @@ public class SubmapImpl implements Submap {
 	}
 
 	public float getWidth() {
-		return this.width;
+		return width;
 	}
 
 	public float getHeight() {
-		return this.height;
+		return height;
 	}
 
 	public float getXOffset() {
-		return this.xOffset;
+		return xOffset;
 	}
 
 	public float getYOffset() {
-		return this.yOffset;
+		return yOffset;
 	}
 
 	@Override

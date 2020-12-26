@@ -2,8 +2,8 @@ package team.chisel.ctm.client.texture.type;
 
 import net.minecraft.util.math.Direction;
 
-import team.chisel.ctm.api.texture.CTMTexture;
-import team.chisel.ctm.api.util.TextureInfo;
+import team.chisel.ctm.api.client.CTMTexture;
+import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.texture.TexturePlane;
 
 public class TextureTypePlane extends TextureTypeCTM {
@@ -32,6 +32,6 @@ public class TextureTypePlane extends TextureTypeCTM {
 	}
 
 	public Direction.Type getPlane() {
-		return this.plane;
+		return plane;
 	}
 }

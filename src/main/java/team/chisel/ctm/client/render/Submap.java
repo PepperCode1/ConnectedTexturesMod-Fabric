@@ -1,4 +1,4 @@
-package team.chisel.ctm.api.texture;
+package team.chisel.ctm.client.render;
 
 import net.minecraft.client.texture.Sprite;
 

@@ -19,11 +19,9 @@ import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.math.Direction;
 
-import team.chisel.ctm.api.model.CTMUnbakedModel;
-import team.chisel.ctm.api.texture.CTMTexture;
-import team.chisel.ctm.api.texture.Renderable;
-import team.chisel.ctm.api.texture.TextureContext;
-import team.chisel.ctm.api.util.TextureContextList;
+import team.chisel.ctm.api.client.CTMTexture;
+import team.chisel.ctm.api.client.Renderable;
+import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.client.mixin.BakedQuadAccessor;
 import team.chisel.ctm.client.render.BakedQuadUtil;
 
@@ -52,13 +50,13 @@ public class CTMBakedModel extends AbstractCTMBakedModel {
 			// Gather all quads and map them to their textures
 			// All quads should have an associated ICTMTexture, so ignore any that do not
 			for (BakedQuad bakedQuad : parentQuads) {
-				CTMTexture<?> texture = this.getOverrideTexture(random, bakedQuad.getColorIndex(), ((BakedQuadAccessor) bakedQuad).getSprite().getId());
+				CTMTexture<?> texture = getOverrideTexture(random, bakedQuad.getColorIndex(), ((BakedQuadAccessor) bakedQuad).getSprite().getId());
 				if (texture == null) {
-					texture = this.getTexture(random, ((BakedQuadAccessor) bakedQuad).getSprite().getId());
+					texture = getTexture(random, ((BakedQuadAccessor) bakedQuad).getSprite().getId());
 				}
 
 				if (texture != null) {
-					Sprite spriteReplacement = this.getOverrideSprite(random, bakedQuad.getColorIndex());
+					Sprite spriteReplacement = getOverrideSprite(random, bakedQuad.getColorIndex());
 					if (spriteReplacement != null) {
 						bakedQuad = BakedQuadUtil.retextureQuad(bakedQuad, spriteReplacement);
 					}

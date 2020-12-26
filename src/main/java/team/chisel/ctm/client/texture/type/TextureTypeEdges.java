@@ -7,8 +7,8 @@ import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
 
-import team.chisel.ctm.api.texture.CTMTexture;
-import team.chisel.ctm.api.util.TextureInfo;
+import team.chisel.ctm.api.client.CTMTexture;
+import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.render.CTMLogic;
 import team.chisel.ctm.client.texture.TextureEdges;
 import team.chisel.ctm.client.texture.context.TextureContextCTM;
@@ -48,7 +48,7 @@ public class TextureTypeEdges extends TextureTypeCTM {
 		}
 
 		public boolean isObscured() {
-			return this.obscured;
+			return obscured;
 		}
 
 		@Override

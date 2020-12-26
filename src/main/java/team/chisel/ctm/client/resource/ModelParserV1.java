@@ -17,8 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
 
-import team.chisel.ctm.api.model.CTMUnbakedModel;
-import team.chisel.ctm.api.model.ModelParser;
+import team.chisel.ctm.client.model.CTMUnbakedModel;
 import team.chisel.ctm.client.model.CTMUnbakedModelImpl;
 
 public class ModelParserV1 implements ModelParser {

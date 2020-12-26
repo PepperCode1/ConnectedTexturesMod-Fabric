@@ -1,6 +1,6 @@
-package team.chisel.ctm.api.texture;
+package team.chisel.ctm.api.client;
 
-import team.chisel.ctm.client.impl.TextureTypeRegistryImpl;
+import team.chisel.ctm.impl.client.TextureTypeRegistryImpl;
 
 /**
  * Registry for {@link TextureType}. Use {@link TextureTypeRegistry#INSTANCE} to obtain an instance of this class.

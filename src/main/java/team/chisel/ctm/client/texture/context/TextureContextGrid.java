@@ -1,6 +1,7 @@
 package team.chisel.ctm.client.texture.context;
 
 import java.util.EnumMap;
+import java.util.Random;
 
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +27,7 @@ public abstract class TextureContextGrid extends TextureContextPosition {
 		}
 		long serialized = 0;
 		for (@NotNull Direction side : Direction.values()) {
-			BlockPos modifiedPosition = position.add(FaceOffset.getBlockPosOffsetFromFaceOffset(side, texture.getXOffset(), texture.getYOffset()));
+			BlockPos modifiedPosition = this.pos.add(FaceOffset.getBlockPosOffsetFromFaceOffset(side, texture.getXOffset(), texture.getYOffset()));
 			Point2i coords = calculateTextureCoord(modifiedPosition, texture.getXSize(), texture.getYSize(), side);
 			textureCoords.put(side, coords);
 			// Calculate a unique index for a submap (x + (y * x-size)), then shift it left by the max bit storage (10 bits = 1024 unique indices)
@@ -56,11 +57,11 @@ public abstract class TextureContextGrid extends TextureContextPosition {
 		}
 
 		public int getX() {
-			return this.x;
+			return x;
 		}
 
 		public int getY() {
-			return this.y;
+			return y;
 		}
 
 		@Override
@@ -68,8 +69,8 @@ public abstract class TextureContextGrid extends TextureContextPosition {
 			if (o == this) return true;
 			if (!(o instanceof TextureContextGrid.Point2i)) return false;
 			final TextureContextGrid.Point2i other = (TextureContextGrid.Point2i) o;
-			if (this.getX() != other.getX()) return false;
-			if (this.getY() != other.getY()) return false;
+			if (getX() != other.getX()) return false;
+			if (getY() != other.getY()) return false;
 			return true;
 		}
 
@@ -77,19 +78,19 @@ public abstract class TextureContextGrid extends TextureContextPosition {
 		public int hashCode() {
 			final int PRIME = 59;
 			int result = 1;
-			result = result * PRIME + this.getX();
-			result = result * PRIME + this.getY();
+			result = result * PRIME + getX();
+			result = result * PRIME + getY();
 			return result;
 		}
 
 		@Override
 		public String toString() {
-			return "TextureContextGrid.Point2i(x=" + this.getX() + ", y=" + this.getY() + ")";
+			return "TextureContextGrid.Point2i(x=" + getX() + ", y=" + getY() + ")";
 		}
 	}
 
-	public static class Patterned extends TextureContextGrid {
-		public Patterned(BlockPos pos, TextureMap texture, boolean applyOffset) {
+	public static class TextureContextPatterned extends TextureContextGrid {
+		public TextureContextPatterned(BlockPos pos, TextureMap texture, boolean applyOffset) {
 			super(pos, texture, applyOffset);
 		}
 
@@ -130,10 +131,10 @@ public abstract class TextureContextGrid extends TextureContextPosition {
 		}
 	}
 
-	public static class Random extends TextureContextGrid {
-		private static final java.util.Random RANDOM = new java.util.Random();
+	public static class TextureContextRandom extends TextureContextGrid {
+		private static final Random RANDOM = new Random();
 
-		public Random(BlockPos pos, TextureMap texture, boolean applyOffset) {
+		public TextureContextRandom(BlockPos pos, TextureMap texture, boolean applyOffset) {
 			super(pos, texture, applyOffset);
 		}
 

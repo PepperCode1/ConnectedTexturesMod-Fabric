@@ -4,13 +4,13 @@ import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.math.Direction;
 
-import team.chisel.ctm.api.texture.Renderable;
-import team.chisel.ctm.api.texture.Submap;
-import team.chisel.ctm.api.texture.TextureContext;
-import team.chisel.ctm.api.util.TextureInfo;
+import team.chisel.ctm.api.client.Renderable;
+import team.chisel.ctm.api.client.TextureContext;
+import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.render.RenderableArray;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
+import team.chisel.ctm.client.render.Submap;
 import team.chisel.ctm.client.render.SubmapImpl;
 import team.chisel.ctm.client.texture.context.TextureContextCTM;
 import team.chisel.ctm.client.texture.type.TextureTypeEdges;

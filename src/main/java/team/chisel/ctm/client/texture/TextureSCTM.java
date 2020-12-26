@@ -5,9 +5,9 @@ import java.util.Optional;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.Direction;
 
-import team.chisel.ctm.api.texture.Renderable;
-import team.chisel.ctm.api.texture.TextureContext;
-import team.chisel.ctm.api.util.TextureInfo;
+import team.chisel.ctm.api.client.Renderable;
+import team.chisel.ctm.api.client.TextureContext;
+import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.render.CTMLogic;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;

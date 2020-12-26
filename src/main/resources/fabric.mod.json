@@ -14,7 +14,7 @@
     "sources": "https://github.com/PepperCode1/ConnectedTexturesMod-Fabric"
   },
 
-  "license": "GPLv2",
+  "license": "GPL-2.0-only",
   "icon": "assets/ctm/icon.png",
 
   "environment": "client",

@@ -6,17 +6,17 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 
-import team.chisel.ctm.api.texture.CTMTexture;
-import team.chisel.ctm.api.texture.TextureContext;
-import team.chisel.ctm.api.texture.TextureType;
-import team.chisel.ctm.api.util.TextureInfo;
+import team.chisel.ctm.api.client.CTMTexture;
+import team.chisel.ctm.api.client.TextureContext;
+import team.chisel.ctm.api.client.TextureInfo;
+import team.chisel.ctm.api.client.TextureType;
 import team.chisel.ctm.client.texture.TextureMap;
 import team.chisel.ctm.client.texture.TextureMap.MapType;
 import team.chisel.ctm.client.texture.context.TextureContextPosition;
 
 public class TextureTypeMap implements TextureType {
-	public static final TextureTypeMap R = new TextureTypeMap(MapType.RANDOM);
-	public static final TextureTypeMap V = new TextureTypeMap(MapType.PATTERNED);
+	public static final TextureTypeMap RANDOM = new TextureTypeMap(MapType.RANDOM);
+	public static final TextureTypeMap PATTERN = new TextureTypeMap(MapType.PATTERNED);
 
 	private final MapType type;
 
@@ -39,7 +39,7 @@ public class TextureTypeMap implements TextureType {
 		return new TextureContextPosition(BlockPos.fromLong(data));
 	}
 
-	public MapType getMapType() {
-		return this.type;
+	public MapType getType() {
+		return type;
 	}
 }

@@ -1,4 +1,4 @@
-package team.chisel.ctm.api.texture;
+package team.chisel.ctm.api.client;
 
 /**
  * The context passed when a CTMTexture transforms a quad.

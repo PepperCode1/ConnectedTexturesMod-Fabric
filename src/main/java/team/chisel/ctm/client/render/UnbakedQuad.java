@@ -9,8 +9,7 @@ import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 
-import team.chisel.ctm.api.texture.Renderable;
-import team.chisel.ctm.api.texture.Submap;
+import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.client.util.BitUtil;
 
 /**

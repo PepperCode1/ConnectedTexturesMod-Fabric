@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 
-import team.chisel.ctm.api.texture.TextureContext;
+import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.client.render.CTMLogic;
 import team.chisel.ctm.client.texture.TextureCTM;
 
@@ -25,7 +25,7 @@ public class TextureContextCTM implements TextureContext {
 			CTMLogic logic = createCTM(state);
 			logic.createSubmapIndices(world, pos, face);
 			logicMap.put(face, logic);
-			this.data |= logic.serialized() << (face.ordinal() * 10);
+			data |= logic.serialized() << (face.ordinal() * 10);
 		}
 	}
 
@@ -43,6 +43,6 @@ public class TextureContextCTM implements TextureContext {
 
 	@Override
 	public long getCompressedData() {
-		return this.data;
+		return data;
 	}
 }

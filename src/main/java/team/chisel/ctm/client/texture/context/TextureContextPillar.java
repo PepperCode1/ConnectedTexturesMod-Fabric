@@ -27,7 +27,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 
-import team.chisel.ctm.api.texture.TextureContext;
+import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.client.util.ConnectionLocation;
 
 public class TextureContextPillar implements TextureContext {
@@ -54,11 +54,11 @@ public class TextureContextPillar implements TextureContext {
 
 	@Override
 	public long getCompressedData() {
-		return this.compressedData;
+		return compressedData;
 	}
 
 	public ConnectionData getData() {
-		return this.data;
+		return data;
 	}
 
 	public static class Connections {
@@ -69,7 +69,7 @@ public class TextureContextPillar implements TextureContext {
 		}
 
 		public EnumSet<Direction> getConnections() {
-			return this.connections;
+			return connections;
 		}
 
 		public boolean connected(Direction facing) {
@@ -135,7 +135,7 @@ public class TextureContextPillar implements TextureContext {
 
 		@Override
 		public String toString() {
-			return "TextureContextPillar.Connections(connections=" + this.getConnections() + ")";
+			return "TextureContextPillar.Connections(connections=" + getConnections() + ")";
 		}
 	}
 
@@ -164,11 +164,11 @@ public class TextureContextPillar implements TextureContext {
 
 		@Override
 		public String toString() {
-			return "TextureContextPillar.ConnectionData(connections=" + this.getConnections() + ", connectionConnections=" + this.connectionsMap + ")";
+			return "TextureContextPillar.ConnectionData(connections=" + getConnections() + ", connectionConnections=" + connectionsMap + ")";
 		}
 
 		public Connections getConnections() {
-			return this.connections;
+			return connections;
 		}
 	}
 }

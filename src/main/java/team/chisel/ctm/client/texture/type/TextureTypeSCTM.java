@@ -6,8 +6,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 
-import team.chisel.ctm.api.texture.CTMTexture;
-import team.chisel.ctm.api.util.TextureInfo;
+import team.chisel.ctm.api.client.CTMTexture;
+import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.render.CTMLogic;
 import team.chisel.ctm.client.texture.TextureCTM;
 import team.chisel.ctm.client.texture.TextureSCTM;

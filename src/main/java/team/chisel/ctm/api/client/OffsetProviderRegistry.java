@@ -1,10 +1,10 @@
-package team.chisel.ctm.api.texture;
+package team.chisel.ctm.api.client;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
-import team.chisel.ctm.client.impl.OffsetProviderRegistryImpl;
+import team.chisel.ctm.impl.client.OffsetProviderRegistryImpl;
 
 /**
  * Registry for {@link OffsetProvider}. Use {@link OffsetProvider#INSTANCE} to obtain an instance of this class.

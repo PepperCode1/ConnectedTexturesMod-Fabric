@@ -8,8 +8,8 @@ import java.util.Set;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.util.Identifier;
 
-import team.chisel.ctm.api.texture.CTMMetadataSection;
 import team.chisel.ctm.client.event.AtlasStitchCallback;
+import team.chisel.ctm.client.resource.CTMMetadataSection;
 import team.chisel.ctm.client.util.ResourceUtil;
 
 public class CTMAtlasStitchCallbackHandler implements AtlasStitchCallback {
@@ -31,7 +31,7 @@ public class CTMAtlasStitchCallbackHandler implements AtlasStitchCallback {
 				if (metadata != null) {
 					// Load proxy data
 					if (metadata.getProxy() != null) {
-						Identifier proxy = new Identifier(metadata.getProxy());
+						Identifier proxy = metadata.getProxy();
 						CTMMetadataSection proxyMetadata = ResourceUtil.getMetadata(ResourceUtil.spriteToAbsolute(proxy));
 						// Load proxy's base sprite
 						newSprites.add(proxy);

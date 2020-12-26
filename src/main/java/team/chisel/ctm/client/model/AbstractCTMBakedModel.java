@@ -35,9 +35,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockRenderView;
 
-import team.chisel.ctm.api.model.CTMUnbakedModel;
-import team.chisel.ctm.api.texture.CTMTexture;
-import team.chisel.ctm.api.util.TextureContextList;
+import team.chisel.ctm.api.client.CTMTexture;
 import team.chisel.ctm.client.mixinterface.WeightedBakedModelExtension;
 import team.chisel.ctm.client.util.ProfileUtil;
 
@@ -68,12 +66,12 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 
 	@NotNull
 	public CTMUnbakedModel getUnbakedModel() {
-		return this.unbakedModel;
+		return unbakedModel;
 	}
 
 	@NotNull
 	public BakedModel getParent() {
-		return this.parent;
+		return parent;
 	}
 
 	@Override
@@ -289,22 +287,22 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 
 		@NotNull
 		public BlockState getCleanState() {
-			return this.cleanState;
+			return cleanState;
 		}
 
 		@Nullable
 		public Object2LongMap<CTMTexture<?>> getSerializedContext() {
-			return this.serializedContext;
+			return serializedContext;
 		}
 
 		@NotNull
 		public BakedModel getParent() {
-			return this.parent;
+			return parent;
 		}
 
 		@Override
 		public String toString() {
-			return "AbstractCTMBakedModel.State(cleanState=" + this.getCleanState() + ", serializedContext=" + this.getSerializedContext() + ", parent=" + this.getParent() + ")";
+			return "AbstractCTMBakedModel.State(cleanState=" + getCleanState() + ", serializedContext=" + getSerializedContext() + ", parent=" + getParent() + ")";
 		}
 	}
 }

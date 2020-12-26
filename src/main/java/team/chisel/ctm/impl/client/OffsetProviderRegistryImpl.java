@@ -1,4 +1,4 @@
-package team.chisel.ctm.client.impl;
+package team.chisel.ctm.impl.client;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,15 +7,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
-import team.chisel.ctm.api.texture.OffsetProvider;
-import team.chisel.ctm.api.texture.OffsetProviderRegistry;
+import team.chisel.ctm.api.client.OffsetProvider;
+import team.chisel.ctm.api.client.OffsetProviderRegistry;
 
 public class OffsetProviderRegistryImpl implements OffsetProviderRegistry {
 	private List<OffsetProvider> providers = new ArrayList<>();
 
 	@Override
 	public void register(OffsetProvider provider) {
-		this.providers.add(provider);
+		providers.add(provider);
 	}
 
 	@Override

@@ -4,10 +4,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 
-import team.chisel.ctm.api.texture.CTMTexture;
-import team.chisel.ctm.api.texture.TextureContext;
-import team.chisel.ctm.api.texture.TextureType;
-import team.chisel.ctm.api.util.TextureInfo;
+import team.chisel.ctm.api.client.CTMTexture;
+import team.chisel.ctm.api.client.TextureContext;
+import team.chisel.ctm.api.client.TextureInfo;
+import team.chisel.ctm.api.client.TextureType;
 import team.chisel.ctm.client.texture.TexturePillar;
 import team.chisel.ctm.client.texture.context.TextureContextPillar;
 

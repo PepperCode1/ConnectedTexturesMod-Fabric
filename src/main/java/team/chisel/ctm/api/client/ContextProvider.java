@@ -1,4 +1,4 @@
-package team.chisel.ctm.api.texture;
+package team.chisel.ctm.api.client;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;

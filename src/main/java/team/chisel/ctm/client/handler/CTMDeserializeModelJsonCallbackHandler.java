@@ -10,15 +10,16 @@ import com.google.gson.JsonObject;
 
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
 
-import team.chisel.ctm.api.model.CTMUnbakedModel;
-import team.chisel.ctm.api.model.ModelParser;
+import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.event.DeserializeModelJsonCallback;
+import team.chisel.ctm.client.model.CTMUnbakedModel;
+import team.chisel.ctm.client.resource.ModelParser;
 import team.chisel.ctm.client.resource.ModelParserV1;
 
 public class CTMDeserializeModelJsonCallbackHandler implements DeserializeModelJsonCallback {
-	private static final Map<Integer, ModelParser> PARSERS = ImmutableMap.of(
-			1, new ModelParserV1()
-	);
+	private static final Map<Integer, ModelParser> PARSERS = new ImmutableMap.Builder<Integer, ModelParser>()
+			.put(1, new ModelParserV1())
+			.build();
 
 	private WrappingCache wrappingCache;
 
@@ -33,10 +34,11 @@ public class CTMDeserializeModelJsonCallbackHandler implements DeserializeModelJ
 			if (jsonObject.has("ctm_version")) {
 				ModelParser parser = PARSERS.get(jsonObject.get("ctm_version").getAsInt());
 				if (parser == null) {
-					throw new IllegalArgumentException("Invalid \"ctm_version\" in model " + jsonObject);
+					CTMClient.LOGGER.error("Invalid \"ctm_version\" in model: " + jsonElement);
+				} else {
+					CTMUnbakedModel model = parser.parse(jsonModel, jsonObject, type, context);
+					wrappingCache.jsonModelsToWrap.put(jsonModel, model);
 				}
-				CTMUnbakedModel model = parser.parse(jsonModel, jsonObject, type, context);
-				wrappingCache.jsonModelsToWrap.put(jsonModel, model);
 			}
 		}
 	}

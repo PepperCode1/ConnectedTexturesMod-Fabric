@@ -6,8 +6,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 
-import team.chisel.ctm.api.util.TextureContextList;
-
 public class CTMRenderContext {
 	private final BlockView world;
 	private final BlockPos pos;
@@ -31,10 +29,10 @@ public class CTMRenderContext {
 	}
 
 	public BlockView getWorld() {
-		return this.world;
+		return world;
 	}
 
 	public BlockPos getPos() {
-		return this.pos;
+		return pos;
 	}
 }

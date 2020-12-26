@@ -1,4 +1,4 @@
-package team.chisel.ctm.api.model;
+package team.chisel.ctm.client.model;
 
 import java.util.Collection;
 
@@ -8,7 +8,7 @@ import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.Identifier;
 
-import team.chisel.ctm.api.texture.CTMTexture;
+import team.chisel.ctm.api.client.CTMTexture;
 
 public interface CTMUnbakedModel extends UnbakedModel {
 	Collection<CTMTexture<?>> getCTMTextures();

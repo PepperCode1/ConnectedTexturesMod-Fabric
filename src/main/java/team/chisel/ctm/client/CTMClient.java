@@ -8,8 +8,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import team.chisel.ctm.api.texture.TextureType;
-import team.chisel.ctm.api.texture.TextureTypeRegistry;
+import team.chisel.ctm.api.client.TextureType;
+import team.chisel.ctm.api.client.TextureTypeRegistry;
 import team.chisel.ctm.client.event.AtlasStitchCallback;
 import team.chisel.ctm.client.event.DeserializeModelJsonCallback;
 import team.chisel.ctm.client.event.ModelsAddedCallback;
@@ -67,10 +67,10 @@ public class CTMClient implements ClientModInitializer {
 		TextureTypeRegistry.INSTANCE.register("edges", new TextureTypeEdges());
 		TextureTypeRegistry.INSTANCE.register("edges_full", new TextureTypeEdgesFull());
 		TextureTypeRegistry.INSTANCE.register("eldritch", new TextureTypeEldritch());
-		TextureTypeRegistry.INSTANCE.register("r", TextureTypeMap.R);
-		TextureTypeRegistry.INSTANCE.register("random", TextureTypeMap.R);
-		TextureTypeRegistry.INSTANCE.register("v", TextureTypeMap.V);
-		TextureTypeRegistry.INSTANCE.register("pattern", TextureTypeMap.V);
+		TextureTypeRegistry.INSTANCE.register("r", TextureTypeMap.RANDOM);
+		TextureTypeRegistry.INSTANCE.register("random", TextureTypeMap.RANDOM);
+		TextureTypeRegistry.INSTANCE.register("v", TextureTypeMap.PATTERN);
+		TextureTypeRegistry.INSTANCE.register("pattern", TextureTypeMap.PATTERN);
 		TextureTypeRegistry.INSTANCE.register("normal", TextureTypeNormal.INSTANCE);
 		type = new TextureTypePillar();
 		TextureTypeRegistry.INSTANCE.register("ctmv", type);
