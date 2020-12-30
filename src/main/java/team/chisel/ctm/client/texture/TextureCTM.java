@@ -1,52 +1,43 @@
 package team.chisel.ctm.client.texture;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiPredicate;
+import static team.chisel.ctm.client.util.connection.ConnectionDirection.BOTTOM;
+import static team.chisel.ctm.client.util.connection.ConnectionDirection.BOTTOM_LEFT;
+import static team.chisel.ctm.client.util.connection.ConnectionDirection.BOTTOM_RIGHT;
+import static team.chisel.ctm.client.util.connection.ConnectionDirection.LEFT;
+import static team.chisel.ctm.client.util.connection.ConnectionDirection.RIGHT;
+import static team.chisel.ctm.client.util.connection.ConnectionDirection.TOP;
+import static team.chisel.ctm.client.util.connection.ConnectionDirection.TOP_LEFT;
+import static team.chisel.ctm.client.util.connection.ConnectionDirection.TOP_RIGHT;
 
-import it.unimi.dsi.fastutil.objects.Object2ByteMap;
-import it.unimi.dsi.fastutil.objects.Object2ByteOpenCustomHashMap;
-import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.block.BlockState;
 import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.Direction;
 
 import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
-import team.chisel.ctm.client.render.CTMLogic;
-import team.chisel.ctm.client.render.CTMLogic.StateComparisonCallback;
 import team.chisel.ctm.client.render.RenderableArray;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 import team.chisel.ctm.client.render.Submap;
 import team.chisel.ctm.client.render.SubmapImpl;
-import team.chisel.ctm.client.resource.BlockStatePredicateParser;
-import team.chisel.ctm.client.texture.context.TextureContextCTM;
+import team.chisel.ctm.client.texture.context.TextureContextConnecting;
 import team.chisel.ctm.client.texture.type.TextureTypeCTM;
-import team.chisel.ctm.client.util.IdentityStrategy;
-import team.chisel.ctm.client.util.ParseUtil;
+import team.chisel.ctm.client.util.connection.ConnectionDirection;
+import team.chisel.ctm.client.util.connection.ConnectionLogic;
 
-public class TextureCTM<T extends TextureTypeCTM> extends AbstractTexture<T> {
-	private final Optional<Boolean> connectInside;
-	private final boolean ignoreStates;
-	private final boolean untransform;
+public class TextureCTM extends AbstractConnectingTexture<TextureTypeCTM> {
+	protected static final ConnectionDirection[][] DIRECTION_MAP = new ConnectionDirection[][] {
+		{BOTTOM, LEFT, BOTTOM_LEFT},
+		{BOTTOM, RIGHT, BOTTOM_RIGHT},
+		{TOP, RIGHT, TOP_RIGHT},
+		{TOP, LEFT, TOP_LEFT}
+	};
+	// Some hardcoded offset values for the different corner indeces.
+	protected static final int[] QUADRANT_SUBMAP_OFFSETS = {4, 5, 1, 0};
+	protected static final int[] DEFAULT_QUADRANT_SUBMAPS = {18, 19, 17, 16};
 
-	@Nullable
-	private final BiPredicate<Direction, BlockState> connectionChecks;
-	private final Map<CacheKey, Object2ByteMap<BlockState>> connectionCache = new HashMap<>();
-
-	public TextureCTM(T type, TextureInfo info) {
+	public TextureCTM(TextureTypeCTM type, TextureInfo info) {
 		super(type, info);
-
-		this.connectInside = info.getInfo().flatMap(obj -> ParseUtil.getBoolean(obj, "connect_inside"));
-		this.ignoreStates = info.getInfo().map(obj -> JsonHelper.getBoolean(obj, "ignore_states", false)).orElse(false);
-		this.untransform = info.getInfo().map(obj -> JsonHelper.getBoolean(obj, "untransform", false)).orElse(false);
-
-		this.connectionChecks = info.getInfo().map(obj -> BlockStatePredicateParser.INSTANCE.parse(obj.get("connect_to"))).orElse(null);
 	}
 
 	@Override
@@ -58,18 +49,23 @@ public class TextureCTM<T extends TextureTypeCTM> extends AbstractTexture<T> {
 			return quad;
 		}
 
-		int[] submapIndexes = ((TextureContextCTM) context).getLogic(bakedQuad.getFace()).getSubmapIndices();
+		int[] quadrantSubmapIds = getQuadrantSubmapIds(((TextureContextConnecting) context).getLogic(bakedQuad.getFace()));
 		SpriteUnbakedQuad[] quads = quad.toQuadrants();
 		for (int i = 0; i < quads.length; i++) {
 			if (quads[i] != null) {
 				int quadrant = (i + 3) % 4;
-				int submapIndex = submapIndexes[quadrant];
+				int quadrantSubmapId = quadrantSubmapIds[quadrant];
 
-				int id = submapIndex / 2;
-				id = id < 8 ? (((id < 4) ? 0 : 2) + (id % 2 == 0 ? 0 : 1)) : 4;
-				Submap submap = getSubmap(id, quad.getAbsoluteUVRotation());
+				int submapId = quadrantSubmapId / 2;
+				submapId = submapId < 8 ? (((submapId < 4) ? 0 : 2) + (submapId % 2 == 0 ? 0 : 1)) : 4;
+				Submap submap;
+				if (submapId == 4) {
+					submap = SubmapImpl.X1;
+				} else {
+					submap = SubmapImpl.getX2Submap(submapId, quad.getAbsoluteUVRotation());
+				}
 
-				quads[i].setUVBounds(sprites[submapIndex > 15 ? 0 : 1]);
+				quads[i].setUVBounds(sprites[quadrantSubmapId > 15 ? 0 : 1]);
 				quads[i].applySubmap(submap);
 			}
 		}
@@ -77,79 +73,37 @@ public class TextureCTM<T extends TextureTypeCTM> extends AbstractTexture<T> {
 		return new RenderableArray(quads);
 	}
 
-	@Override
-	protected SpriteUnbakedQuad unbake(BakedQuad bakedQuad, Direction cullFace) {
-		SpriteUnbakedQuad quad = super.unbake(bakedQuad, cullFace);
-		if (untransform) {
-			quad.untransformUVs();
+	protected int[] getQuadrantSubmapIds(ConnectionLogic logic) {
+		int[] submapIds = new int[4];
+		for (int quadrant = 0; quadrant < 4; quadrant++) {
+			submapIds[quadrant] = getQuadrantSubmapId(logic, quadrant);
 		}
-		return quad;
+		return submapIds;
 	}
 
-	protected Submap getSubmap(int id, int rotation) {
-		if (id == 4) {
-			return SubmapImpl.X1;
-		}
-		if (rotation % 2 == 1) {
-			if (id == 1) {
-				id = 2;
-			} else if (id == 2) {
-				id = 1;
+	protected int getQuadrantSubmapId(ConnectionLogic logic, int quadrant) {
+		ConnectionDirection[] directions = DIRECTION_MAP[quadrant];
+		if (logic.connectedOr(directions[0], directions[1])) {
+			if (logic.connectedAnd(directions)) {
+				// If all dirs are connected, we use the fully connected face,
+				// the base offset value.
+				return QUADRANT_SUBMAP_OFFSETS[quadrant];
+			} else {
+				// This is a bit magic-y, but basically the array is ordered so
+				// the first dir requires an offset of 2, and the second dir
+				// requires an offset of 8, plus the initial offset for the
+				// corner.
+				return QUADRANT_SUBMAP_OFFSETS[quadrant] + (logic.connected(directions[0]) ? 2 : 0) + (logic.connected(directions[1]) ? 8 : 0);
 			}
 		}
-		return SubmapImpl.X2[id / 2][id % 2];
+		return DEFAULT_QUADRANT_SUBMAPS[quadrant];
 	}
 
-	public Optional<Boolean> connectInside() {
-		return connectInside;
-	}
-
-	public boolean ignoreStates() {
-		return ignoreStates;
-	}
-
-	public boolean connectTo(CTMLogic logic, BlockState from, BlockState to, Direction dir) {
-		synchronized (connectionCache) {
-			Object2ByteMap<BlockState> sidecache = connectionCache.computeIfAbsent(new CacheKey(from, dir), k -> {
-				Object2ByteMap<BlockState> map = new Object2ByteOpenCustomHashMap<>(new IdentityStrategy<>());
-				map.defaultReturnValue((byte) -1);
-				return map;
-			});
-			byte cached = sidecache.getByte(to);
-			if (cached == -1) {
-				sidecache.put(to, cached = (byte) ((connectionChecks == null ? StateComparisonCallback.DEFAULT.connects(logic, from, to, dir) : connectionChecks.test(dir, to)) ? 1 : 0));
-			}
-			return cached == 1;
-		}
-	}
-
-	private static final class CacheKey {
-		private final BlockState from;
-		private final Direction dir;
-
-		CacheKey(final BlockState from, final Direction dir) {
-			this.from = from;
-			this.dir = dir;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + dir.hashCode();
-			result = prime * result + System.identityHashCode(from);
-			return result;
-		}
-
-		@Override
-		public boolean equals(@Nullable Object obj) {
-			if (this == obj) return true;
-			if (obj == null) return false;
-			if (getClass() != obj.getClass()) return false;
-			CacheKey other = (CacheKey) obj;
-			if (dir != other.dir) return false;
-			if (from != other.from) return false;
-			return true;
+	protected Submap getQuadrantSubmap(int id) {
+		if (id < 16) {
+			return SubmapImpl.X4[id / 4][id % 4];
+		} else {
+			return SubmapImpl.X2[(id-16) / 2][(id-16) % 2];
 		}
 	}
 }

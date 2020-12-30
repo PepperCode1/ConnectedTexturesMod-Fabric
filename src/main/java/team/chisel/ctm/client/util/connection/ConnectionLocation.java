@@ -1,4 +1,4 @@
-package team.chisel.ctm.client.util;
+package team.chisel.ctm.client.util.connection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -152,9 +152,9 @@ public enum ConnectionLocation {
 
 	public static List<ConnectionLocation> decode(long data) {
 		List<ConnectionLocation> list = new ArrayList<>();
-		for (ConnectionLocation loc : values()) {
-			if ((1 & (data >> loc.ordinal())) != 0) {
-				list.add(loc);
+		for (ConnectionLocation location : values()) {
+			if ((1 & (data >> location.ordinal())) != 0) {
+				list.add(location);
 			}
 		}
 		return list;

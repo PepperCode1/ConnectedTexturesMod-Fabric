@@ -7,13 +7,14 @@ import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
-import team.chisel.ctm.client.render.CTMLogic;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
-import team.chisel.ctm.client.texture.context.TextureContextCTM;
+import team.chisel.ctm.client.render.SubmapImpl;
+import team.chisel.ctm.client.texture.context.TextureContextConnecting;
 import team.chisel.ctm.client.texture.type.TextureTypePlane;
-import team.chisel.ctm.client.util.ConnectionDirection;
+import team.chisel.ctm.client.util.connection.ConnectionDirection;
+import team.chisel.ctm.client.util.connection.ConnectionLogic;
 
-public class TexturePlane extends TextureCTM<TextureTypePlane> {
+public class TexturePlane extends AbstractConnectingTexture<TextureTypePlane> {
 	private final Direction.Type plane;
 
 	public TexturePlane(TextureTypePlane type, TextureInfo info) {
@@ -26,16 +27,16 @@ public class TexturePlane extends TextureCTM<TextureTypePlane> {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 
 		int submapId = 0;
-		if (!CTMClient.getConfigManager().getConfig().disableCTM && context instanceof TextureContextCTM) {
-			submapId = getSubmapId(((TextureContextCTM) context).getLogic(bakedQuad.getFace()));
+		if (!CTMClient.getConfigManager().getConfig().disableCTM && context instanceof TextureContextConnecting) {
+			submapId = getSubmapId(((TextureContextConnecting) context).getLogic(bakedQuad.getFace()));
 		}
 
 		quad.setUVBounds(sprites[0]);
-		quad.applySubmap(getSubmap(submapId, 0));
+		quad.applySubmap(SubmapImpl.getX2Submap(submapId));
 		return quad;
 	}
 
-	private int getSubmapId(CTMLogic logic) {
+	private int getSubmapId(ConnectionLogic logic) {
 		if (logic == null) {
 			return 0;
 		}

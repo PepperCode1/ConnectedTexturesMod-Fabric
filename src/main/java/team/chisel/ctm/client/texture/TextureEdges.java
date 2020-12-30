@@ -7,13 +7,14 @@ import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
-import team.chisel.ctm.client.render.RenderableArray;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
-import team.chisel.ctm.client.texture.context.TextureContextCTM;
+import team.chisel.ctm.client.texture.context.TextureContextConnecting;
 import team.chisel.ctm.client.texture.type.TextureTypeEdges;
-import team.chisel.ctm.client.texture.type.TextureTypeEdges.CTMLogicEdges;
+import team.chisel.ctm.client.util.connection.ConnectionDirection;
+import team.chisel.ctm.client.util.connection.ConnectionLogic;
+import team.chisel.ctm.client.util.connection.ConnectionLogicObscured;
 
-public class TextureEdges extends TextureCTM<TextureTypeEdges> {
+public class TextureEdges extends TextureCTM {
 	public TextureEdges(TextureTypeEdges type, TextureInfo info) {
 		super(type, info);
 	}
@@ -27,12 +28,21 @@ public class TextureEdges extends TextureCTM<TextureTypeEdges> {
 			return quad;
 		}
 
-		CTMLogicEdges logic = (CTMLogicEdges) ((TextureContextCTM) context).getLogic(bakedQuad.getFace());
+		ConnectionLogicObscured logic = (ConnectionLogicObscured) ((TextureContextConnecting) context).getLogic(bakedQuad.getFace());
 		if (logic.isObscured()) {
 			quad.setUVBounds(sprites[2]);
-			return new RenderableArray(quad.toQuadrants());
+			return quad;
 		}
 
 		return super.transformQuad(bakedQuad, context, quadGoal, cullFace);
+	}
+
+	@Override
+	protected int getQuadrantSubmapId(ConnectionLogic logic, int quadrant) {
+		ConnectionDirection[] directions = DIRECTION_MAP[quadrant];
+		if (!logic.connectedOr(directions[0], directions[1]) && logic.connected(directions[2])) {
+			return QUADRANT_SUBMAP_OFFSETS[quadrant];
+		}
+		return super.getQuadrantSubmapId(logic, quadrant);
 	}
 }

@@ -244,8 +244,8 @@ public class UnbakedQuad implements Renderable, Cloneable {
 
 	/**
 	 * <b>Does not take UV reflection into account. Use {@link #getAbsoluteUVRotation()} if UVs might be reflected.</b><br>
-	 * Calculates the UV rotation by checking which vertex has the smallest UVs by using {@code u*u+v*v}.
-	 * @return The UV rotation.
+	 * Calculates the counter-clockwise UV rotation by checking which vertex has the smallest UVs by using {@code u*u+v*v}.
+	 * @return The counter-clockwise UV rotation.
 	 */
 	public int getUVRotation() {
 		int minVertex = -1;
@@ -287,8 +287,8 @@ public class UnbakedQuad implements Renderable, Cloneable {
 	}
 
 	/**
-	 * Calculates the absolute UV rotation by reflecting the result from {@link #getUVReflection()}.
-	 * @return The absolute UV rotation.
+	 * Calculates the absolute counter-clockwise UV rotation by reflecting the result from {@link #getUVReflection()}.
+	 * @return The absolute counter-clockwise UV rotation.
 	 */
 	public int getAbsoluteUVRotation() {
 		Reflection reflection = getUVReflection();

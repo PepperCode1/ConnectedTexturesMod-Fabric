@@ -12,13 +12,13 @@ import team.chisel.ctm.client.render.RenderableArray;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 import team.chisel.ctm.client.render.Submap;
 import team.chisel.ctm.client.render.SubmapImpl;
-import team.chisel.ctm.client.texture.context.TextureContextCTM;
-import team.chisel.ctm.client.texture.type.TextureTypeEdges;
-import team.chisel.ctm.client.texture.type.TextureTypeEdges.CTMLogicEdges;
-import team.chisel.ctm.client.util.ConnectionDirection;
+import team.chisel.ctm.client.texture.context.TextureContextConnecting;
+import team.chisel.ctm.client.texture.type.TextureTypeEdgesFull;
+import team.chisel.ctm.client.util.connection.ConnectionDirection;
+import team.chisel.ctm.client.util.connection.ConnectionLogicObscured;
 
-public class TextureEdgesFull extends TextureEdges {
-	public TextureEdgesFull(TextureTypeEdges type, TextureInfo info) {
+public class TextureEdgesFull extends AbstractConnectingTexture<TextureTypeEdgesFull> {
+	public TextureEdgesFull(TextureTypeEdgesFull type, TextureInfo info) {
 		super(type, info);
 	}
 
@@ -31,7 +31,7 @@ public class TextureEdgesFull extends TextureEdges {
 			return quad;
 		}
 
-		CTMLogicEdges logic = (CTMLogicEdges) ((TextureContextCTM) context).getLogic(bakedQuad.getFace());
+		ConnectionLogicObscured logic = (ConnectionLogicObscured) ((TextureContextConnecting) context).getLogic(bakedQuad.getFace());
 		Sprite sprite;
 		Submap submap = null;
 		// Short circuit zero connections, as this is almost always the most common case

@@ -5,22 +5,22 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 
 import team.chisel.ctm.api.client.CTMTexture;
-import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.api.client.TextureType;
 import team.chisel.ctm.client.CTMClient;
+import team.chisel.ctm.client.texture.AbstractConnectingTexture;
 import team.chisel.ctm.client.texture.TextureCTM;
-import team.chisel.ctm.client.texture.context.TextureContextCTM;
+import team.chisel.ctm.client.texture.context.TextureContextConnecting;
 
 public class TextureTypeCTM implements TextureType {
 	@Override
 	public CTMTexture<? extends TextureTypeCTM> makeTexture(TextureInfo info) {
-		return new TextureCTM<TextureTypeCTM>(this, info);
+		return new TextureCTM(this, info);
 	}
 
 	@Override
-	public TextureContextCTM getTextureContext(BlockState state, BlockView world, BlockPos pos, CTMTexture<?> texture) {
-		return new TextureContextCTM(state, world, pos, (TextureCTM<?>) texture);
+	public TextureContextConnecting getTextureContext(BlockState state, BlockView world, BlockPos pos, CTMTexture<?> texture) {
+		return new TextureContextConnecting(state, world, pos, (AbstractConnectingTexture<?>) texture);
 	}
 
 	@Override
@@ -31,10 +31,5 @@ public class TextureTypeCTM implements TextureType {
 	@Override
 	public int requiredTextures() {
 		return 2;
-	}
-
-	@Override
-	public TextureContext getContextFromData(long data) {
-		throw new UnsupportedOperationException();
 	}
 }

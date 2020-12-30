@@ -1,0 +1,17 @@
+{
+  "ctm": {
+    "ctm_version": 1,
+    "type": "EDGES",
+    "textures": [
+      "minecraft:block/farmland_ctm",
+      "minecraft:block/farmland_moist"
+    ],
+    "extra": {
+      "connect_to": [
+        { "block": "minecraft:water" },
+        { "block": "minecraft:flowing_water" },
+        { "block": "minecraft:farmland", "predicate": { "moisture": 7 } }
+      ]
+    }
+  }
+}

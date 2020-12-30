@@ -91,6 +91,21 @@ public class SubmapImpl implements Submap {
 		return new SubmapImpl(newWidth, newHeight, newXOffset, newYOffset);
 	}
 
+	public static Submap getX2Submap(int id) {
+		return SubmapImpl.X2[id / 2][id % 2];
+	}
+
+	public static Submap getX2Submap(int id, int rotation) {
+		if (rotation % 2 == 1) {
+			if (id == 1) {
+				id = 2;
+			} else if (id == 2) {
+				id = 1;
+			}
+		}
+		return getX2Submap(id);
+	}
+
 	private static class NormalizedSubmap implements Submap {
 		private final Submap parent;
 

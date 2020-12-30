@@ -1,19 +1,19 @@
 package team.chisel.ctm.client.texture.context;
 
-import static team.chisel.ctm.client.util.ConnectionLocation.DOWN;
-import static team.chisel.ctm.client.util.ConnectionLocation.EAST;
-import static team.chisel.ctm.client.util.ConnectionLocation.NORTH;
-import static team.chisel.ctm.client.util.ConnectionLocation.NORTH_EAST_DOWN;
-import static team.chisel.ctm.client.util.ConnectionLocation.NORTH_EAST_UP;
-import static team.chisel.ctm.client.util.ConnectionLocation.NORTH_WEST_DOWN;
-import static team.chisel.ctm.client.util.ConnectionLocation.NORTH_WEST_UP;
-import static team.chisel.ctm.client.util.ConnectionLocation.SOUTH;
-import static team.chisel.ctm.client.util.ConnectionLocation.SOUTH_EAST_DOWN;
-import static team.chisel.ctm.client.util.ConnectionLocation.SOUTH_EAST_UP;
-import static team.chisel.ctm.client.util.ConnectionLocation.SOUTH_WEST_DOWN;
-import static team.chisel.ctm.client.util.ConnectionLocation.SOUTH_WEST_UP;
-import static team.chisel.ctm.client.util.ConnectionLocation.UP;
-import static team.chisel.ctm.client.util.ConnectionLocation.WEST;
+import static team.chisel.ctm.client.util.connection.ConnectionLocation.DOWN;
+import static team.chisel.ctm.client.util.connection.ConnectionLocation.EAST;
+import static team.chisel.ctm.client.util.connection.ConnectionLocation.NORTH;
+import static team.chisel.ctm.client.util.connection.ConnectionLocation.NORTH_EAST_DOWN;
+import static team.chisel.ctm.client.util.connection.ConnectionLocation.NORTH_EAST_UP;
+import static team.chisel.ctm.client.util.connection.ConnectionLocation.NORTH_WEST_DOWN;
+import static team.chisel.ctm.client.util.connection.ConnectionLocation.NORTH_WEST_UP;
+import static team.chisel.ctm.client.util.connection.ConnectionLocation.SOUTH;
+import static team.chisel.ctm.client.util.connection.ConnectionLocation.SOUTH_EAST_DOWN;
+import static team.chisel.ctm.client.util.connection.ConnectionLocation.SOUTH_EAST_UP;
+import static team.chisel.ctm.client.util.connection.ConnectionLocation.SOUTH_WEST_DOWN;
+import static team.chisel.ctm.client.util.connection.ConnectionLocation.SOUTH_WEST_UP;
+import static team.chisel.ctm.client.util.connection.ConnectionLocation.UP;
+import static team.chisel.ctm.client.util.connection.ConnectionLocation.WEST;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -28,7 +28,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 
 import team.chisel.ctm.api.client.TextureContext;
-import team.chisel.ctm.client.util.ConnectionLocation;
+import team.chisel.ctm.client.util.connection.ConnectionLocation;
 
 public class TextureContextPillar implements TextureContext {
 	private static final ConnectionLocation[] MAIN_VALUES = {UP, DOWN, NORTH, SOUTH, EAST, WEST};

@@ -33,9 +33,9 @@ public class TextureContextList {
 		ProfileUtil.swap("ctm_context_gather");
 		for (CTMTexture<?> texture : textures) {
 			TextureType type = texture.getType();
-			TextureContext ctx = type.getTextureContext(state, cachedWorld, pos, texture);
-			if (ctx != null) {
-				contextMap.put(texture, ctx);
+			TextureContext context = type.getTextureContext(state, cachedWorld, pos, texture);
+			if (context != null) {
+				contextMap.put(texture, context);
 			}
 		}
 

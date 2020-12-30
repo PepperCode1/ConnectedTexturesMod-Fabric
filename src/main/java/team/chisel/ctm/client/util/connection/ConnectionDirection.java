@@ -1,4 +1,4 @@
-package team.chisel.ctm.client.util;
+package team.chisel.ctm.client.util.connection;
 
 import static net.minecraft.util.math.Direction.DOWN;
 import static net.minecraft.util.math.Direction.EAST;
@@ -20,7 +20,7 @@ import net.minecraft.util.math.Direction.AxisDirection;
 import net.minecraft.world.BlockView;
 
 import team.chisel.ctm.api.client.util.NotNullType;
-import team.chisel.ctm.client.render.CTMLogic;
+import team.chisel.ctm.client.util.DirectionHelper;
 
 /**
  * Think of this class as a "Two dimensional Direction, with diagonals".
@@ -112,7 +112,7 @@ public enum ConnectionDirection {
 	 * @param side The side of the current face.
 	 * @return True if the block is connected in the given ConnectionDirection, false otherwise.
 	 */
-	public boolean isConnected(CTMLogic logic, BlockView world, BlockPos pos, Direction side) {
+	public boolean isConnected(ConnectionLogic logic, BlockView world, BlockPos pos, Direction side) {
 		return logic.isConnected(world, pos, applyConnection(pos, side), side);
 	}
 
@@ -125,7 +125,7 @@ public enum ConnectionDirection {
 	 * @param state The state to check for connection with.
 	 * @return True if the block is connected in the given ConnectionDirection, false otherwise.
 	 */
-	public boolean isConnected(CTMLogic logic, BlockView world, BlockPos pos, Direction side, BlockState state) {
+	public boolean isConnected(ConnectionLogic logic, BlockView world, BlockPos pos, Direction side, BlockState state) {
 		return logic.isConnected(world, pos, applyConnection(pos, side), side, state);
 	}
 

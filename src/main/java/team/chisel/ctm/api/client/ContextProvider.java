@@ -22,5 +22,7 @@ public interface ContextProvider {
 	 * @param data The compressed data, which will match what is produced by {@link TextureContext#getCompressedData()}.
 	 */
 	@Deprecated
-	TextureContext getContextFromData(long data);
+	default TextureContext getContextFromData(long data) {
+		throw new UnsupportedOperationException();
+	}
 }
