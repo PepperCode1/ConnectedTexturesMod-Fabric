@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "ConnectedTexturesMod for Fabric",
-  "description": "Allows resource packs to create dynamic models.",
+  "description": "An unofficial Fabric port of the original ConnectedTexturesMod. Adds extensions to the vanilla model and texture system to allow resource packs to create complex models.",
   "authors": [
     "Team Chisel",
     "Pepper_Bell"
