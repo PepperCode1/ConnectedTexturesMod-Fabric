@@ -12,11 +12,12 @@ import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.api.client.TextureType;
 import team.chisel.ctm.client.texture.TextureMap;
 import team.chisel.ctm.client.texture.TextureMap.MapType;
+import team.chisel.ctm.client.texture.TextureMap.MapTypeImpl;
 import team.chisel.ctm.client.texture.context.TextureContextPosition;
 
 public class TextureTypeMap implements TextureType {
-	public static final TextureTypeMap RANDOM = new TextureTypeMap(MapType.RANDOM);
-	public static final TextureTypeMap PATTERN = new TextureTypeMap(MapType.PATTERNED);
+	public static final TextureTypeMap RANDOM = new TextureTypeMap(MapTypeImpl.RANDOM);
+	public static final TextureTypeMap PATTERN = new TextureTypeMap(MapTypeImpl.PATTERNED);
 
 	private final MapType type;
 
@@ -30,8 +31,12 @@ public class TextureTypeMap implements TextureType {
 	}
 
 	@Override
-	public TextureContext getTextureContext(BlockState state, BlockView world, @NotNull BlockPos pos, CTMTexture<?> tex) {
-		return type.getContext(pos, (TextureMap) tex);
+	public TextureContext getTextureContext(BlockState state, BlockView world, @NotNull BlockPos pos, CTMTexture<?> texture) {
+		if (!(texture instanceof TextureMap)) {
+			return new TextureContextPosition(pos);
+		}
+
+		return type.getContext(pos, (TextureMap) texture);
 	}
 
 	@Override

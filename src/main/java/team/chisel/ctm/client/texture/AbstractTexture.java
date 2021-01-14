@@ -2,8 +2,6 @@ package team.chisel.ctm.client.texture;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import com.google.gson.JsonElement;
@@ -11,7 +9,6 @@ import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
 import net.fabricmc.fabric.api.renderer.v1.material.MaterialFinder;
-import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.render.model.BakedQuad;
@@ -31,13 +28,13 @@ import team.chisel.ctm.client.render.SpriteUnbakedQuad;
  */
 public abstract class AbstractTexture<T extends TextureType> implements CTMTexture<T> {
 	protected static final ThreadLocal<MaterialFinder> FINDER = ThreadLocal.withInitial(() -> RendererAccess.INSTANCE.getRenderer().materialFinder());
-	protected static final Map<BlendMode, RenderMaterial> BLEND_MODE_CACHE = new ConcurrentHashMap<>();
 
 	protected T type;
 	protected BlendMode blendMode;
 	@NotNullType
 	protected Sprite[] sprites;
 	protected boolean hasLight;
+	protected boolean isEmissive;
 	protected int skyLight;
 	protected int blockLight;
 
@@ -49,13 +46,16 @@ public abstract class AbstractTexture<T extends TextureType> implements CTMTextu
 			JsonElement light = info.getInfo().get().get("light");
 			if (light != null) {
 				if (light.isJsonPrimitive()) {
-					this.hasLight = true;
-					this.skyLight = this.blockLight = parseLightValue(light);
+					hasLight = true;
+					skyLight = blockLight = parseLightValue(light);
 				} else if (light.isJsonObject()) {
 					this.hasLight = true;
 					JsonObject lightObject = light.getAsJsonObject();
-					this.skyLight = parseLightValue(lightObject.get("sky"));
-					this.blockLight = parseLightValue(lightObject.get("block"));
+					skyLight = parseLightValue(lightObject.get("sky"));
+					blockLight = parseLightValue(lightObject.get("block"));
+				}
+				if (skyLight == 15 && blockLight == 15) {
+					isEmissive = true;
 				}
 			}
 		}
@@ -93,12 +93,8 @@ public abstract class AbstractTexture<T extends TextureType> implements CTMTextu
 		if (hasLight) {
 			quad.setLight(skyLight, blockLight);
 		}
-		if (blendMode != null) {
-			quad.material = BLEND_MODE_CACHE.get(blendMode);
-			if (quad.material == null) {
-				quad.material = FINDER.get().blendMode(0, blendMode).find();
-				BLEND_MODE_CACHE.put(blendMode, quad.material);
-			}
+		if (blendMode != null || isEmissive) {
+			quad.material = FINDER.get().blendMode(0, blendMode).emissive(0, isEmissive).find();
 		}
 		return quad;
 	}

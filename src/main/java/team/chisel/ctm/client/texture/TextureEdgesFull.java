@@ -12,7 +12,7 @@ import team.chisel.ctm.client.render.RenderableArray;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 import team.chisel.ctm.client.render.Submap;
 import team.chisel.ctm.client.render.SubmapImpl;
-import team.chisel.ctm.client.texture.context.TextureContextConnecting;
+import team.chisel.ctm.client.texture.context.TextureContextConnectingObscured;
 import team.chisel.ctm.client.texture.type.TextureTypeEdgesFull;
 import team.chisel.ctm.client.util.connection.ConnectionDirection;
 import team.chisel.ctm.client.util.connection.ConnectionLogicObscured;
@@ -26,12 +26,12 @@ public class TextureEdgesFull extends AbstractConnectingTexture<TextureTypeEdges
 	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 
-		if (context == null || CTMClient.getConfigManager().getConfig().disableCTM) {
+		if (CTMClient.getConfigManager().getConfig().disableCTM || !(context instanceof TextureContextConnectingObscured)) {
 			quad.setUVBounds(sprites[0]);
 			return quad;
 		}
 
-		ConnectionLogicObscured logic = (ConnectionLogicObscured) ((TextureContextConnecting) context).getLogic(bakedQuad.getFace());
+		ConnectionLogicObscured logic = ((TextureContextConnectingObscured) context).getLogic(bakedQuad.getFace());
 		Sprite sprite;
 		Submap submap = null;
 		// Short circuit zero connections, as this is almost always the most common case

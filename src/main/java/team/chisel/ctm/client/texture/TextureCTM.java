@@ -44,7 +44,7 @@ public class TextureCTM extends AbstractConnectingTexture<TextureTypeCTM> {
 	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 
-		if (context == null || CTMClient.getConfigManager().getConfig().disableCTM) {
+		if (CTMClient.getConfigManager().getConfig().disableCTM || !(context instanceof TextureContextConnecting)) {
 			quad.setUVBounds(sprites[0]);
 			return quad;
 		}

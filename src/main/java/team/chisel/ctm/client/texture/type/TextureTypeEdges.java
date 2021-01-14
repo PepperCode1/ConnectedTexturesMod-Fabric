@@ -8,6 +8,7 @@ import team.chisel.ctm.api.client.CTMTexture;
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.texture.TextureEdges;
 import team.chisel.ctm.client.texture.context.TextureContextConnecting;
+import team.chisel.ctm.client.texture.context.TextureContextConnectingObscured;
 
 public class TextureTypeEdges extends TextureTypeCTM {
 	@Override
@@ -17,7 +18,7 @@ public class TextureTypeEdges extends TextureTypeCTM {
 
 	@Override
 	public TextureContextConnecting getTextureContext(BlockState state, BlockView world, BlockPos pos, CTMTexture<?> texture) {
-		return new TextureContextConnecting.TextureContextConnectingObscured(state, world, pos, (TextureEdges) texture);
+		return new TextureContextConnectingObscured(state, world, pos, (TextureEdges) texture);
 	}
 
 	@Override

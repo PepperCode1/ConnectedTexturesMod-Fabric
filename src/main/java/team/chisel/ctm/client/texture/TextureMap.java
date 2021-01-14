@@ -18,7 +18,6 @@ import team.chisel.ctm.client.render.Submap;
 import team.chisel.ctm.client.render.SubmapImpl;
 import team.chisel.ctm.client.texture.context.TextureContextGrid;
 import team.chisel.ctm.client.texture.context.TextureContextGrid.Point2i;
-import team.chisel.ctm.client.texture.context.TextureContextPosition;
 import team.chisel.ctm.client.texture.type.TextureTypeMap;
 
 public class TextureMap extends AbstractTexture<TextureTypeMap> {
@@ -26,11 +25,11 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 	private final int ySize;
 	private final int xOffset;
 	private final int yOffset;
-	private final MapType map;
+	private final MapType mapType;
 
 	public TextureMap(TextureTypeMap type, TextureInfo info) {
 		super(type, info);
-		map = type.getType();
+		mapType = type.getType();
 		if (info.getInfo().isPresent()) {
 			JsonObject jsonObject = info.getInfo().get();
 			if (jsonObject.has("width") && jsonObject.has("height")) {
@@ -66,7 +65,7 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 
 	@Override
 	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
-		return map.transformQuad(this, bakedQuad, context, quadGoal, cullFace);
+		return mapType.transformQuad(this, bakedQuad, context, quadGoal, cullFace);
 	}
 
 	public int getXSize() {
@@ -85,17 +84,31 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 		return yOffset;
 	}
 
-	public enum MapType {
+	public interface MapType {
+		Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace);
+
+		@NotNull
+		TextureContext getContext(@NotNull BlockPos pos, @NotNull TextureMap texture);
+	}
+
+	// TODO the enum fields are very similar
+	public enum MapTypeImpl implements MapType {
 		RANDOM {
 			@Override
-			protected Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace) {
-				Point2i textureCoords = context == null ? new Point2i(1, 1) : ((TextureContextGrid) context).getTextureCoords(bakedQuad.getFace());
+			public Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace) {
+				Point2i textureCoords;
+				if (context instanceof TextureContextGrid) {
+					textureCoords = ((TextureContextGrid) context).getTextureCoords(bakedQuad.getFace());
+				} else {
+					textureCoords = new Point2i(1, 1);
+				}
+
 				float intervalX = 16.0F / texture.getXSize();
 				float intervalY = 16.0F / texture.getYSize();
-				float maxU = textureCoords.getX() * intervalX;
-				float maxV = textureCoords.getY() * intervalY;
-				Submap submap = new SubmapImpl(intervalX, intervalY, maxU - intervalX, maxV - intervalY);
-				// TODO move this code somewhere else, it's copied from below
+				float maxX = intervalX * textureCoords.getX();
+				float maxY = intervalY * textureCoords.getY();
+				Submap submap = new SubmapImpl(intervalX, intervalY, maxX - intervalX, maxY - intervalY);
+
 				SpriteUnbakedQuad quad = texture.unbake(bakedQuad, cullFace);
 				if (quadGoal == 4) {
 					SpriteUnbakedQuad[] quads = quad.toQuadrants();
@@ -114,20 +127,26 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 			}
 
 			@Override
-			public TextureContext getContext(@NotNull BlockPos pos, @NotNull TextureMap tex) {
-				return new TextureContextGrid.TextureContextRandom(pos, tex, true);
+			public TextureContext getContext(@NotNull BlockPos pos, @NotNull TextureMap texture) {
+				return new TextureContextGrid.TextureContextRandom(pos, texture, true);
 			}
 		},
 		PATTERNED {
 			@Override
-			protected Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace) {
-				Point2i textureCoords = context == null ? new Point2i(0, 0) : ((TextureContextGrid) context).getTextureCoords(bakedQuad.getFace());
-				float intervalU = 16.0F / texture.xSize;
-				float intervalV = 16.0F / texture.ySize;
-				// throw new RuntimeException(index % variationSize+" and "+index/variationSize);
-				float minU = intervalU * textureCoords.getX();
-				float minV = intervalV * textureCoords.getY();
-				Submap submap = new SubmapImpl(intervalU, intervalV, minU, minV);
+			public Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace) {
+				Point2i textureCoords;
+				if (context instanceof TextureContextGrid) {
+					textureCoords = ((TextureContextGrid) context).getTextureCoords(bakedQuad.getFace());
+				} else {
+					textureCoords = new Point2i(0, 0);
+				}
+
+				float intervalX = 16.0F / texture.getXSize();
+				float intervalY = 16.0F / texture.getYSize();
+				float minX = intervalX * textureCoords.getX();
+				float minY = intervalY * textureCoords.getY();
+
+				Submap submap = new SubmapImpl(intervalX, intervalY, minX, minY);
 				SpriteUnbakedQuad quad = texture.unbake(bakedQuad, cullFace);
 				if (quadGoal == 4) {
 					SpriteUnbakedQuad[] quads = quad.toQuadrants();
@@ -150,12 +169,5 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 				return new TextureContextGrid.TextureContextPatterned(pos, texture, true);
 			}
 		};
-
-		protected abstract Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace);
-
-		@NotNull
-		public TextureContext getContext(@NotNull BlockPos pos, @NotNull TextureMap texture) {
-			return new TextureContextPosition(pos);
-		}
 	}
 }

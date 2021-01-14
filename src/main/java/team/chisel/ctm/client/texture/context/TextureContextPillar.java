@@ -41,9 +41,9 @@ public class TextureContextPillar implements TextureContext {
 	public TextureContextPillar(BlockView world, BlockPos pos) {
 		data = new ConnectionData(world, pos);
 		BlockState state = world.getBlockState(pos);
-		for (ConnectionLocation loc : ALL_VALUES) {
-			if (state == world.getBlockState(loc.transform(pos))) {
-				compressedData = compressedData | loc.getMask();
+		for (ConnectionLocation location : ALL_VALUES) {
+			if (state == world.getBlockState(location.transform(pos))) {
+				compressedData = compressedData | location.getMask();
 			}
 		}
 	}
@@ -102,15 +102,15 @@ public class TextureContextPillar implements TextureContext {
 		public static Connections forData(long data, Direction offset) {
 			EnumSet<Direction> connections = EnumSet.noneOf(Direction.class);
 			if (offset == null) {
-				for (ConnectionLocation loc : MAIN_VALUES) {
-					if ((data & loc.getMask()) != 0) {
-						connections.add(ConnectionLocation.toFacing(loc));
+				for (ConnectionLocation location : MAIN_VALUES) {
+					if ((data & location.getMask()) != 0) {
+						connections.add(ConnectionLocation.toFacing(location));
 					}
 				}
 			} else {
-				for (ConnectionLocation loc : OFFSET_VALUES) {
-					if ((data & loc.getMask()) != 0) {
-						Direction facing = loc.clipOrDestroy(offset);
+				for (ConnectionLocation location : OFFSET_VALUES) {
+					if ((data & location.getMask()) != 0) {
+						Direction facing = location.clipOrDestroy(offset);
 						if (facing != null) {
 							connections.add(facing);
 						}

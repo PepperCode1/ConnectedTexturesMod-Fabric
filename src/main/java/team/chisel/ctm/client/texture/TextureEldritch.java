@@ -31,8 +31,13 @@ public class TextureEldritch extends AbstractTexture<TextureTypeEldritch> {
 		Vec2f min = new Vec2f(bounds[0], bounds[1]);
 		Vec2f max = new Vec2f(bounds[2], bounds[3]);
 
-		BlockPos pos = context == null ? BlockPos.ORIGIN : ((TextureContextPosition) context).getPosition();
-		RANDOM.setSeed(MathHelper.hashCode(pos) + (bakedQuad.getFace() == null ? -1 : bakedQuad.getFace().ordinal()));
+		BlockPos pos;
+		if (context instanceof TextureContextPosition) {
+			pos = ((TextureContextPosition) context).getPosition();
+		} else {
+			pos = BlockPos.ORIGIN;
+		}
+		RANDOM.setSeed(MathHelper.hashCode(pos) + bakedQuad.getFace().ordinal());
 
 		float xOffset = getRandomOffset();
 		float yOffset = getRandomOffset();
@@ -57,6 +62,6 @@ public class TextureEldritch extends AbstractTexture<TextureTypeEldritch> {
 	}
 
 	private static float getRandomOffset() {
-		return (float) RANDOM.nextGaussian() * 0.08f;
+		return (float) RANDOM.nextGaussian() * 0.08F;
 	}
 }

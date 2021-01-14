@@ -33,9 +33,9 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 
 	@Override
 	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
-		if (context == null) {
+		if (!(context instanceof TextureContextPillar)) {
 			SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
-			if (bakedQuad.getFace() != null && bakedQuad.getFace().getAxis().isVertical()) {
+			if (bakedQuad.getFace().getAxis().isVertical()) {
 				quad.setUVBounds(sprites[0]);
 			} else {
 				quad.setUVBounds(sprites[1]);
@@ -43,13 +43,13 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 			}
 			return quad;
 		}
-		return getQuad(bakedQuad, context, cullFace);
+		return getQuad(bakedQuad, (TextureContextPillar) context, cullFace);
 	}
 
-	private UnbakedQuad getQuad(BakedQuad bakedQuad, TextureContext context, Direction cullFace) {
+	private UnbakedQuad getQuad(BakedQuad bakedQuad, TextureContextPillar context, Direction cullFace) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 		Direction nominalFace = bakedQuad.getFace();
-		ConnectionData data = ((TextureContextPillar) context).getData();
+		ConnectionData data = context.getData();
 		Connections connections = data.getConnections();
 
 		// This is the order of operations for connections
