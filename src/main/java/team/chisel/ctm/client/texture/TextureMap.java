@@ -12,7 +12,6 @@ import net.minecraft.util.math.Direction;
 import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
-import team.chisel.ctm.client.render.RenderableArray;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 import team.chisel.ctm.client.render.Submap;
 import team.chisel.ctm.client.render.SubmapImpl;
@@ -64,8 +63,8 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
-		return mapType.transformQuad(this, bakedQuad, context, quadGoal, cullFace);
+	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, Direction cullFace) {
+		return mapType.transformQuad(this, bakedQuad, context, cullFace);
 	}
 
 	public int getXSize() {
@@ -85,7 +84,7 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 	}
 
 	public interface MapType {
-		Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace);
+		Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, @Nullable TextureContext context, Direction cullFace);
 
 		@NotNull
 		TextureContext getContext(@NotNull BlockPos pos, @NotNull TextureMap texture);
@@ -95,10 +94,12 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 	public enum MapTypeImpl implements MapType {
 		RANDOM {
 			@Override
-			public Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace) {
+			public Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, @Nullable TextureContext context, Direction cullFace) {
+				SpriteUnbakedQuad quad = texture.unbake(bakedQuad, cullFace);
+
 				Point2i textureCoords;
 				if (context instanceof TextureContextGrid) {
-					textureCoords = ((TextureContextGrid) context).getTextureCoords(bakedQuad.getFace());
+					textureCoords = ((TextureContextGrid) context).getTextureCoords(quad.nominalFace);
 				} else {
 					textureCoords = new Point2i(1, 1);
 				}
@@ -109,21 +110,9 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 				float maxY = intervalY * textureCoords.getY();
 				Submap submap = new SubmapImpl(intervalX, intervalY, maxX - intervalX, maxY - intervalY);
 
-				SpriteUnbakedQuad quad = texture.unbake(bakedQuad, cullFace);
-				if (quadGoal == 4) {
-					SpriteUnbakedQuad[] quads = quad.toQuadrants();
-					for (int i = 0; i < quads.length; i++) {
-						if (quads[i] != null) {
-							quads[i].setUVBounds(texture.sprites[0]);
-							quads[i].applySubmap(submap);
-						}
-					}
-					return new RenderableArray(quads);
-				} else {
-					quad.setUVBounds(texture.sprites[0]);
-					quad.applySubmap(submap);
-					return quad;
-				}
+				quad.setUVBounds(texture.sprites[0]);
+				quad.applySubmap(submap);
+				return quad;
 			}
 
 			@Override
@@ -133,10 +122,12 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 		},
 		PATTERNED {
 			@Override
-			public Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace) {
+			public Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, @Nullable TextureContext context, Direction cullFace) {
+				SpriteUnbakedQuad quad = texture.unbake(bakedQuad, cullFace);
+
 				Point2i textureCoords;
 				if (context instanceof TextureContextGrid) {
-					textureCoords = ((TextureContextGrid) context).getTextureCoords(bakedQuad.getFace());
+					textureCoords = ((TextureContextGrid) context).getTextureCoords(quad.nominalFace);
 				} else {
 					textureCoords = new Point2i(0, 0);
 				}
@@ -145,23 +136,11 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 				float intervalY = 16.0F / texture.getYSize();
 				float minX = intervalX * textureCoords.getX();
 				float minY = intervalY * textureCoords.getY();
-
 				Submap submap = new SubmapImpl(intervalX, intervalY, minX, minY);
-				SpriteUnbakedQuad quad = texture.unbake(bakedQuad, cullFace);
-				if (quadGoal == 4) {
-					SpriteUnbakedQuad[] quads = quad.toQuadrants();
-					for (int i = 0; i < quads.length; i++) {
-						if (quads[i] != null) {
-							quads[i].setUVBounds(texture.sprites[0]);
-							quads[i].applySubmap(submap);
-						}
-					}
-					return new RenderableArray(quads);
-				} else {
-					quad.setUVBounds(texture.sprites[0]);
-					quad.applySubmap(submap);
-					return quad;
-				}
+
+				quad.setUVBounds(texture.sprites[0]);
+				quad.applySubmap(submap);
+				return quad;
 			}
 
 			@Override

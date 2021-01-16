@@ -22,12 +22,12 @@ public class TextureSCTM extends AbstractConnectingTexture<TextureTypeSCTM> {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
+	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, Direction cullFace) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 
 		int submapId = 0;
 		if (!CTMClient.getConfigManager().getConfig().disableCTM && context instanceof TextureContextConnecting) {
-			submapId = getSubmapId(((TextureContextConnecting) context).getLogic(bakedQuad.getFace()));
+			submapId = getSubmapId(((TextureContextConnecting) context).getLogic(quad.nominalFace));
 		}
 
 		quad.setUVBounds(sprites[0]);

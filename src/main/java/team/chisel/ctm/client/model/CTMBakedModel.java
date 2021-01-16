@@ -1,9 +1,6 @@
 package team.chisel.ctm.client.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 
 import com.google.common.collect.ObjectArrays;
@@ -45,10 +42,8 @@ public class CTMBakedModel extends AbstractCTMBakedModel {
 		for (Direction cullFace : CULL_FACES) {
 			List<BakedQuad> parentQuads = parent.getQuads(state, cullFace, random);
 
-			// Linked to maintain the order of quads
-			Map<BakedQuad, CTMTexture<?>> textureMap = new LinkedHashMap<>();
 			// Gather all quads and map them to their textures
-			// All quads should have an associated ICTMTexture, so ignore any that do not
+			// All quads should have an associated CTMTexture, so ignore any that do not
 			for (BakedQuad bakedQuad : parentQuads) {
 				CTMTexture<?> texture = getOverrideTexture(random, bakedQuad.getColorIndex(), ((BakedQuadAccessor) bakedQuad).getSprite().getId());
 				if (texture == null) {
@@ -61,18 +56,12 @@ public class CTMBakedModel extends AbstractCTMBakedModel {
 						bakedQuad = BakedQuadUtil.retextureQuad(bakedQuad, spriteReplacement);
 					}
 
-					textureMap.put(bakedQuad, texture);
+					TextureContext context = contextList == null ? null : contextList.getTextureContext(texture);
+					Renderable renderable = texture.transformQuad(bakedQuad, context, cullFace);
+					if (renderable != null) {
+						renderable.render(emitter);
+					}
 				}
-			}
-
-			// Compute the quad goal for a given cullface
-			// TODO this means that non-culling (null facing) quads will *all* share the same quad goal, which is excessive
-			// Explore optimizations to quad goal (detecting overlaps??)
-			int quadGoal = contextList == null ? 1 : textureMap.values().stream().mapToInt(texture -> texture.getType().getQuadsPerSide()).max().orElse(1);
-			for (Entry<BakedQuad, CTMTexture<?>> entry : textureMap.entrySet()) {
-				TextureContext context = contextList == null ? null : contextList.getTextureContext(entry.getValue());
-				Renderable renderable = entry.getValue().transformQuad(entry.getKey(), context, quadGoal, cullFace);
-				renderable.render(emitter);
 			}
 		}
 

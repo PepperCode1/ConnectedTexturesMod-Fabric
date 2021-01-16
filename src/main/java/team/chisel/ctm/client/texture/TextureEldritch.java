@@ -24,7 +24,7 @@ public class TextureEldritch extends AbstractTexture<TextureTypeEldritch> {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
+	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, Direction cullFace) {
 		UnbakedQuad quad = unbake(bakedQuad, cullFace);
 
 		float[] bounds = quad.getSmallestUVBounds();
@@ -37,7 +37,7 @@ public class TextureEldritch extends AbstractTexture<TextureTypeEldritch> {
 		} else {
 			pos = BlockPos.ORIGIN;
 		}
-		RANDOM.setSeed(MathHelper.hashCode(pos) + bakedQuad.getFace().ordinal());
+		RANDOM.setSeed(MathHelper.hashCode(pos) + quad.nominalFace.ordinal());
 
 		float xOffset = getRandomOffset();
 		float yOffset = getRandomOffset();

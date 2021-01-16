@@ -1,11 +1,9 @@
 package team.chisel.ctm.client.resource;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 
-import com.google.common.collect.ObjectArrays;
 import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
 import org.jetbrains.annotations.Nullable;
@@ -37,20 +35,36 @@ public interface CTMMetadataSection {
 
 	// TODO move elsewhere
 	default CTMTexture<?> makeTexture(Sprite sprite, Function<SpriteIdentifier, Sprite> spriteGetter) {
-		CTMMetadataSection meta = this;
+		CTMMetadataSection metadata = this;
 		if (getProxy() != null) {
 			Sprite proxySprite = spriteGetter.apply(new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, getProxy()));
+			CTMMetadataSection proxyMetadata = null;
 			try {
-				meta = ResourceUtil.getMetadata(proxySprite);
-				if (meta == null) {
-					meta = new CTMMetadataSectionV1();
-				}
-				sprite = proxySprite;
+				proxyMetadata = ResourceUtil.getMetadata(proxySprite);
 			} catch (IOException e) {
-				CTMClient.LOGGER.error("Could not parse metadata of proxy. Ignoring proxy and using base texture. " + getProxy(), e);
-				meta = this;
+				e.printStackTrace();
+			}
+
+			if (proxyMetadata != null) {
+				sprite = proxySprite;
+				metadata = proxyMetadata;
+			} else {
+				CTMClient.LOGGER.error("Could not get metadata of proxy sprite {}. Ignoring proxy and using base texture.", getProxy());
 			}
 		}
-		return meta.getType().makeTexture(new TextureInfo(Arrays.stream(ObjectArrays.concat(sprite.getId(), meta.getAdditionalTextures())).map(identifier -> new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, identifier)).map(spriteGetter::apply).toArray(Sprite[]::new), meta.getBlendMode(), Optional.of(meta.getExtraData())));
+
+		Identifier[] textures = metadata.getAdditionalTextures();
+		int provided = textures.length;
+		int required = metadata.getType().requiredTextures()+1;
+		Sprite[] sprites = new Sprite[required];
+		sprites[0] = sprite;
+		for (int i = 1; i < required; i++) {
+			Identifier identifier = null;
+			if (i <= provided) {
+				identifier = textures[i-1];
+			}
+			sprites[i] = spriteGetter.apply(new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, identifier));
+		}
+		return metadata.getType().makeTexture(new TextureInfo(sprites, metadata.getBlendMode(), Optional.of(metadata.getExtraData())));
 	}
 }

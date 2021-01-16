@@ -19,7 +19,7 @@ public interface CTMTexture<T extends TextureType> {
 	 * @param cullFace The cull face. This is not the same as the BakedQuad's face.
 	 * @return A Renderable.
 	 */
-	Renderable transformQuad(BakedQuad bakedQuad, @Nullable TextureContext context, int quadGoal, Direction cullFace);
+	Renderable transformQuad(BakedQuad bakedQuad, @Nullable TextureContext context, Direction cullFace);
 
 	Collection<Identifier> getTextures();
 
@@ -36,7 +36,7 @@ public interface CTMTexture<T extends TextureType> {
 	Sprite getParticle();
 
 	/**
-	 * The BlendMode with which this texture will be rendered.
+	 * Gets the BlendMode with which this texture will be rendered.
 	 * @return The BlendMode of this texture.
 	 */
 	@Nullable

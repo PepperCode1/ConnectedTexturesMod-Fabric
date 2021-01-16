@@ -34,7 +34,7 @@ public class CTMDeserializeModelJsonCallbackHandler implements DeserializeModelJ
 			if (jsonObject.has("ctm_version")) {
 				ModelParser parser = PARSERS.get(jsonObject.get("ctm_version").getAsInt());
 				if (parser == null) {
-					CTMClient.LOGGER.error("Invalid \"ctm_version\" in model: " + jsonElement);
+					CTMClient.LOGGER.error("Invalid \"ctm_version\" in model {}.", jsonElement);
 				} else {
 					CTMUnbakedModel model = parser.parse(jsonModel, jsonObject, type, context);
 					wrappingCache.jsonModelsToWrap.put(jsonModel, model);

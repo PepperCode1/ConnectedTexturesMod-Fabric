@@ -20,10 +20,10 @@ public class ResourceUtil {
 	private static final Map<Identifier, CTMMetadataSection> METADATA_CACHE = new HashMap<>();
 
 	public static Resource getResource(Sprite sprite) throws IOException {
-		return getResource(spriteToAbsolute(sprite.getId()));
+		return getResource(toTextureIdentifier(sprite.getId()));
 	}
 
-	public static Identifier spriteToAbsolute(Identifier identifier) {
+	public static Identifier toTextureIdentifier(Identifier identifier) {
 		if (!identifier.getPath().startsWith("textures/")) {
 			identifier = new Identifier(identifier.getNamespace(), "textures/" + identifier.getPath());
 		}
@@ -65,7 +65,7 @@ public class ResourceUtil {
 
 	@Nullable
 	public static CTMMetadataSection getMetadata(Sprite sprite) throws IOException {
-		return getMetadata(spriteToAbsolute(sprite.getId()));
+		return getMetadata(toTextureIdentifier(sprite.getId()));
 	}
 
 	@Nullable

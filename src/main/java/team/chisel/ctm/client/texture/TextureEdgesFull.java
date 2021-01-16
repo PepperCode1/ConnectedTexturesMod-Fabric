@@ -8,7 +8,6 @@ import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
-import team.chisel.ctm.client.render.RenderableArray;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 import team.chisel.ctm.client.render.Submap;
 import team.chisel.ctm.client.render.SubmapImpl;
@@ -23,7 +22,7 @@ public class TextureEdgesFull extends AbstractConnectingTexture<TextureTypeEdges
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
+	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, Direction cullFace) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 
 		if (CTMClient.getConfigManager().getConfig().disableCTM || !(context instanceof TextureContextConnectingObscured)) {
@@ -31,7 +30,7 @@ public class TextureEdgesFull extends AbstractConnectingTexture<TextureTypeEdges
 			return quad;
 		}
 
-		ConnectionLogicObscured logic = ((TextureContextConnectingObscured) context).getLogic(bakedQuad.getFace());
+		ConnectionLogicObscured logic = ((TextureContextConnectingObscured) context).getLogic(quad.nominalFace);
 		Sprite sprite;
 		Submap submap = null;
 		// Short circuit zero connections, as this is almost always the most common case
@@ -82,19 +81,8 @@ public class TextureEdgesFull extends AbstractConnectingTexture<TextureTypeEdges
 			}
 		}
 
-		if (quadGoal == 1) {
-			quad.setUVBounds(sprite);
-			quad.applySubmap(submap);
-			return quad;
-		} else {
-			SpriteUnbakedQuad[] quads = quad.toQuadrants();
-			for (SpriteUnbakedQuad quad1 : quads) {
-				if (quad1 != null) {
-					quad1.setUVBounds(sprite);
-					quad1.applySubmap(submap);
-				}
-			}
-			return new RenderableArray(quads);
-		}
+		quad.setUVBounds(sprite);
+		quad.applySubmap(submap);
+		return quad;
 	}
 }

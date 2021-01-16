@@ -20,7 +20,7 @@ public class TextureEdges extends TextureCTM {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
+	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, Direction cullFace) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 
 		if (CTMClient.getConfigManager().getConfig().disableCTM || !(context instanceof TextureContextConnectingObscured)) {
@@ -28,13 +28,13 @@ public class TextureEdges extends TextureCTM {
 			return quad;
 		}
 
-		ConnectionLogicObscured logic = ((TextureContextConnectingObscured) context).getLogic(bakedQuad.getFace());
+		ConnectionLogicObscured logic = ((TextureContextConnectingObscured) context).getLogic(quad.nominalFace);
 		if (logic.isObscured()) {
 			quad.setUVBounds(sprites[2]);
 			return quad;
 		}
 
-		return super.transformQuad(bakedQuad, context, quadGoal, cullFace);
+		return super.transformQuad(bakedQuad, context, cullFace);
 	}
 
 	@Override

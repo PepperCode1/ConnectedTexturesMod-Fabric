@@ -17,14 +17,6 @@ public interface TextureType extends ContextProvider {
 	<T extends TextureType> CTMTexture<? extends T> makeTexture(TextureInfo info);
 
 	/**
-	 * Gets the amount of quads per cull face.
-	 * @return The number of quads.
-	 */
-	default int getQuadsPerSide() {
-		return 1;
-	}
-
-	/**
 	 * The number of textures required for this texture type.
 	 * For instance, {@link team.chisel.ctm.client.texture.type.TextureTypeCTM} requires two.
 	 * @return The number of textures required.

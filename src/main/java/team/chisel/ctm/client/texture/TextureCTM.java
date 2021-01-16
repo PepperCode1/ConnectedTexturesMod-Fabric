@@ -41,7 +41,7 @@ public class TextureCTM extends AbstractConnectingTexture<TextureTypeCTM> {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
+	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, Direction cullFace) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 
 		if (CTMClient.getConfigManager().getConfig().disableCTM || !(context instanceof TextureContextConnecting)) {
@@ -49,7 +49,7 @@ public class TextureCTM extends AbstractConnectingTexture<TextureTypeCTM> {
 			return quad;
 		}
 
-		int[] quadrantSubmapIds = getQuadrantSubmapIds(((TextureContextConnecting) context).getLogic(bakedQuad.getFace()));
+		int[] quadrantSubmapIds = getQuadrantSubmapIds(((TextureContextConnecting) context).getLogic(quad.nominalFace));
 		SpriteUnbakedQuad[] quads = quad.toQuadrants();
 		for (int i = 0; i < quads.length; i++) {
 			if (quads[i] != null) {

@@ -23,11 +23,6 @@ public class TextureTypeSCTM implements TextureType {
 	}
 
 	@Override
-	public int getQuadsPerSide() {
-		return 1;
-	}
-
-	@Override
 	public int requiredTextures() {
 		return 1;
 	}

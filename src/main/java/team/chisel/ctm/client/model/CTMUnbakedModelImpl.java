@@ -78,7 +78,7 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 			CTMMetadataSection metadata = null;
 			if (entry.getValue().isJsonPrimitive() && entry.getValue().getAsJsonPrimitive().isString()) {
 				Identifier identifier = new Identifier(entry.getValue().getAsString());
-				metadata = ResourceUtil.getMetadata(ResourceUtil.spriteToAbsolute(identifier));
+				metadata = ResourceUtil.getMetadata(ResourceUtil.toTextureIdentifier(identifier));
 				textureDependencies.add(identifier);
 			} else if (entry.getValue().isJsonObject()) {
 				JsonObject jsonObject = entry.getValue().getAsJsonObject();
@@ -94,7 +94,7 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 			}
 		}
 
-		textureDependencies.removeIf(identifier -> identifier.getPath().startsWith("#"));
+		textureDependencies.removeIf((identifier) -> identifier.getPath().startsWith("#"));
 	}
 
 	@Override
@@ -105,23 +105,9 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 	@Override
 	public Collection<SpriteIdentifier> getTextureDependencies(Function<Identifier, UnbakedModel> modelGetter, Set<Pair<String, String>> unresolvedTextureReferences) {
 		List<SpriteIdentifier> identifiers = textureDependencies.stream()
-				.map(identifier -> new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, identifier))
+				.map((identifier) -> new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, identifier))
 				.collect(Collectors.toList());
 		identifiers.addAll(parent.getTextureDependencies(modelGetter, unresolvedTextureReferences));
-		// Validate all texture metadata
-		for (SpriteIdentifier identifier : identifiers) {
-			CTMMetadataSection metadata;
-			try {
-				metadata = ResourceUtil.getMetadata(ResourceUtil.spriteToAbsolute(identifier.getTextureId()));
-			} catch (IOException e) {
-				throw new RuntimeException("Failed to get metadata for texture " + identifier.getTextureId(), e);
-			}
-			if (metadata != null) {
-				if (metadata.getType().requiredTextures() != metadata.getAdditionalTextures().length + 1) {
-					throw new IllegalArgumentException(String.format("Texture type %s requires exactly %d textures, but %d were provided. " + identifier.getTextureId(), metadata.getType(), metadata.getType().requiredTextures(), metadata.getAdditionalTextures().length + 1));
-				}
-			}
-		}
 		return identifiers;
 	}
 
@@ -149,7 +135,7 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 				//
 			}
 			final CTMMetadataSection metadata1 = metadata;
-			textures.computeIfAbsent(sprite.getId(), id -> {
+			textures.computeIfAbsent(sprite.getId(), (id) -> {
 				CTMTexture<?> texture;
 				if (metadata1 == null) {
 					texture = TextureTypeNormal.INSTANCE.makeTexture(new TextureInfo(new Sprite[] { sprite }, null, Optional.empty()));
@@ -172,10 +158,10 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 		if (textureOverrides == null) {
 			textureOverrides = new HashMap<>();
 			for (Int2ObjectMap.Entry<CTMMetadataSection> entry : metaOverrides.int2ObjectEntrySet()) {
-				List<ModelElementFace> matches = jsonParent.getElements().stream().flatMap(b -> b.faces.values().stream()).filter(b -> b.tintIndex == entry.getIntKey()).collect(Collectors.toList());
+				List<ModelElementFace> matches = jsonParent.getElements().stream().flatMap((element) -> element.faces.values().stream()).filter((face) -> face.tintIndex == entry.getIntKey()).collect(Collectors.toList());
 				Multimap<SpriteIdentifier, ModelElementFace> bySprite = HashMultimap.create();
 				// TODO 1.15 this isn't right
-				matches.forEach(part -> bySprite.put(((JsonUnbakedModelAccessor) jsonParent).getTextureMap().getOrDefault(part.textureId.substring(1), Either.right(part.textureId)).left().get(), part));
+				matches.forEach((part) -> bySprite.put(((JsonUnbakedModelAccessor) jsonParent).getTextureMap().getOrDefault(part.textureId.substring(1), Either.right(part.textureId)).left().get(), part));
 				for (Map.Entry<SpriteIdentifier, Collection<ModelElementFace>> entry1 : bySprite.asMap().entrySet()) {
 					Identifier textureId = entry1.getKey().getTextureId();
 					Sprite sprite = getOverrideSprite(entry.getIntKey());
@@ -191,7 +177,10 @@ public class CTMUnbakedModelImpl implements CTMUnbakedModel {
 
 	@Override
 	public Collection<CTMTexture<?>> getCTMTextures() {
-		return ImmutableList.<CTMTexture<?>>builder().addAll(textures.values()).addAll(textureOverrides.values()).build();
+		return ImmutableList.<CTMTexture<?>>builder()
+				.addAll(textures.values())
+				.addAll(textureOverrides.values())
+				.build();
 	}
 
 	@Override

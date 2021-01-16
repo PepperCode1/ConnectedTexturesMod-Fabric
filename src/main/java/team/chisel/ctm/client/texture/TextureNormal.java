@@ -6,7 +6,6 @@ import net.minecraft.util.math.Direction;
 import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
-import team.chisel.ctm.client.render.RenderableArray;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 import team.chisel.ctm.client.texture.type.TextureTypeNormal;
 
@@ -19,12 +18,9 @@ public class TextureNormal extends AbstractTexture<TextureTypeNormal> {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
+	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, Direction cullFace) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 		quad.setUVBounds(sprites[0]);
-		if (quadGoal == 4) {
-			return new RenderableArray(quad.toQuadrants());
-		}
 		return quad;
 	}
 }

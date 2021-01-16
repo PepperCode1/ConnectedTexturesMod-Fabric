@@ -20,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.render.model.WeightedBakedModel;
@@ -127,36 +126,36 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 		return getParent();
 	}
 
-	private <T> T applyToParent(Random rand, Function<AbstractCTMBakedModel, T> func) {
-		BakedModel parent = getParent(rand);
+	private <T> T applyToParent(Random random, Function<AbstractCTMBakedModel, T> function) {
+		BakedModel parent = getParent(random);
 		if (parent instanceof AbstractCTMBakedModel) {
-			return func.apply((AbstractCTMBakedModel) parent);
+			return function.apply((AbstractCTMBakedModel) parent);
 		}
 		return null;
 	}
 
-	protected CTMTexture<?> getOverrideTexture(Random rand, int tintIndex, Identifier texture) {
-		CTMTexture<?> ret = getUnbakedModel().getOverrideTexture(tintIndex, texture);
-		if (ret == null) {
-			ret = applyToParent(rand, parent -> parent.getOverrideTexture(rand, tintIndex, texture));
+	protected CTMTexture<?> getOverrideTexture(Random random, int tintIndex, Identifier identifier) {
+		CTMTexture<?> texture = getUnbakedModel().getOverrideTexture(tintIndex, identifier);
+		if (texture == null) {
+			texture = applyToParent(random, parent -> parent.getOverrideTexture(random, tintIndex, identifier));
 		}
-		return ret;
+		return texture;
 	}
 
-	protected CTMTexture<?> getTexture(Random rand, Identifier texture) {
-		CTMTexture<?> ret = getUnbakedModel().getTexture(texture);
-		if (ret == null) {
-			ret = applyToParent(rand, parent -> parent.getTexture(rand, texture));
+	protected CTMTexture<?> getTexture(Random random, Identifier identifier) {
+		CTMTexture<?> texture = getUnbakedModel().getTexture(identifier);
+		if (texture == null) {
+			texture = applyToParent(random, parent -> parent.getTexture(random, identifier));
 		}
-		return ret;
+		return texture;
 	}
 
-	protected Sprite getOverrideSprite(Random rand, int tintIndex) {
-		Sprite ret = getUnbakedModel().getOverrideSprite(tintIndex);
-		if (ret == null) {
-			ret = applyToParent(rand, parent -> parent.getOverrideSprite(rand, tintIndex));
+	protected Sprite getOverrideSprite(Random random, int tintIndex) {
+		Sprite sprite = getUnbakedModel().getOverrideSprite(tintIndex);
+		if (sprite == null) {
+			sprite = applyToParent(random, parent -> parent.getOverrideSprite(random, tintIndex));
 		}
-		return ret;
+		return sprite;
 	}
 
 	public Collection<CTMTexture<?>> getCTMTextures() {
@@ -168,24 +167,17 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 		return builder.build();
 	}
 
-	@SuppressWarnings("resource")
-	public Mesh getBlockMesh(BlockState state, Random random, CTMRenderContext renderContext) {
-		ProfileUtil.push("ctm_models");
+	public Mesh getBlockMesh(BlockState state, Random random, BlockRenderView blockView, BlockPos pos) {
+		ProfileUtil.push("ctm_model_block");
 		BakedModel parent = getParent(random);
 		Mesh mesh = null;
 		try {
-			if (MinecraftClient.getInstance().world != null && renderContext != null) {
-				ProfileUtil.push("state_creation");
-				TextureContextList contextList = renderContext.getContextList(state, this);
-				Object2LongMap<CTMTexture<?>> serialized = contextList.serialized();
-				ProfileUtil.swap("model_creation");
-				mesh = STATE_CACHE.get(new State(state, serialized, parent), () -> createMesh(state, unbakedModel, parent, contextList, random));
-				ProfileUtil.pop();
-			} else if (state != null) {
-				ProfileUtil.push("model_creation");
-				mesh = STATE_CACHE.get(new State(state, null, parent), () -> createMesh(state, unbakedModel, parent, null, random));
-				ProfileUtil.pop();
-			}
+			ProfileUtil.push("ctm_context_creation");
+			TextureContextList contextList = new TextureContextList(state, getCTMTextures(), blockView, pos);
+			Object2LongMap<CTMTexture<?>> serialized = contextList.serialized();
+			ProfileUtil.swap("ctm_mesh_creation");
+			mesh = STATE_CACHE.get(new State(state, serialized, parent), () -> createMesh(state, unbakedModel, parent, contextList, random));
+			ProfileUtil.pop();
 		} catch (ExecutionException e) {
 			throw new RuntimeException(e);
 		}
@@ -194,7 +186,7 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	}
 
 	public Mesh getItemMesh(ItemStack itemStack, Random random) {
-		ProfileUtil.push("ctm_models");
+		ProfileUtil.push("ctm_model_item");
 		Item item = itemStack.getItem();
 		Mesh mesh = null;
 		try {
@@ -214,7 +206,7 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 
 	@Override
 	public void emitBlockQuads(BlockRenderView blockView, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, RenderContext context) {
-		context.meshConsumer().accept(getBlockMesh(state, randomSupplier.get(), new CTMRenderContext(blockView, pos)));
+		context.meshConsumer().accept(getBlockMesh(state, randomSupplier.get(), blockView, pos));
 	}
 
 	@Override

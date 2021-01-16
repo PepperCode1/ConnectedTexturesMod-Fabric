@@ -6,6 +6,7 @@ import net.minecraft.util.profiler.Profiler;
 
 import team.chisel.ctm.client.event.ModelsLoadedCallback;
 import team.chisel.ctm.client.model.AbstractCTMBakedModel;
+import team.chisel.ctm.client.util.ResourceUtil;
 
 public class CTMModelsLoadedCallbackHandler implements ModelsLoadedCallback {
 	private WrappingCache wrappingCache;
@@ -18,5 +19,6 @@ public class CTMModelsLoadedCallbackHandler implements ModelsLoadedCallback {
 	public void onModelsLoaded(ModelLoader modelLoader, ResourceManager resourceManager, Profiler profiler) {
 		wrappingCache.invalidate();
 		AbstractCTMBakedModel.invalidateCaches();
+		ResourceUtil.invalidateCaches();
 	}
 }

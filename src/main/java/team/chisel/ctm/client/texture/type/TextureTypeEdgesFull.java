@@ -27,9 +27,4 @@ public class TextureTypeEdgesFull implements TextureType {
 	public int requiredTextures() {
 		return 2;
 	}
-
-	@Override
-	public int getQuadsPerSide() {
-		return 1;
-	}
 }

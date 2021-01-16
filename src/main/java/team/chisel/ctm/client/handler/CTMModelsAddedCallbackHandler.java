@@ -74,7 +74,7 @@ public class CTMModelsAddedCallbackHandler implements ModelsAddedCallback {
 							CTMMetadataSection metadata = null;
 							// Cache all dependent texture metadata
 							try {
-								metadata = ResourceUtil.getMetadata(ResourceUtil.spriteToAbsolute(texture.getTextureId()));
+								metadata = ResourceUtil.getMetadata(ResourceUtil.toTextureIdentifier(texture.getTextureId()));
 							} catch (IOException e) {
 								// Fallthrough
 							}

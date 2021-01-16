@@ -24,7 +24,7 @@ public class TextureContextConnecting implements TextureContext {
 		for (Direction face : Direction.values()) {
 			ConnectionLogic logic = createLogic(world, pos, face);
 			logicMap.put(face, logic);
-			data |= logic.serialized() << (face.ordinal() * 10);
+			data |= logic.serialized() << (face.ordinal() * 8);
 		}
 	}
 

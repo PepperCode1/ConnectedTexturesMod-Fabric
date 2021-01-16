@@ -19,7 +19,6 @@ import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 import team.chisel.ctm.client.render.Submap;
 import team.chisel.ctm.client.render.SubmapImpl;
-import team.chisel.ctm.client.render.UnbakedQuad;
 import team.chisel.ctm.client.texture.context.TextureContextPillar;
 import team.chisel.ctm.client.texture.context.TextureContextPillar.ConnectionData;
 import team.chisel.ctm.client.texture.context.TextureContextPillar.Connections;
@@ -32,23 +31,23 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, int quadGoal, Direction cullFace) {
-		if (!(context instanceof TextureContextPillar)) {
-			SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
-			if (bakedQuad.getFace().getAxis().isVertical()) {
+	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, Direction cullFace) {
+		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
+		if (context instanceof TextureContextPillar) {
+			transform(quad, (TextureContextPillar) context);
+		} else {
+			if (quad.nominalFace.getAxis().isVertical()) {
 				quad.setUVBounds(sprites[0]);
 			} else {
 				quad.setUVBounds(sprites[1]);
 				quad.applySubmap(SubmapImpl.X2[0][0]);
 			}
-			return quad;
 		}
-		return getQuad(bakedQuad, (TextureContextPillar) context, cullFace);
+		return quad;
 	}
 
-	private UnbakedQuad getQuad(BakedQuad bakedQuad, TextureContextPillar context, Direction cullFace) {
-		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
-		Direction nominalFace = bakedQuad.getFace();
+	private void transform(SpriteUnbakedQuad quad, TextureContextPillar context) {
+		Direction nominalFace = quad.nominalFace;
 		ConnectionData data = context.getData();
 		Connections connections = data.getConnections();
 
@@ -114,7 +113,6 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 		} else {
 			quad.setUVBounds(sprites[0]);
 		}
-		return quad;
 	}
 
 	private Submap getSubmap(Direction face1, Direction face2, Connections connections) {

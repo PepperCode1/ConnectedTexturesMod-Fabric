@@ -59,7 +59,7 @@ public class CTMClient implements ClientModInitializer {
 		WrappingCache wrappingCache = new WrappingCache();
 		DeserializeModelJsonCallback.EVENT.register(new CTMDeserializeModelJsonCallbackHandler(wrappingCache));
 		ModelsAddedCallback.EVENT.register(new CTMModelsAddedCallbackHandler(wrappingCache));
-		AtlasStitchCallback.EVENT.register(new CTMAtlasStitchCallbackHandler(wrappingCache));
+		AtlasStitchCallback.EVENT.register(new CTMAtlasStitchCallbackHandler());
 		ModelsLoadedCallback.EVENT.register(new CTMModelsLoadedCallbackHandler(wrappingCache));
 
 		TextureType type;
