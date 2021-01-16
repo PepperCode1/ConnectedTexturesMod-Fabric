@@ -18,6 +18,8 @@ A checkstyle has been added to make sure the code style is consistent. It is bas
 
 [CTMF Wiki](https://github.com/PepperCode1/ConnectedTexturesMod-Fabric/wiki)
 
+[CTMF CurseForge](https://www.curseforge.com/minecraft/mc-mods/ctm-fabric)
+
 [CTM Wiki](https://github.com/Chisel-Team/ConnectedTexturesMod/wiki)
 
 [CTM Github](https://github.com/Chisel-Team/ConnectedTexturesMod)
