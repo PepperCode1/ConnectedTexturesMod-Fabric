@@ -20,7 +20,7 @@ public class TextureEdges extends TextureCTM {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, Direction cullFace) {
+	public Renderable transformQuad(BakedQuad bakedQuad, Direction cullFace, TextureContext context) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 
 		if (CTMClient.getConfigManager().getConfig().disableCTM || !(context instanceof TextureContextConnectingObscured)) {
@@ -34,7 +34,7 @@ public class TextureEdges extends TextureCTM {
 			return quad;
 		}
 
-		return super.transformQuad(bakedQuad, context, cullFace);
+		return super.transformQuad(bakedQuad, cullFace, context);
 	}
 
 	@Override

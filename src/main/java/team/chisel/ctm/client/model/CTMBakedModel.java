@@ -14,53 +14,57 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 
 import team.chisel.ctm.api.client.CTMTexture;
 import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.client.mixin.BakedQuadAccessor;
-import team.chisel.ctm.client.render.BakedQuadUtil;
+import team.chisel.ctm.client.render.RenderUtil;
 
 public class CTMBakedModel extends AbstractCTMBakedModel {
 	private static final ThreadLocal<MeshBuilder> MESH_BUILDER = ThreadLocal.withInitial(() -> RendererAccess.INSTANCE.getRenderer().meshBuilder());
 	private static final Direction[] CULL_FACES = ObjectArrays.concat(Direction.values(), (Direction) null);
 
-	public CTMBakedModel(CTMUnbakedModel unbakedModel, BakedModel parent) {
-		super(unbakedModel, parent);
+	public CTMBakedModel(BakedModel parent, CTMModelInfo modelInfo) {
+		super(parent, modelInfo);
 	}
 
 	@Override
-	protected Mesh createMesh(@Nullable BlockState state, CTMUnbakedModel unbakedModel, BakedModel parent, @Nullable TextureContextList contextList, Random random) {
+	protected Mesh createMesh(BakedModel parent, CTMModelInfo modelInfo, @Nullable TextureContextList contextList, @Nullable BlockState state, Random random) {
 		MeshBuilder builder = MESH_BUILDER.get();
 		QuadEmitter emitter = builder.getEmitter();
-
-		while (parent instanceof CTMBakedModel) {
-			parent = ((AbstractCTMBakedModel) parent).getParent(random);
-		}
 
 		for (Direction cullFace : CULL_FACES) {
 			List<BakedQuad> parentQuads = parent.getQuads(state, cullFace, random);
 
-			// Gather all quads and map them to their textures
-			// All quads should have an associated CTMTexture, so ignore any that do not
+			// Gather all BakedQuads and map them to their CTMTextures
+			// Pass BakedQuads that do not have an associated CTMTexture directly to the QuadEmitter
 			for (BakedQuad bakedQuad : parentQuads) {
-				CTMTexture<?> texture = getOverrideTexture(random, bakedQuad.getColorIndex(), ((BakedQuadAccessor) bakedQuad).getSprite().getId());
+				Identifier spriteId = ((BakedQuadAccessor) bakedQuad).getSprite().getId();
+				int tintIndex = bakedQuad.getColorIndex();
+
+				Sprite overrideSprite = getOverrideSprite(random, tintIndex);
+				if (overrideSprite != null) {
+					bakedQuad = RenderUtil.retextureQuad(bakedQuad, overrideSprite);
+					spriteId = overrideSprite.getId();
+				}
+
+				CTMTexture<?> texture = getOverrideTexture(random, tintIndex, spriteId);
 				if (texture == null) {
-					texture = getTexture(random, ((BakedQuadAccessor) bakedQuad).getSprite().getId());
+					texture = getTexture(random, spriteId);
 				}
 
 				if (texture != null) {
-					Sprite spriteReplacement = getOverrideSprite(random, bakedQuad.getColorIndex());
-					if (spriteReplacement != null) {
-						bakedQuad = BakedQuadUtil.retextureQuad(bakedQuad, spriteReplacement);
-					}
-
-					TextureContext context = contextList == null ? null : contextList.getTextureContext(texture);
-					Renderable renderable = texture.transformQuad(bakedQuad, context, cullFace);
+					TextureContext context = contextList == null ? null : contextList.getContext(texture);
+					Renderable renderable = texture.transformQuad(bakedQuad, cullFace, context);
 					if (renderable != null) {
 						renderable.render(emitter);
 					}
+				} else {
+					emitter.fromVanilla(bakedQuad, null, cullFace);
+					emitter.emit();
 				}
 			}
 		}
@@ -70,10 +74,10 @@ public class CTMBakedModel extends AbstractCTMBakedModel {
 
 	@Override
 	public Sprite getSprite() {
-		CTMTexture<?> texture = getUnbakedModel().getTexture(getParent().getSprite().getId());
+		CTMTexture<?> texture = getModelInfo().getTexture(getParent().getSprite().getId());
 		if (texture != null) {
 			return texture.getParticle();
 		}
-		return getParent().getSprite();
+		return super.getSprite();
 	}
 }

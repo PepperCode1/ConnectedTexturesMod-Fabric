@@ -6,7 +6,7 @@ import team.chisel.ctm.impl.client.TextureTypeRegistryImpl;
  * Registry for {@link TextureType}. Use {@link TextureTypeRegistry#INSTANCE} to obtain an instance of this class.
  */
 public interface TextureTypeRegistry {
-	TextureTypeRegistry INSTANCE = new TextureTypeRegistryImpl();
+	TextureTypeRegistry INSTANCE = TextureTypeRegistryImpl.INSTANCE;
 
 	void register(String name, TextureType type);
 

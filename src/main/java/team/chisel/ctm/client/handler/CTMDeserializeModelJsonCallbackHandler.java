@@ -7,12 +7,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
 
 import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.event.DeserializeModelJsonCallback;
-import team.chisel.ctm.client.model.CTMUnbakedModel;
 import team.chisel.ctm.client.resource.ModelParser;
 import team.chisel.ctm.client.resource.ModelParserV1;
 
@@ -21,10 +21,10 @@ public class CTMDeserializeModelJsonCallbackHandler implements DeserializeModelJ
 			.put(1, new ModelParserV1())
 			.build();
 
-	private WrappingCache wrappingCache;
+	private Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap;
 
-	public CTMDeserializeModelJsonCallbackHandler(WrappingCache wrappingCache) {
-		this.wrappingCache = wrappingCache;
+	public CTMDeserializeModelJsonCallbackHandler(Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap) {
+		this.jsonOverrideMap = jsonOverrideMap;
 	}
 
 	@Override
@@ -36,8 +36,10 @@ public class CTMDeserializeModelJsonCallbackHandler implements DeserializeModelJ
 				if (parser == null) {
 					CTMClient.LOGGER.error("Invalid \"ctm_version\" in model {}.", jsonElement);
 				} else {
-					CTMUnbakedModel model = parser.parse(jsonModel, jsonObject, type, context);
-					wrappingCache.jsonModelsToWrap.put(jsonModel, model);
+					Int2ObjectMap<JsonElement> overrides = parser.parse(jsonModel, jsonObject, type, context);
+					if (overrides != null) {
+						jsonOverrideMap.put(jsonModel, overrides);
+					}
 				}
 			}
 		}

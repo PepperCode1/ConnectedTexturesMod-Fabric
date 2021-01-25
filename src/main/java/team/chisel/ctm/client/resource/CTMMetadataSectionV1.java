@@ -20,8 +20,8 @@ public class CTMMetadataSectionV1 implements CTMMetadataSection {
 	private TextureType type = TextureTypeNormal.INSTANCE;
 	private BlendMode blendMode;
 	private Identifier proxy;
-	private Identifier[] additionalTextures = new Identifier[0];
-	private JsonObject extraData = new JsonObject();
+	private Identifier[] additionalTextures;
+	private JsonObject extraData;
 
 	public static CTMMetadataSection fromJson(JsonObject jsonObject) throws JsonParseException {
 		CTMMetadataSectionV1 metadata = new CTMMetadataSectionV1();
@@ -72,6 +72,9 @@ public class CTMMetadataSectionV1 implements CTMMetadataSection {
 					}
 				}
 			}
+		}
+		if (metadata.additionalTextures == null) {
+			metadata.additionalTextures = new Identifier[0];
 		}
 		if (jsonObject.has("extra") && jsonObject.get("extra").isJsonObject()) {
 			metadata.extraData = jsonObject.getAsJsonObject("extra");

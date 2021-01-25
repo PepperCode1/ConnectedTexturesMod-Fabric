@@ -63,8 +63,8 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, Direction cullFace) {
-		return mapType.transformQuad(this, bakedQuad, context, cullFace);
+	public Renderable transformQuad(BakedQuad bakedQuad, Direction cullFace, TextureContext context) {
+		return mapType.transformQuad(this, bakedQuad, cullFace, context);
 	}
 
 	public int getXSize() {
@@ -84,7 +84,7 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 	}
 
 	public interface MapType {
-		Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, @Nullable TextureContext context, Direction cullFace);
+		Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, Direction cullFace, @Nullable TextureContext context);
 
 		@NotNull
 		TextureContext getContext(@NotNull BlockPos pos, @NotNull TextureMap texture);
@@ -94,7 +94,7 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 	public enum MapTypeImpl implements MapType {
 		RANDOM {
 			@Override
-			public Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, @Nullable TextureContext context, Direction cullFace) {
+			public Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, Direction cullFace, @Nullable TextureContext context) {
 				SpriteUnbakedQuad quad = texture.unbake(bakedQuad, cullFace);
 
 				Point2i textureCoords;
@@ -122,7 +122,7 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 		},
 		PATTERNED {
 			@Override
-			public Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, @Nullable TextureContext context, Direction cullFace) {
+			public Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, Direction cullFace, @Nullable TextureContext context) {
 				SpriteUnbakedQuad quad = texture.unbake(bakedQuad, cullFace);
 
 				Point2i textureCoords;

@@ -33,9 +33,10 @@ public class ConfigManager {
 			try (FileReader reader = new FileReader(file)) {
 				config = GSON.fromJson(reader, Config.class);
 			} catch (IOException e) {
-				e.printStackTrace();
+				CTMClient.LOGGER.error("Error loading config.", e);
 			}
-		} else {
+		}
+		if (config == null) {
 			config = new Config();
 			save();
 		}
@@ -45,7 +46,7 @@ public class ConfigManager {
 		try (FileWriter writer = new FileWriter(file)) {
 			writer.write(GSON.toJson(config));
 		} catch (IOException e) {
-			e.printStackTrace();
+			CTMClient.LOGGER.error("Error saving config.", e);
 		}
 	}
 

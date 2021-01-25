@@ -43,19 +43,19 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	private static final Cache<Item, Mesh> ITEM_CACHE = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).<Item, Mesh>build();
 
 	@NotNull
-	private final CTMUnbakedModel unbakedModel;
-	@NotNull
 	private final BakedModel parent;
+	@NotNull
+	private final CTMModelInfo modelInfo;
 
-	public AbstractCTMBakedModel(@NotNull final CTMUnbakedModel unbakedModel, @NotNull final BakedModel parent) {
-		if (unbakedModel == null) {
-			throw new NullPointerException("unbakedModel is marked non-null but is null");
-		}
+	public AbstractCTMBakedModel(@NotNull final BakedModel parent, @NotNull final CTMModelInfo modelInfo) {
 		if (parent == null) {
 			throw new NullPointerException("parent is marked non-null but is null");
 		}
-		this.unbakedModel = unbakedModel;
+		if (modelInfo == null) {
+			throw new NullPointerException("modelInfo is marked non-null but is null");
+		}
 		this.parent = parent;
+		this.modelInfo = modelInfo;
 	}
 
 	public static void invalidateCaches() {
@@ -64,18 +64,17 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	}
 
 	@NotNull
-	public CTMUnbakedModel getUnbakedModel() {
-		return unbakedModel;
-	}
-
-	@NotNull
 	public BakedModel getParent() {
 		return parent;
 	}
 
+	@NotNull
+	public CTMModelInfo getModelInfo() {
+		return modelInfo;
+	}
+
 	@Override
 	public List<BakedQuad> getQuads(BlockState state, Direction face, Random random) {
-		//ModelHelper.toQuadLists(mesh);
 		return parent.getQuads(state, face, random);
 	}
 
@@ -85,13 +84,13 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	}
 
 	@Override
-	public ModelOverrideList getOverrides() {
-		return ModelOverrideList.EMPTY;
+	public boolean hasDepth() {
+		return parent.hasDepth();
 	}
 
 	@Override
-	public boolean hasDepth() {
-		return parent.hasDepth();
+	public boolean isSideLit() {
+		return parent.isSideLit();
 	}
 
 	@Override
@@ -100,7 +99,6 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	}
 
 	@Override
-	@NotNull
 	public Sprite getSprite() {
 		return parent.getSprite();
 	}
@@ -111,8 +109,8 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	}
 
 	@Override
-	public boolean isSideLit() {
-		return parent.isSideLit();
+	public ModelOverrideList getOverrides() {
+		return ModelOverrideList.EMPTY;
 	}
 
 	/**
@@ -120,10 +118,10 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	 */
 	@NotNull
 	public BakedModel getParent(Random random) {
-		if (getParent() instanceof WeightedBakedModel) {
-			return ((WeightedBakedModelExtension) getParent()).getRandomModel(random);
+		if (parent instanceof WeightedBakedModel) {
+			return ((WeightedBakedModelExtension) parent).getRandomModel(random);
 		}
-		return getParent();
+		return parent;
 	}
 
 	private <T> T applyToParent(Random random, Function<AbstractCTMBakedModel, T> function) {
@@ -134,37 +132,37 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 		return null;
 	}
 
-	protected CTMTexture<?> getOverrideTexture(Random random, int tintIndex, Identifier identifier) {
-		CTMTexture<?> texture = getUnbakedModel().getOverrideTexture(tintIndex, identifier);
-		if (texture == null) {
-			texture = applyToParent(random, parent -> parent.getOverrideTexture(random, tintIndex, identifier));
+	public Collection<CTMTexture<?>> getCTMTextures() {
+		ImmutableList.Builder<CTMTexture<?>> builder = ImmutableList.builder();
+		builder.addAll(modelInfo.getTextures());
+		if (parent instanceof AbstractCTMBakedModel) {
+			builder.addAll(((AbstractCTMBakedModel) parent).getCTMTextures());
 		}
-		return texture;
+		return builder.build();
 	}
 
 	protected CTMTexture<?> getTexture(Random random, Identifier identifier) {
-		CTMTexture<?> texture = getUnbakedModel().getTexture(identifier);
+		CTMTexture<?> texture = modelInfo.getTexture(identifier);
 		if (texture == null) {
-			texture = applyToParent(random, parent -> parent.getTexture(random, identifier));
+			texture = applyToParent(random, (parent) -> parent.getTexture(random, identifier));
 		}
 		return texture;
 	}
 
 	protected Sprite getOverrideSprite(Random random, int tintIndex) {
-		Sprite sprite = getUnbakedModel().getOverrideSprite(tintIndex);
+		Sprite sprite = modelInfo.getOverrideSprite(tintIndex);
 		if (sprite == null) {
-			sprite = applyToParent(random, parent -> parent.getOverrideSprite(random, tintIndex));
+			sprite = applyToParent(random, (parent) -> parent.getOverrideSprite(random, tintIndex));
 		}
 		return sprite;
 	}
 
-	public Collection<CTMTexture<?>> getCTMTextures() {
-		ImmutableList.Builder<CTMTexture<?>> builder = ImmutableList.builder();
-		builder.addAll(getUnbakedModel().getCTMTextures());
-		if (getParent() instanceof AbstractCTMBakedModel) {
-			builder.addAll(((AbstractCTMBakedModel) getParent()).getCTMTextures());
+	protected CTMTexture<?> getOverrideTexture(Random random, int tintIndex, Identifier identifier) {
+		CTMTexture<?> texture = modelInfo.getOverrideTexture(tintIndex, identifier);
+		if (texture == null) {
+			texture = applyToParent(random, (parent) -> parent.getOverrideTexture(random, tintIndex, identifier));
 		}
-		return builder.build();
+		return texture;
 	}
 
 	public Mesh getBlockMesh(BlockState state, Random random, BlockRenderView blockView, BlockPos pos) {
@@ -176,7 +174,7 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 			TextureContextList contextList = new TextureContextList(state, getCTMTextures(), blockView, pos);
 			Object2LongMap<CTMTexture<?>> serialized = contextList.serialized();
 			ProfileUtil.swap("ctm_mesh_creation");
-			mesh = STATE_CACHE.get(new State(state, serialized, parent), () -> createMesh(state, unbakedModel, parent, contextList, random));
+			mesh = STATE_CACHE.get(new State(state, serialized, parent), () -> createMesh(parent, modelInfo, contextList, state, random));
 			ProfileUtil.pop();
 		} catch (ExecutionException e) {
 			throw new RuntimeException(e);
@@ -195,7 +193,7 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 				if (item instanceof BlockItem) {
 					block = ((BlockItem) item).getBlock();
 				}
-				return createMesh(block == null ? null : block.getDefaultState(), unbakedModel, getParent(random), null, random);
+				return createMesh(getParent(random), modelInfo, null, block == null ? null : block.getDefaultState(), random);
 			});
 		} catch (ExecutionException e) {
 			throw new RuntimeException(e);
@@ -222,7 +220,7 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	/**
 	 * This method must be thread-safe as it may be called from multiple threads at once.
 	 */
-	protected abstract Mesh createMesh(BlockState state, @NotNull CTMUnbakedModel unbakedModel, BakedModel parent, TextureContextList contextList, Random random);
+	protected abstract Mesh createMesh(BakedModel parent, @NotNull CTMModelInfo modelInfo, TextureContextList contextList, BlockState state, Random random);
 
 	private static class State {
 		@NotNull

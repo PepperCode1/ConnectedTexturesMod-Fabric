@@ -2,7 +2,6 @@ package team.chisel.ctm.api.client;
 
 import java.util.Collection;
 
-import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.render.model.BakedQuad;
@@ -10,16 +9,15 @@ import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 
-public interface CTMTexture<T extends TextureType> {
+public interface CTMTexture<T extends TextureType> { // TODO remove generic argument?
 	/**
 	 * Transforms a BakedQuad.
 	 * @param bakedQuad The BakedQuad.
-	 * @param context The Context. <b>If this is null, the model which is currently being built is an item model.</b>
-	 * @param quadGoal The amount of quads that should be rendered by the returned Renderable.
 	 * @param cullFace The cull face. This is not the same as the BakedQuad's face.
+	 * @param context The Context. <b>If this is null, the model which is currently being built is an item model.</b>
 	 * @return A Renderable.
 	 */
-	Renderable transformQuad(BakedQuad bakedQuad, @Nullable TextureContext context, Direction cullFace);
+	Renderable transformQuad(BakedQuad bakedQuad, Direction cullFace, @Nullable TextureContext context);
 
 	Collection<Identifier> getTextures();
 
@@ -34,11 +32,4 @@ public interface CTMTexture<T extends TextureType> {
 	 * @return The sprite for the particle.
 	 */
 	Sprite getParticle();
-
-	/**
-	 * Gets the BlendMode with which this texture will be rendered.
-	 * @return The BlendMode of this texture.
-	 */
-	@Nullable
-	BlendMode getBlendMode();
 }

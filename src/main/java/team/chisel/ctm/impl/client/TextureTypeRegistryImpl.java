@@ -6,16 +6,21 @@ import java.util.Map;
 
 import team.chisel.ctm.api.client.TextureType;
 import team.chisel.ctm.api.client.TextureTypeRegistry;
+import team.chisel.ctm.client.CTMClient;
 
 public class TextureTypeRegistryImpl implements TextureTypeRegistry {
+	public static final TextureTypeRegistryImpl INSTANCE = new TextureTypeRegistryImpl();
+
 	private Map<String, TextureType> types = new HashMap<>();
 
 	public void register(String name, TextureType type) {
 		String key = name.toLowerCase(Locale.ROOT);
-		if (types.containsKey(key) && types.get(key) != type) {
-			throw new IllegalArgumentException("TextureType with name " + key + " has already been registered!");
-		} else if (types.get(key) != type) {
-			types.put(key, type);
+		if (types.get(key) != type) {
+			if (types.containsKey(key)) {
+				CTMClient.LOGGER.error("TextureType with name {} has already been registered!", key);
+			} else {
+				types.put(key, type);
+			}
 		}
 	}
 

@@ -19,7 +19,6 @@ import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.Direction.AxisDirection;
 import net.minecraft.world.BlockView;
 
-import team.chisel.ctm.api.client.util.NotNullType;
 import team.chisel.ctm.client.util.DirectionHelper;
 
 /**
@@ -53,9 +52,9 @@ public enum ConnectionDirection {
 		}
 	}
 
-	@NotNullType
+	@NotNull
 	private Direction[] directions;
-	@NotNullType
+	@NotNull
 	private BlockPos[] offsets = new BlockPos[6];
 
 	ConnectionDirection(Direction... directions) {
@@ -65,7 +64,7 @@ public enum ConnectionDirection {
 	private void buildCaches() {
 		// Fill normalized dirs
 		for (Direction normal : Direction.values()) {
-			@NotNullType Direction[] normalized;
+			@NotNull Direction[] normalized;
 			if (normal == NORMAL) {
 				normalized = directions;
 			} else if (normal == NORMAL.getOpposite()) {

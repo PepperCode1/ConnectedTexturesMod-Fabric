@@ -2,11 +2,17 @@ package team.chisel.ctm.client;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
+import com.google.gson.JsonElement;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import net.minecraft.client.render.model.json.JsonUnbakedModel;
 
 import team.chisel.ctm.api.client.TextureType;
 import team.chisel.ctm.api.client.TextureTypeRegistry;
@@ -18,7 +24,6 @@ import team.chisel.ctm.client.handler.CTMAtlasStitchCallbackHandler;
 import team.chisel.ctm.client.handler.CTMDeserializeModelJsonCallbackHandler;
 import team.chisel.ctm.client.handler.CTMModelsAddedCallbackHandler;
 import team.chisel.ctm.client.handler.CTMModelsLoadedCallbackHandler;
-import team.chisel.ctm.client.handler.WrappingCache;
 import team.chisel.ctm.client.texture.type.TextureTypeCTM;
 import team.chisel.ctm.client.texture.type.TextureTypeEdges;
 import team.chisel.ctm.client.texture.type.TextureTypeEdgesFull;
@@ -31,7 +36,7 @@ import team.chisel.ctm.client.texture.type.TextureTypeSCTM;
 
 public class CTMClient implements ClientModInitializer {
 	public static final String MOD_ID = "ctm";
-	public static final Logger LOGGER = LogManager.getLogger();
+	public static final Logger LOGGER = LogManager.getLogger("ctm");
 
 	private static CTMClient instance;
 	private static ConfigManager configManager;
@@ -56,11 +61,11 @@ public class CTMClient implements ClientModInitializer {
 
 		getConfigManager();
 
-		WrappingCache wrappingCache = new WrappingCache();
-		DeserializeModelJsonCallback.EVENT.register(new CTMDeserializeModelJsonCallbackHandler(wrappingCache));
-		ModelsAddedCallback.EVENT.register(new CTMModelsAddedCallbackHandler(wrappingCache));
+		Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap = new HashMap<>();
+		DeserializeModelJsonCallback.EVENT.register(new CTMDeserializeModelJsonCallbackHandler(jsonOverrideMap));
+		ModelsAddedCallback.EVENT.register(new CTMModelsAddedCallbackHandler(jsonOverrideMap));
 		AtlasStitchCallback.EVENT.register(new CTMAtlasStitchCallbackHandler());
-		ModelsLoadedCallback.EVENT.register(new CTMModelsLoadedCallbackHandler(wrappingCache));
+		ModelsLoadedCallback.EVENT.register(new CTMModelsLoadedCallbackHandler());
 
 		TextureType type;
 		TextureTypeRegistry.INSTANCE.register("ctm", new TextureTypeCTM());

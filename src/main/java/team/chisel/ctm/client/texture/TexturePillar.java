@@ -31,7 +31,7 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, Direction cullFace) {
+	public Renderable transformQuad(BakedQuad bakedQuad, Direction cullFace, TextureContext context) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 		if (context instanceof TextureContextPillar) {
 			transform(quad, (TextureContextPillar) context);

@@ -9,6 +9,8 @@ import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
 import net.fabricmc.fabric.api.renderer.v1.material.MaterialFinder;
+import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.render.model.BakedQuad;
@@ -20,7 +22,6 @@ import net.minecraft.util.math.MathHelper;
 import team.chisel.ctm.api.client.CTMTexture;
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.api.client.TextureType;
-import team.chisel.ctm.api.client.util.NotNullType;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 
 /**
@@ -30,18 +31,18 @@ public abstract class AbstractTexture<T extends TextureType> implements CTMTextu
 	protected static final ThreadLocal<MaterialFinder> FINDER = ThreadLocal.withInitial(() -> RendererAccess.INSTANCE.getRenderer().materialFinder());
 
 	protected T type;
-	protected BlendMode blendMode;
-	@NotNullType
+	@NotNull
 	protected Sprite[] sprites;
+	protected RenderMaterial material;
 	protected boolean hasLight;
-	protected boolean isEmissive;
 	protected int skyLight;
 	protected int blockLight;
 
 	public AbstractTexture(T type, TextureInfo info) {
 		this.type = type;
-		this.blendMode = info.getBlendMode();
-		this.sprites = info.getSprites();
+		sprites = info.getSprites();
+
+		boolean isEmissive = false;
 		if (info.getInfo().isPresent()) {
 			JsonElement light = info.getInfo().get().get("light");
 			if (light != null) {
@@ -59,6 +60,11 @@ public abstract class AbstractTexture<T extends TextureType> implements CTMTextu
 				}
 			}
 		}
+
+		BlendMode blendMode = info.getBlendMode();
+		if (blendMode != null || isEmissive) {
+			material = FINDER.get().blendMode(0, blendMode).emissive(0, isEmissive).find();
+		}
 	}
 
 	private static int parseLightValue(@Nullable JsonElement data) {
@@ -69,32 +75,27 @@ public abstract class AbstractTexture<T extends TextureType> implements CTMTextu
 	}
 
 	@Override
-	public Sprite getParticle() {
-		return sprites[0];
-	}
-
-	@Override
 	public Collection<Identifier> getTextures() {
 		return Arrays.stream(sprites).map(Sprite::getId).collect(Collectors.toList());
 	}
 
+	@Override
 	public T getType() {
 		return type;
 	}
 
-	public BlendMode getBlendMode() {
-		return blendMode;
+	@Override
+	public Sprite getParticle() {
+		return sprites[0];
 	}
 
 	protected SpriteUnbakedQuad unbake(BakedQuad bakedQuad, Direction cullFace) {
 		SpriteUnbakedQuad quad = new SpriteUnbakedQuad(bakedQuad);
 		quad.cullFace = cullFace;
 		quad.nominalFace = bakedQuad.getFace();
+		quad.material = material;
 		if (hasLight) {
 			quad.setLight(skyLight, blockLight);
-		}
-		if (blendMode != null || isEmissive) {
-			quad.material = FINDER.get().blendMode(0, blendMode).emissive(0, isEmissive).find();
 		}
 		return quad;
 	}

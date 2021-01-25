@@ -24,7 +24,7 @@ public class TextureEldritch extends AbstractTexture<TextureTypeEldritch> {
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, Direction cullFace) {
+	public Renderable transformQuad(BakedQuad bakedQuad, Direction cullFace, TextureContext context) {
 		UnbakedQuad quad = unbake(bakedQuad, cullFace);
 
 		float[] bounds = quad.getSmallestUVBounds();

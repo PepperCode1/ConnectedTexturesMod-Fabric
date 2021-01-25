@@ -22,7 +22,7 @@ public class TextureEdgesFull extends AbstractConnectingTexture<TextureTypeEdges
 	}
 
 	@Override
-	public Renderable transformQuad(BakedQuad bakedQuad, TextureContext context, Direction cullFace) {
+	public Renderable transformQuad(BakedQuad bakedQuad, Direction cullFace, TextureContext context) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 
 		if (CTMClient.getConfigManager().getConfig().disableCTM || !(context instanceof TextureContextConnectingObscured)) {

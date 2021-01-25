@@ -10,7 +10,7 @@ import team.chisel.ctm.impl.client.OffsetProviderRegistryImpl;
  * Registry for {@link OffsetProvider}. Use {@link OffsetProvider#INSTANCE} to obtain an instance of this class.
  */
 public interface OffsetProviderRegistry {
-	OffsetProviderRegistry INSTANCE = new OffsetProviderRegistryImpl();
+	OffsetProviderRegistry INSTANCE = OffsetProviderRegistryImpl.INSTANCE;
 
 	void register(OffsetProvider provider);
 

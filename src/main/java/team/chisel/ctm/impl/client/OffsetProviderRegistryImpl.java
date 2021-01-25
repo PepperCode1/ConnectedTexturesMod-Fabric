@@ -11,6 +11,8 @@ import team.chisel.ctm.api.client.OffsetProvider;
 import team.chisel.ctm.api.client.OffsetProviderRegistry;
 
 public class OffsetProviderRegistryImpl implements OffsetProviderRegistry {
+	public static final OffsetProviderRegistryImpl INSTANCE = new OffsetProviderRegistryImpl();
+
 	private List<OffsetProvider> providers = new ArrayList<>();
 
 	@Override
