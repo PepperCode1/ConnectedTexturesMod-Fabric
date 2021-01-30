@@ -72,19 +72,19 @@ public class CTMClient implements ClientModInitializer {
 		TextureTypeRegistry.INSTANCE.register("edges", new TextureTypeEdges());
 		TextureTypeRegistry.INSTANCE.register("edges_full", new TextureTypeEdgesFull());
 		TextureTypeRegistry.INSTANCE.register("eldritch", new TextureTypeEldritch());
-		TextureTypeRegistry.INSTANCE.register("r", TextureTypeMap.RANDOM);
 		TextureTypeRegistry.INSTANCE.register("random", TextureTypeMap.RANDOM);
-		TextureTypeRegistry.INSTANCE.register("v", TextureTypeMap.PATTERN);
+		TextureTypeRegistry.INSTANCE.register("r", TextureTypeMap.RANDOM);
 		TextureTypeRegistry.INSTANCE.register("pattern", TextureTypeMap.PATTERN);
+		TextureTypeRegistry.INSTANCE.register("v", TextureTypeMap.PATTERN);
 		TextureTypeRegistry.INSTANCE.register("normal", TextureTypeNormal.INSTANCE);
 		type = new TextureTypePillar();
-		TextureTypeRegistry.INSTANCE.register("ctmv", type);
 		TextureTypeRegistry.INSTANCE.register("pillar", type);
-		TextureTypeRegistry.INSTANCE.register("ctmh", TextureTypePlane.HORIZONRAL);
+		TextureTypeRegistry.INSTANCE.register("ctmv", type);
 		TextureTypeRegistry.INSTANCE.register("ctm_horizontal", TextureTypePlane.HORIZONRAL);
+		TextureTypeRegistry.INSTANCE.register("ctmh", TextureTypePlane.HORIZONRAL);
 		TextureTypeRegistry.INSTANCE.register("ctm_vertical", TextureTypePlane.VERTICAL);
 		type = new TextureTypeSCTM();
-		TextureTypeRegistry.INSTANCE.register("sctm", type);
 		TextureTypeRegistry.INSTANCE.register("ctm_simple", type);
+		TextureTypeRegistry.INSTANCE.register("sctm", type);
 	}
 }

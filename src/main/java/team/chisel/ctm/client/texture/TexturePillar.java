@@ -52,17 +52,17 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 		Connections connections = data.getConnections();
 
 		// This is the order of operations for connections
-		EnumSet<Direction> realConnections = EnumSet.copyOf(data.getConnections().getConnections());
+		EnumSet<Direction> realConnections = EnumSet.copyOf(connections.getConnections());
 		if (connections.connectedOr(UP, DOWN)) {
 			// If connected up or down, ignore all other connections
-			realConnections.removeIf(f -> f.getAxis().isHorizontal());
+			realConnections.removeIf((direction) -> direction.getAxis().isHorizontal());
 		} else if (connections.connectedOr(EAST, WEST)) {
 			// If connected east or west, ignore any north/south connections, and any connections that are already connected up or down
-			realConnections.removeIf(f -> f == NORTH || f == SOUTH);
-			realConnections.removeIf(f -> blockConnectionZ(f, data));
+			realConnections.removeIf((direction) -> direction == NORTH || direction == SOUTH);
+			realConnections.removeIf((direction) -> blockConnectionZ(direction, data));
 		} else {
 			// Otherwise, remove every connection that is already connected to something else
-			realConnections.removeIf(f -> blockConnectionY(f, data));
+			realConnections.removeIf((direction) -> blockConnectionY(direction, data));
 		}
 
 		// Replace our initial connection data with the new info
@@ -73,7 +73,7 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 		if (nominalFace.getAxis().isHorizontal() && connections.connectedOr(UP, DOWN)) {
 			submap = getSubmap(UP, DOWN, connections);
 		} else if (connections.connectedOr(EAST, WEST)) {
-			rotation = 1;
+			rotation = 3;
 			submap = getSubmap(EAST, WEST, connections);
 		} else if (connections.connectedOr(NORTH, SOUTH)) {
 			submap = getSubmap(NORTH, SOUTH, connections);
@@ -86,13 +86,11 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 
 		// Side textures need to be rotated to look correct
 		if (connected && !connections.connectedOr(UP, DOWN)) {
-			if (nominalFace == EAST) {
-				rotation += 1;
-			}
-			if (nominalFace == NORTH) {
-				rotation += 2;
-			}
 			if (nominalFace == WEST) {
+				rotation += 1;
+			} else if (nominalFace == NORTH) {
+				rotation += 2;
+			} else if (nominalFace == EAST) {
 				rotation += 3;
 			}
 		}
@@ -138,7 +136,7 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 	}
 
 	private boolean blockConnection(Direction direction, Axis axis, ConnectionData data) {
-		Direction rot = DirectionHelper.rotateAround(direction, axis);
-		return data.getConnections(direction).connectedOr(rot, rot.getOpposite());
+		Direction rotated = DirectionHelper.rotateAround(direction, axis);
+		return data.getConnections(direction).connectedOr(rotated, rotated.getOpposite());
 	}
 }

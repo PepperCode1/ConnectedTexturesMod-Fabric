@@ -51,9 +51,7 @@ public class SpriteUnbakedQuad extends UnbakedQuad {
 	public SpriteUnbakedQuad[] toQuadrants() {
 		UnbakedQuad[] quads = super.toQuadrants();
 		SpriteUnbakedQuad[] spriteQuads = new SpriteUnbakedQuad[quads.length];
-		for (int i = 0; i < quads.length; i++) {
-			spriteQuads[i] = (SpriteUnbakedQuad) quads[i];
-		}
+		System.arraycopy(quads, 0, spriteQuads, 0, quads.length);
 		return spriteQuads;
 	}
 
