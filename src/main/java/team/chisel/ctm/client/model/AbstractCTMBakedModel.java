@@ -110,7 +110,7 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 
 	@Override
 	public ModelOverrideList getOverrides() {
-		return ModelOverrideList.EMPTY;
+		return parent.getOverrides();
 	}
 
 	/**
