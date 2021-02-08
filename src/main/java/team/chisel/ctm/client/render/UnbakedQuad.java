@@ -107,6 +107,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 
 	/**
 	 * Sets the color values for all vertexes.
+	 *
 	 * @param red int 0-255
 	 * @param green int 0-255
 	 * @param blue int 0-255
@@ -118,6 +119,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 
 	/**
 	 * Sets the light values for all vertexes.
+	 *
 	 * @param skyLight int 0-15
 	 * @param blockLight int 0-15
 	 */
@@ -133,6 +135,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 	/**
 	 * Sets new UV bounds relative the passed UV bounds.
 	 * Uses linear interpolation to let vertex UVs remain in the same position relative to the new bounds.
+	 *
 	 * @param bounds UV bounds in the form of float[] {minU, minV, maxU, maxV}.
 	 * @param newBounds UV bounds in the form of float[] {minU, minV, maxU, maxV}.
 	 */
@@ -147,6 +150,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 
 	/**
 	 * Applies a submap to the passed bounds and sets them as the new bounds relative to the passed bounds.
+	 *
 	 * @param bounds UV bounds in the form of float[] {minU, minV, maxU, maxV}.
 	 * @param submap The submap to apply.
 	 */
@@ -164,6 +168,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 
 	/**
 	 * Interpolates the passed bounds toward their center point by the specified amount and sets them as the new bounds relative to the passed bounds.
+	 *
 	 * @param bounds UV bounds in the form of float[] {minU, minV, maxU, maxV}.
 	 * @param delta float 0-1. The factor by which to interpolate.
 	 */
@@ -180,6 +185,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 
 	/**
 	 * Rotates the UVs by 90 degree intervals counter-clockwise around the provided center point.
+	 *
 	 * @param center A point in the form of float[] {u, v}.
 	 * @param rotation The rotation. If it is not 0-3, modulo will be used to fit it to that range.
 	 */
@@ -217,6 +223,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 
 	/**
 	 * Reflect the UVs across the provided center point.
+	 *
 	 * @param center A point in the form of float[] {u, v}.
 	 * @param reflection The way to reflect.
 	 */
@@ -232,6 +239,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 
 	/**
 	 * Untransforms the UVs so that they are not rotated or reflected.
+	 *
 	 * @param center A point in the form of float[] {u, v}.
 	 */
 	public void untransformUVs(float[] center) {
@@ -240,17 +248,19 @@ public class UnbakedQuad implements Renderable, Cloneable {
 	}
 
 	/**
-	 * <b>Does not take UV reflection into account. Use {@link #getAbsoluteUVRotation()} if UVs might be reflected.</b><br>
-	 * Calculates the counter-clockwise UV rotation by checking which vertex has the smallest UVs by using {@code u*u+v*v}.
+	 * <b>Does not take UV reflection into account. Use {@link #getAbsoluteUVRotation()} if UVs might be reflected.</b>
+	 *
+	 * <p>Calculates the counter-clockwise UV rotation by checking which vertex has the smallest UVs by using {@code u*u+v*v}.
+	 *
 	 * @return The counter-clockwise UV rotation.
 	 */
 	public int getUVRotation() {
 		int minVertex = -1;
-		double minDistance = 2;
+		float minDistance = 2;
 		Vertex vertex;
 		for (int vertexId = 0; vertexId < 4; vertexId++) {
 			vertex = vertexes[vertexId];
-			double distance = vertex.u * vertex.u + vertex.v * vertex.v;
+			float distance = vertex.u * vertex.u + vertex.v * vertex.v;
 			if (distance < minDistance) {
 				minDistance = distance;
 				minVertex = vertexId;
@@ -261,6 +271,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 
 	/**
 	 * Calculates the UV reflection.
+	 *
 	 * @return The UV reflection.
 	 */
 	public Reflection getUVReflection() {
@@ -285,6 +296,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 
 	/**
 	 * Calculates the absolute counter-clockwise UV rotation by reflecting the result from {@link #getUVReflection()}.
+	 *
 	 * @return The absolute counter-clockwise UV rotation.
 	 */
 	public int getAbsoluteUVRotation() {
@@ -301,6 +313,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 
 	/**
 	 * Calculates UV bounds that form the smallest rectangle that encompasses all vertex UVs.
+	 *
 	 * @return UV bounds in the form of float[] {minU, minV, maxU, maxV}.
 	 */
 	public float[] getSmallestUVBounds() {
@@ -329,6 +342,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 
 	/**
 	 * Divides this quad into two. Clones vertexes if the values don't change using {@link Vertex#clone()}.
+	 *
 	 * @param delta float 0-1. Where to create new vertexes in relation to the current ones. For example {@code 0.5f} divides the quad in half.
 	 * @param shift Whether to shift all operations by one vertex or not. This will flip the division line from horizontal to vertical or vice versa, depending on vertex order.
 	 * @return An UnbakedQuad[2]. The first quad will always have its first vertex have the same values as the first vertex in this quad.
@@ -359,6 +373,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 
 	/**
 	 * Divides this quad into four quads by using {@link #divide(float, boolean)} twice.
+	 *
 	 * @return An UnbakedQuad[4]. The quad at each index will contain a vertex with the same values as the one at the same index in this quad.
 	 */
 	public UnbakedQuad[] toQuadrants() {
@@ -378,6 +393,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 	/**
 	 * Creates a new UnbakedQuad, but only clones the properties from this quad to the new one.
 	 * This means that everything except vertexes is cloned.
+	 *
 	 * @return The new UnbakedQuad.
 	 */
 	public UnbakedQuad cloneProperties() {

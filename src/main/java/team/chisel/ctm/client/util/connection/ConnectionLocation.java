@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 /**
- * Represents the different spots for connection locations for a ctm block.
+ * Represents the different spots for connection locations for a CTM block model.
  */
 public enum ConnectionLocation {
 	UP(ConnectionDirection.TOP),

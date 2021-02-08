@@ -40,7 +40,7 @@ import team.chisel.ctm.client.util.ProfileUtil;
 
 public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedModel {
 	private static final Cache<State, Mesh> STATE_CACHE = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).maximumSize(5000).<State, Mesh>build();
-	private static final Cache<Item, Mesh> ITEM_CACHE = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).<Item, Mesh>build();
+	private static final Cache<BakedModel, Mesh> ITEM_CACHE = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).<BakedModel, Mesh>build();
 
 	@NotNull
 	private final BakedModel parent;
@@ -59,8 +59,8 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	}
 
 	public static void invalidateCaches() {
-		ITEM_CACHE.invalidateAll();
 		STATE_CACHE.invalidateAll();
+		ITEM_CACHE.invalidateAll();
 	}
 
 	@NotNull
@@ -185,10 +185,10 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 
 	public Mesh getItemMesh(ItemStack itemStack, Random random) {
 		ProfileUtil.push("ctm_model_item");
-		Item item = itemStack.getItem();
 		Mesh mesh = null;
 		try {
-			mesh = ITEM_CACHE.get(item, () -> {
+			mesh = ITEM_CACHE.get(this, () -> {
+				Item item = itemStack.getItem();
 				Block block = null;
 				if (item instanceof BlockItem) {
 					block = ((BlockItem) item).getBlock();

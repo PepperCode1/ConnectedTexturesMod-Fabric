@@ -12,6 +12,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import org.apache.commons.lang3.tuple.Pair;
@@ -27,8 +28,10 @@ import net.minecraft.client.render.model.json.ModelElementFace;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 
 import team.chisel.ctm.api.client.CTMTexture;
+import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.resource.CTMMetadataReader;
 import team.chisel.ctm.client.resource.CTMMetadataSection;
 import team.chisel.ctm.client.util.ResourceUtil;
@@ -67,12 +70,14 @@ public class JsonCTMUnbakedModel implements UnbakedModel {
 					SpriteIdentifier spriteId = TextureUtil.toSpriteIdentifier(identifier);
 					identifierOverrides.put(tintIndex, spriteId);
 					extraTextureDependencies.add(spriteId);
-					metadata = ResourceUtil.getMetadata(ResourceUtil.toTextureIdentifier(identifier));
+					metadata = ResourceUtil.getMetadataSafe(ResourceUtil.toTextureIdentifier(identifier));
 				} else if (element.isJsonObject()) {
 					metadata = CTMMetadataReader.INSTANCE.fromJson(element.getAsJsonObject());
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
+			} catch (InvalidIdentifierException e) {
+				CTMClient.LOGGER.error("Error processing CTM override: invalid identifier.", e);
+			} catch (JsonParseException e) {
+				CTMClient.LOGGER.error("Error processing CTM override: invalid JSON.", e);
 			}
 			if (metadata != null) {
 				for (Identifier identifier : metadata.getAdditionalTextures()) {

@@ -22,12 +22,12 @@ import net.minecraft.world.BlockView;
 import team.chisel.ctm.client.util.DirectionHelper;
 
 /**
- * Think of this class as a "Two dimensional Direction, with diagonals".
+ * Think of this class as a "two dimensional Direction, with diagonals".
  *
  * <p>It represents the eight different directions a face of a block can connect with CTM, and contains the logic for determining if a block is indeed connected in that direction.
  *
- * <p>Note that, for example, {@link #TOP_RIGHT} does not mean connected to the {@link #TOP} and {@link #RIGHT}, but connected in the diagonal direction represented by {@link #TOP_RIGHT}. This is used
- * for inner corner rendering.
+ * <p>Note that, for example, {@link #TOP_RIGHT} does not mean connected to the {@link #TOP} and {@link #RIGHT}, but connected in the diagonal direction represented by {@link #TOP_RIGHT}.
+ * This is used for inner corner rendering.
  */
 public enum ConnectionDirection {
 	TOP(UP),
@@ -47,7 +47,7 @@ public enum ConnectionDirection {
 
 	static {
 		// Run after static init
-		for (ConnectionDirection direction : ConnectionDirection.VALUES) {
+		for (ConnectionDirection direction : VALUES) {
 			direction.buildCaches();
 		}
 	}
@@ -105,7 +105,8 @@ public enum ConnectionDirection {
 
 	/**
 	 * Finds if this block is connected for the given side in this ConnectionDirection.
-	 * @param logic The CTM instance to use for logic.
+	 *
+	 * @param logic The connection logic.
 	 * @param world The world the block is in.
 	 * @param pos The position of the block.
 	 * @param side The side of the current face.
@@ -117,7 +118,8 @@ public enum ConnectionDirection {
 
 	/**
 	 * Finds if this block is connected for the given side in this ConnectionDirection.
-	 * @param logic The CTM instance to use for logic.
+	 *
+	 * @param logic The connection logic.
 	 * @param world The world the block is in.
 	 * @param pos The position of the block.
 	 * @param side The side of the current face.
@@ -129,7 +131,8 @@ public enum ConnectionDirection {
 	}
 
 	/**
-	 * Apply this ConnectionDirection to the given BlockPos for the given Direction normal direction.
+	 * Apply this ConnectionDirection to the given BlockPos for the given Direction.
+	 *
 	 * @return The offset BlockPos.
 	 */
 	@NotNull
@@ -161,7 +164,8 @@ public enum ConnectionDirection {
 		return offsets[normal.ordinal()];
 	}
 
-	public @Nullable ConnectionDirection getDirFor(Direction[] directions) {
+	@Nullable
+	public ConnectionDirection getDirectionFor(Direction[] directions) {
 		if (directions == this.directions) { // Short circuit for identical return from getNormalizedDirs
 			return this;
 		}

@@ -29,8 +29,8 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 	public TextureMap(TextureTypeMap type, TextureInfo info) {
 		super(type, info);
 		mapType = type.getType();
-		if (info.getInfo().isPresent()) {
-			JsonObject jsonObject = info.getInfo().get();
+		if (info.getExtraInfo().isPresent()) {
+			JsonObject jsonObject = info.getExtraInfo().get();
 			if (jsonObject.has("width") && jsonObject.has("height")) {
 				Preconditions.checkArgument(jsonObject.get("width").isJsonPrimitive() && jsonObject.get("width").getAsJsonPrimitive().isNumber(), "width must be a number!");
 				Preconditions.checkArgument(jsonObject.get("height").isJsonPrimitive() && jsonObject.get("height").getAsJsonPrimitive().isNumber(), "height must be a number!");

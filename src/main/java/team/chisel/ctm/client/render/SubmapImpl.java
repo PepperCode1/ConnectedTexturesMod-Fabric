@@ -3,8 +3,8 @@ package team.chisel.ctm.client.render;
 import net.minecraft.client.texture.Sprite;
 
 public class SubmapImpl implements Submap {
-	private static final float DIV3 = 16 / 3.0F;
-	private static final float FACTOR = 16.0F;
+	public static final float FACTOR = 16.0F;
+	private static final float DIV3 = FACTOR / 3.0F;
 
 	public static final Submap X1 = new SubmapImpl(16, 16, 0, 0);
 	public static final Submap[][] X2 = new Submap[][] {

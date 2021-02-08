@@ -1,6 +1,5 @@
 package team.chisel.ctm.client.util;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -21,12 +20,7 @@ public class TextureUtil {
 	public static void initializeTextures(Set<SpriteIdentifier> textureDependencies, Map<Identifier, CTMTexture<?>> textures, Function<SpriteIdentifier, Sprite> spriteGetter) {
 		for (SpriteIdentifier identifier : textureDependencies) {
 			Sprite sprite = spriteGetter.apply(identifier);
-			CTMMetadataSection metadata = null;
-			try {
-				metadata = ResourceUtil.getMetadata(sprite);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			CTMMetadataSection metadata = ResourceUtil.getMetadataSafe(sprite);
 			if (metadata != null) {
 				textures.put(sprite.getId(), makeTexture(metadata, sprite, spriteGetter));
 			}
@@ -39,13 +33,7 @@ public class TextureUtil {
 		} else {
 			if (metadata.getProxy() != null) {
 				Sprite proxySprite = spriteGetter.apply(toSpriteIdentifier(metadata.getProxy()));
-				CTMMetadataSection proxyMetadata = null;
-				try {
-					proxyMetadata = ResourceUtil.getMetadata(proxySprite);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
+				CTMMetadataSection proxyMetadata = ResourceUtil.getMetadataSafe(proxySprite);
 				if (proxyMetadata != null) {
 					sprite = proxySprite;
 					metadata = proxyMetadata;

@@ -7,7 +7,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 /**
- * Provides texture offsets for {@link team.chisel.ctm.client.texture.TextureMap}.
+ * Provides texture block offsets for some textures, such as {@link team.chisel.ctm.client.texture.TextureMap}.
  */
 public interface OffsetProvider {
 	@NotNull

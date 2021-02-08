@@ -2,7 +2,7 @@ package team.chisel.ctm.client.texture.type;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
+import net.minecraft.world.BlockRenderView;
 
 import team.chisel.ctm.api.client.CTMTexture;
 import team.chisel.ctm.api.client.TextureInfo;
@@ -18,7 +18,7 @@ public class TextureTypeCTM implements TextureType {
 	}
 
 	@Override
-	public TextureContextConnecting getTextureContext(BlockState state, BlockView world, BlockPos pos, CTMTexture<?> texture) {
+	public TextureContextConnecting getTextureContext(BlockState state, BlockRenderView world, BlockPos pos, CTMTexture<?> texture) {
 		return new TextureContextConnecting(state, world, pos, (AbstractConnectingTexture<?>) texture);
 	}
 

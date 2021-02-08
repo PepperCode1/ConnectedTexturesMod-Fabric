@@ -43,8 +43,8 @@ public abstract class AbstractTexture<T extends TextureType> implements CTMTextu
 		sprites = info.getSprites();
 
 		boolean isEmissive = false;
-		if (info.getInfo().isPresent()) {
-			JsonElement light = info.getInfo().get().get("light");
+		if (info.getExtraInfo().isPresent()) {
+			JsonElement light = info.getExtraInfo().get().get("light");
 			if (light != null) {
 				if (light.isJsonPrimitive()) {
 					hasLight = true;

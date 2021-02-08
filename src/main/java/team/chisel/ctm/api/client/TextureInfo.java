@@ -8,38 +8,37 @@ import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
 import net.minecraft.client.texture.Sprite;
 
 /**
- * Bean to hold information that the {@link TextureType} should use to make a {@link CTMTexture}.
+ * Bean to hold information that a {@link TextureType} should use to make a {@link CTMTexture}.
  */
 public class TextureInfo {
 	private Sprite[] sprites;
 	private BlendMode blendMode;
-	private Optional<JsonObject> info;
+	private Optional<JsonObject> extraInfo;
 
-	public TextureInfo(Sprite[] sprites, BlendMode blendMode, Optional<JsonObject> info) {
+	public TextureInfo(Sprite[] sprites, BlendMode blendMode, Optional<JsonObject> extraInfo) {
 		this.sprites = sprites;
 		this.blendMode = blendMode;
-		this.info = info;
+		this.extraInfo = extraInfo;
 	}
 
 	/**
-	 * Gets the sprites to use for this texture.
+	 * Gets the sprites to use for the texture.
 	 */
 	public Sprite[] getSprites() {
 		return sprites;
 	}
 
 	/**
-	 * Returns the BlendMode for this texture.
+	 * Gets the BlendMode for the texture.
 	 */
 	public BlendMode getBlendMode() {
 		return blendMode;
 	}
 
 	/**
-	 * Gets a JsonObject that had the key "info" for extra texture information.
-	 * This JsonObject might not exist.
+	 * Gets the JsonObject that contains the extra information for the texture.
 	 */
-	public Optional<JsonObject> getInfo() {
-		return info;
+	public Optional<JsonObject> getExtraInfo() {
+		return extraInfo;
 	}
 }

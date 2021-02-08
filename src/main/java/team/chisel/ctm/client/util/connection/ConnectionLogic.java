@@ -40,13 +40,13 @@ public class ConnectionLogic {
 	}
 
 	/**
-	 * Builds the connection map and stores it in this CTM instance. The {@link #connected(ConnectionDirection)}, {@link #connectedAnd(ConnectionDirection...)}, and {@link #connectedOr(ConnectionDirection...)} methods can be used to access it.
+	 * Builds the connection map and stores it in this instance. The {@link #connected(ConnectionDirection)}, {@link #connectedAnd(ConnectionDirection...)}, and {@link #connectedOr(ConnectionDirection...)} methods can be used to access it.
 	 */
 	public void buildConnectionMap(@NotNull BlockView world, @NotNull BlockPos pos, @NotNull Direction side) {
 		BlockState state = getConnectionState(world, pos, side, pos);
 		// TODO this naive check doesn't work for models that have unculled faces.
 		// Perhaps a smarter optimization could be done eventually?
-		//if (state.shouldSideBeRendered(world, pos, side)) {
+		//if (state.shouldDrawSide(world, pos, side)) {
 		for (ConnectionDirection direction : ConnectionDirection.VALUES) {
 			setConnectedState(direction, direction.isConnected(this, world, pos, side, state));
 		}
@@ -80,7 +80,7 @@ public class ConnectionLogic {
 
 	/**
 	 * @param directions The directions to check connection in.
-	 * @return True if the cached connectionMap holds a connection in <i><b>all</b></i> the given {@link ConnectionDirection directions}.
+	 * @return True if the cached connectionMap holds a connection in <i><b>all</b></i> of the given {@link ConnectionDirection directions}.
 	 */
 	public boolean connectedAnd(ConnectionDirection... directions) {
 		for (ConnectionDirection direction : directions) {
@@ -93,7 +93,7 @@ public class ConnectionLogic {
 
 	/**
 	 * @param directions The directions to check connection in.
-	 * @return True if the cached connectionMap holds a connection in <i><b>one of</b></i> the given {@link ConnectionDirection directions}.
+	 * @return True if the cached connectionMap holds a connection in <i><b>at least one</b></i> of the given {@link ConnectionDirection directions}.
 	 */
 	public boolean connectedOr(ConnectionDirection... directions) {
 		for (ConnectionDirection direction : directions) {
@@ -104,6 +104,10 @@ public class ConnectionLogic {
 		return false;
 	}
 
+	/**
+	 * @param directions The directions to check connection in.
+	 * @return True if the cached connectionMap holds a connection in <i><b>none</b></i> of the given {@link ConnectionDirection directions}.
+	 */
 	public boolean connectedNone(ConnectionDirection... directions) {
 		for (ConnectionDirection direction : directions) {
 			if (connected(direction)) {
@@ -113,6 +117,10 @@ public class ConnectionLogic {
 		return true;
 	}
 
+	/**
+	 * @param directions The directions to check connection in.
+	 * @return True if the cached connectionMap holds a connection in <i><b>only all</b></i> of the given {@link ConnectionDirection directions}.
+	 */
 	public boolean connectedOnly(ConnectionDirection... directions) {
 		byte map = 0;
 		for (ConnectionDirection direction : directions) {
@@ -127,8 +135,9 @@ public class ConnectionLogic {
 
 	/**
 	 * A simple check for if the given block can connect to the given direction on the given side.
-	 * @param world
-	 * @param current The position of your block.
+	 *
+	 * @param world The world.
+	 * @param current The position of the block.
 	 * @param connection The position of the block to check against.
 	 * @param direction The {@link Direction side} of the block to check for connection status. This is <i>not</i> the direction to check in.
 	 * @return True if the given block can connect to the given location on the given side.
@@ -148,8 +157,9 @@ public class ConnectionLogic {
 
 	/**
 	 * A simple check for if the given block can connect to the given direction on the given side.
-	 * @param world
-	 * @param current The position of your block.
+	 *
+	 * @param world The world.
+	 * @param current The position of the block.
 	 * @param connection The position of the block to check against.
 	 * @param direction The {@link Direction side} of the block to check for connection status. This is <i>not</i> the direction to check in.
 	 * @param state The state to check against for connection.

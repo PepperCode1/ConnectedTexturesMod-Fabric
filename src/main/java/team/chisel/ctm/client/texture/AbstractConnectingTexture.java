@@ -36,11 +36,11 @@ public abstract class AbstractConnectingTexture<T extends TextureType> extends A
 	public AbstractConnectingTexture(T type, TextureInfo info) {
 		super(type, info);
 
-		this.connectInside = info.getInfo().flatMap(obj -> ParseUtil.getBoolean(obj, "connect_inside"));
-		this.ignoreStates = info.getInfo().map(obj -> JsonHelper.getBoolean(obj, "ignore_states", false)).orElse(false);
-		this.untransform = info.getInfo().map(obj -> JsonHelper.getBoolean(obj, "untransform", false)).orElse(false);
+		this.connectInside = info.getExtraInfo().flatMap(obj -> ParseUtil.getBoolean(obj, "connect_inside"));
+		this.ignoreStates = info.getExtraInfo().map(obj -> JsonHelper.getBoolean(obj, "ignore_states", false)).orElse(false);
+		this.untransform = info.getExtraInfo().map(obj -> JsonHelper.getBoolean(obj, "untransform", false)).orElse(false);
 
-		this.connectionChecks = info.getInfo().map(obj -> BlockStatePredicateParser.INSTANCE.parse(obj.get("connect_to"))).orElse(null);
+		this.connectionChecks = info.getExtraInfo().map(obj -> BlockStatePredicateParser.INSTANCE.parse(obj.get("connect_to"))).orElse(null);
 	}
 
 	@Override

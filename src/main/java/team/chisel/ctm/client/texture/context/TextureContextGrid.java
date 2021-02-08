@@ -4,7 +4,6 @@ import java.util.EnumMap;
 import java.util.Random;
 
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -26,7 +25,7 @@ public abstract class TextureContextGrid extends TextureContextPosition {
 			applyOffset();
 		}
 		long serialized = 0;
-		for (@NotNull Direction side : Direction.values()) {
+		for (Direction side : Direction.values()) {
 			BlockPos modifiedPosition = this.pos.add(FaceOffset.getBlockPosOffsetFromFaceOffset(side, texture.getXOffset(), texture.getYOffset()));
 			Point2i coords = calculateTextureCoord(modifiedPosition, texture.getXSize(), texture.getYSize(), side);
 			textureCoords.put(side, coords);

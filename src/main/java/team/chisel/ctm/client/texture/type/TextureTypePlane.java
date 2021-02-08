@@ -3,7 +3,7 @@ package team.chisel.ctm.client.texture.type;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
+import net.minecraft.world.BlockRenderView;
 
 import team.chisel.ctm.api.client.CTMTexture;
 import team.chisel.ctm.api.client.TextureContext;
@@ -29,7 +29,7 @@ public class TextureTypePlane implements TextureType {
 	}
 
 	@Override
-	public TextureContext getTextureContext(BlockState state, BlockView world, BlockPos pos, CTMTexture<?> texture) {
+	public TextureContext getTextureContext(BlockState state, BlockRenderView world, BlockPos pos, CTMTexture<?> texture) {
 		return new TextureContextConnecting(state, world, pos, (AbstractConnectingTexture<?>) texture);
 	}
 
