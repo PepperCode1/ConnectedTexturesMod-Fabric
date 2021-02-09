@@ -42,9 +42,9 @@ public class CTMModelsAddedCallbackHandler implements ModelsAddedCallback {
 			Collection<SpriteIdentifier> dependencies = unbakedModel.getTextureDependencies(modelLoader::getOrLoadModel, VoidSet.get());
 			if (unbakedModel instanceof JsonUnbakedModel) {
 				JsonUnbakedModel jsonModel = (JsonUnbakedModel) unbakedModel;
-				// do not wrap generated item models
+				// do not wrap builtin models
 				// root model check after getTextureDependencies so it's actually set
-				if (jsonModel.getRootModel() == ModelLoader.GENERATION_MARKER) {
+				if (jsonModel.getRootModel() == ModelLoader.GENERATION_MARKER || jsonModel.getRootModel() == ModelLoader.BLOCK_ENTITY_MARKER) {
 					continue;
 				}
 				Int2ObjectMap<JsonElement> overrides = getOverrides(jsonModel);

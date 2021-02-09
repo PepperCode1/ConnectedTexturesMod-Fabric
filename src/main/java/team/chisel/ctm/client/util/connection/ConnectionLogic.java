@@ -1,6 +1,5 @@
 package team.chisel.ctm.client.util.connection;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
@@ -43,31 +42,103 @@ public class ConnectionLogic {
 	 * Builds the connection map and stores it in this instance. The {@link #connected(ConnectionDirection)}, {@link #connectedAnd(ConnectionDirection...)}, and {@link #connectedOr(ConnectionDirection...)} methods can be used to access it.
 	 */
 	public void buildConnectionMap(@NotNull BlockView world, @NotNull BlockPos pos, @NotNull Direction side) {
-		BlockState state = getConnectionState(world, pos, side, pos);
+		BlockState state = getConnectionState(world, pos, null, side);
 		// TODO this naive check doesn't work for models that have unculled faces.
 		// Perhaps a smarter optimization could be done eventually?
 		//if (state.shouldDrawSide(world, pos, side)) {
 		for (ConnectionDirection direction : ConnectionDirection.VALUES) {
-			setConnectedState(direction, direction.isConnected(this, world, pos, side, state));
+			setConnected(direction, isConnected(world, pos, side, state, direction));
 		}
 		//}
 	}
 
-	public void buildConnectionMap(long data, Direction side) { // TODO never used. remove?
-		connectionMap = 0; // Clear all connections
-		List<ConnectionLocation> connections = ConnectionLocation.decode(data);
-		for (ConnectionLocation location : connections) {
-			if (location.getDirectionForSide(side) != null) {
-				ConnectionDirection direction = location.getDirectionForSide(side);
-				if (direction != null) {
-					setConnectedState(direction, true);
-				}
-			}
-		}
+	/**
+	 * <b>Use {@link #connected} if the connection map has already been built.</b>
+	 *
+	 * <p>Check if the given block position can connect to another position on the given side.
+	 *
+	 * @param world The world.
+	 * @param pos The position of the block.
+	 * @param side The {@link Direction side} of the block to check for connection status. This is <i>not</i> the direction to check in.
+	 * @param direction The direction in which to check.
+	 * @return True if the block can connect in the given ConnectionDirection, false otherwise.
+	 */
+	public boolean isConnected(BlockView world, BlockPos pos, Direction side, ConnectionDirection direction) {
+		return isConnected(world, pos, direction.applyOffset(pos, side), side);
 	}
 
-	protected void setConnectedState(ConnectionDirection direction, boolean connected) {
-		connectionMap = setConnectedState(connectionMap, direction, connected);
+	/**
+	 * <b>Use {@link #connected} if the connection map has already been built.</b>
+	 *
+	 * <p>Check if the given block position can connect to another position on the given side.
+	 *
+	 * @param world The world.
+	 * @param pos The position of the block.
+	 * @param side The {@link Direction side} of the block to check for connection status. This is <i>not</i> the direction to check in.
+	 * @param state The state of the block with which to check for connection with.
+	 * @param direction The direction in which to check.
+	 * @return True if the block can connect in the given ConnectionDirection, false otherwise.
+	 */
+	public boolean isConnected(BlockView world, BlockPos pos, Direction side, BlockState state, ConnectionDirection direction) {
+		return isConnected(world, pos, direction.applyOffset(pos, side), side, state);
+	}
+
+	/**
+	 * <b>Use {@link #connected} if the connection map has already been built.</b>
+	 *
+	 * <p>Check if the given block position can connect to another position on the given side.
+	 *
+	 * @param world The world.
+	 * @param pos The position of the block.
+	 * @param connection The position of the block to check against.
+	 * @param side The {@link Direction side} of the block to check for connection status. This is <i>not</i> the direction to check in.
+	 * @return True if the positions can connect, false otherwise.
+	 */
+	public boolean isConnected(BlockView world, BlockPos pos, BlockPos connection, Direction side) {
+		BlockState state = getConnectionState(world, pos, connection, side);
+		return isConnected(world, pos, connection, side, state);
+	}
+
+	/**
+	 * <b>Use {@link #connected} if the connection map has already been built.</b>
+	 *
+	 * <p>Check if the given block position can connect to another position on the given side.
+	 *
+	 * @param world The world.
+	 * @param pos The position of the block.
+	 * @param connection The position of the block to check against.
+	 * @param side The {@link Direction side} of the block to check for connection status. This is <i>not</i> the direction to check in.
+	 * @param state The state of the block with which to check for connection with.
+	 * @return True if the positions can connect, false otherwise.
+	 */
+	public boolean isConnected(BlockView world, BlockPos pos, BlockPos connection, Direction side, BlockState state) {
+		BlockState connectionState = getConnectionState(world, connection, pos, side);
+		// bad API user
+		if (connectionState == null) {
+			throw new IllegalStateException("Error: received null facade blockstate from block " + world.getBlockState(connection));
+		}
+		boolean connected = compare(state, connectionState, side);
+		boolean disableObscured = disableObscuredFaceCheck.orElse(CTMClient.getConfigManager().getConfig().connectInsideCTM);
+		// no block obscuring this face
+		if (disableObscured) {
+			return connected;
+		}
+		BlockState obscuring = getConnectionState(world, connection.offset(side), pos, side);
+		// check that we aren't already connected outwards from this side
+		connected &= !compare(state, obscuring, side);
+		return connected;
+	}
+
+	public BlockState getConnectionState(BlockView world, BlockPos pos, @Nullable BlockPos connection, @Nullable Direction side) {
+		BlockState state = world.getBlockState(pos);
+		if (state.getBlock() instanceof Facade) {
+			return ((Facade) state.getBlock()).getFacadeState(world, pos, connection, side);
+		}
+		return state;
+	}
+
+	protected boolean compare(BlockState from, BlockState to, Direction side) {
+		return stateComparator.connects(this, from, to, side);
 	}
 
 	/**
@@ -75,7 +146,7 @@ public class ConnectionLogic {
 	 * @return True if the cached connectionMap holds a connection in this {@link ConnectionDirection direction}.
 	 */
 	public boolean connected(ConnectionDirection direction) {
-		return ((connectionMap >> direction.ordinal()) & 1) == 1;
+		return getConnected(connectionMap, direction);
 	}
 
 	/**
@@ -124,86 +195,32 @@ public class ConnectionLogic {
 	public boolean connectedOnly(ConnectionDirection... directions) {
 		byte map = 0;
 		for (ConnectionDirection direction : directions) {
-			map = setConnectedState(map, direction, true);
+			map = setConnected(map, direction, true);
 		}
 		return map == connectionMap;
+	}
+
+	public boolean hasConnections() {
+		return connectionMap != 0;
 	}
 
 	public int numConnections() {
 		return Integer.bitCount(connectionMap);
 	}
 
-	/**
-	 * A simple check for if the given block can connect to the given direction on the given side.
-	 *
-	 * @param world The world.
-	 * @param current The position of the block.
-	 * @param connection The position of the block to check against.
-	 * @param direction The {@link Direction side} of the block to check for connection status. This is <i>not</i> the direction to check in.
-	 * @return True if the given block can connect to the given location on the given side.
-	 */
-	public final boolean isConnected(BlockView world, BlockPos current, BlockPos connection, Direction direction) {
-		BlockState state = getConnectionState(world, current, direction, connection);
-		return isConnected(world, current, connection, direction, state);
-	}
-
-	public BlockState getConnectionState(BlockView world, BlockPos pos, @Nullable Direction side, BlockPos connection) {
-		BlockState state = world.getBlockState(pos);
-		if (state.getBlock() instanceof Facade) {
-			return ((Facade) state.getBlock()).getFacade(world, pos, side, connection);
-		}
-		return state;
-	}
-
-	/**
-	 * A simple check for if the given block can connect to the given direction on the given side.
-	 *
-	 * @param world The world.
-	 * @param current The position of the block.
-	 * @param connection The position of the block to check against.
-	 * @param direction The {@link Direction side} of the block to check for connection status. This is <i>not</i> the direction to check in.
-	 * @param state The state to check against for connection.
-	 * @return True if the given block can connect to the given location on the given side.
-	 */
-	public boolean isConnected(BlockView world, BlockPos current, BlockPos connection, Direction direction, BlockState state) {
-		//if (CTMLib.chiselLoaded() && connectionBlocked(world, x, y, z, dir.ordinal())) {
-		//	return false;
-		//}
-		BlockPos obscuringPos = connection.offset(direction);
-		boolean disableObscured = disableObscuredFaceCheck.orElse(CTMClient.getConfigManager().getConfig().connectInsideCTM);
-		BlockState connectionState = getConnectionState(world, connection, direction, current);
-		BlockState obscuring = disableObscured ? null : getConnectionState(world, obscuringPos, direction, current);
-		// bad API user
-		if (connectionState == null) {
-			throw new IllegalStateException("Error: received null blockstate as facade from block " + world.getBlockState(connection));
-		}
-		boolean connected = stateComparator(state, connectionState, direction);
-		// no block obscuring this face
-		if (obscuring == null) {
-			return connected;
-		}
-		// check that we aren't already connected outwards from this side
-		connected &= !stateComparator(state, obscuring, direction);
-		return connected;
-	}
-
-	protected boolean stateComparator(BlockState from, BlockState to, Direction direction) {
-		return stateComparator.connects(this, from, to, direction);
-	}
-
-	//private boolean connectionBlocked(BlockView world, int x, int y, int z, int side) {
-	//	Block block = world.getBlock(x, y, z);
-	//	if (block instanceof IConnectable) {
-	//		return !((IConnectable) block).canConnectCTM(world, x, y, z, side);
-	//	}
-	//	return false;
-	//}
-
 	public long serialized() {
 		return Byte.toUnsignedLong(connectionMap);
 	}
 
-	private static byte setConnectedState(byte map, ConnectionDirection direction, boolean connected) {
+	protected void setConnected(ConnectionDirection direction, boolean connected) {
+		connectionMap = setConnected(connectionMap, direction, connected);
+	}
+
+	protected static boolean getConnected(byte map, ConnectionDirection direction) {
+		return ((map >> direction.ordinal()) & 1) == 1;
+	}
+
+	protected static byte setConnected(byte map, ConnectionDirection direction, boolean connected) {
 		if (connected) {
 			return (byte) (map | (1 << direction.ordinal()));
 		} else {
@@ -212,8 +229,8 @@ public class ConnectionLogic {
 	}
 
 	public interface StateComparisonCallback {
-		StateComparisonCallback DEFAULT = (logic, from, to, direction) -> logic.ignoreStates ? from.getBlock() == to.getBlock() : from == to;
+		StateComparisonCallback DEFAULT = (logic, from, to, side) -> logic.ignoreStates ? from.getBlock() == to.getBlock() : from == to;
 
-		boolean connects(ConnectionLogic logic, BlockState from, BlockState to, Direction direction);
+		boolean connects(ConnectionLogic logic, BlockState from, BlockState to, Direction side);
 	}
 }

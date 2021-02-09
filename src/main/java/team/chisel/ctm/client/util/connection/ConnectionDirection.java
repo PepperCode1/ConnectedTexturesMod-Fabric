@@ -12,19 +12,17 @@ import java.util.Arrays;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.world.BlockView;
 
 import team.chisel.ctm.client.util.DirectionHelper;
 
 /**
  * Think of this class as a "two dimensional Direction, with diagonals".
  *
- * <p>It represents the eight different directions a face of a block can connect with CTM, and contains the logic for determining if a block is indeed connected in that direction.
+ * <p>It represents the eight different directions a face of a block can connect with CTM.
  *
  * <p>Note that, for example, {@link #TOP_RIGHT} does not mean connected to the {@link #TOP} and {@link #RIGHT}, but connected in the diagonal direction represented by {@link #TOP_RIGHT}.
  * This is used for inner corner rendering.
@@ -64,7 +62,7 @@ public enum ConnectionDirection {
 	private void buildCaches() {
 		// Fill normalized dirs
 		for (Direction normal : Direction.values()) {
-			@NotNull Direction[] normalized;
+			Direction[] normalized;
 			if (normal == NORMAL) {
 				normalized = directions;
 			} else if (normal == NORMAL.getOpposite()) {
@@ -104,44 +102,18 @@ public enum ConnectionDirection {
 	}
 
 	/**
-	 * Finds if this block is connected for the given side in this ConnectionDirection.
-	 *
-	 * @param logic The connection logic.
-	 * @param world The world the block is in.
-	 * @param pos The position of the block.
-	 * @param side The side of the current face.
-	 * @return True if the block is connected in the given ConnectionDirection, false otherwise.
-	 */
-	public boolean isConnected(ConnectionLogic logic, BlockView world, BlockPos pos, Direction side) {
-		return logic.isConnected(world, pos, applyConnection(pos, side), side);
-	}
-
-	/**
-	 * Finds if this block is connected for the given side in this ConnectionDirection.
-	 *
-	 * @param logic The connection logic.
-	 * @param world The world the block is in.
-	 * @param pos The position of the block.
-	 * @param side The side of the current face.
-	 * @param state The state to check for connection with.
-	 * @return True if the block is connected in the given ConnectionDirection, false otherwise.
-	 */
-	public boolean isConnected(ConnectionLogic logic, BlockView world, BlockPos pos, Direction side, BlockState state) {
-		return logic.isConnected(world, pos, applyConnection(pos, side), side, state);
-	}
-
-	/**
 	 * Apply this ConnectionDirection to the given BlockPos for the given Direction.
 	 *
 	 * @return The offset BlockPos.
 	 */
 	@NotNull
-	public BlockPos applyConnection(BlockPos pos, Direction side) {
+	public BlockPos applyOffset(BlockPos pos, Direction side) {
 		return pos.add(getOffset(side));
 	}
 
+	@Deprecated
 	public ConnectionDirection relativize(Direction normal) {
-		throw new UnsupportedOperationException("Yell at tterrag to finish deserialization");
+		throw new UnsupportedOperationException("Deserialization is not yet supported");
 		/*
 		if (normal == NORMAL) {
 			return this;

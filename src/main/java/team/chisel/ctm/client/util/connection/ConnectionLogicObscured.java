@@ -19,37 +19,37 @@ public class ConnectionLogicObscured extends ConnectionLogic {
 	}
 
 	@Override
-	public boolean isConnected(BlockView world, BlockPos current, BlockPos connection, Direction direction, BlockState state) {
+	public boolean isConnected(BlockView world, BlockPos pos, BlockPos connection, Direction side, BlockState state) {
 		if (isObscured()) {
 			return false;
 		}
-		BlockState obscuring = getConnectionState(world, current.offset(direction), direction, current);
-		if (stateComparator(state, obscuring, direction)) {
+		BlockState obscuring = getConnectionState(world, pos.offset(side), pos, side);
+		if (compare(state, obscuring, side)) {
 			setObscured(true);
 			return false;
 		}
-		BlockState connectionState = getConnectionState(world, connection, direction, current);
-		BlockState obscuringcon = getConnectionState(world, connection.offset(direction), direction, current);
-		if (stateComparator(state, connectionState, direction) || stateComparator(state, obscuringcon, direction)) {
-			Vec3d difference = Vec3d.of(connection.subtract(current));
+		BlockState connectionState = getConnectionState(world, connection, pos, side);
+		BlockState obscuringCon = getConnectionState(world, connection.offset(side), pos, side);
+		if (compare(state, connectionState, side) || compare(state, obscuringCon, side)) {
+			Vec3d difference = Vec3d.of(connection.subtract(pos));
 			if (difference.lengthSquared() > 1) {
 				difference = difference.normalize();
-				if (direction.getAxis() == Axis.Z) {
+				if (side.getAxis() == Axis.Z) {
 					difference = difference.rotateY((float) (-Math.PI / 2));
 				}
 				float angle = (float) Math.PI / 4;
 				Vec3d vA;
 				Vec3d vB;
-				if (direction.getAxis().isVertical()) {
+				if (side.getAxis().isVertical()) {
 					vA = difference.rotateY(angle);
 					vB = difference.rotateY(-angle);
 				} else {
 					vA = difference.rotateX(angle);
 					vB = difference.rotateX(-angle);
 				}
-				BlockPos posA = new BlockPos(vA).add(current);
-				BlockPos posB = new BlockPos(vB).add(current);
-				return (getConnectionState(world, posA, direction, current) == state && !stateComparator(state, getConnectionState(world, posA.offset(direction), direction, current), direction)) || (getConnectionState(world, posB, direction, current) == state && !stateComparator(state, getConnectionState(world, posB.offset(direction), direction, current), direction));
+				BlockPos posA = new BlockPos(vA).add(pos);
+				BlockPos posB = new BlockPos(vB).add(pos);
+				return (getConnectionState(world, posA, pos, side) == state && !compare(state, getConnectionState(world, posA.offset(side), pos, side), side)) || (getConnectionState(world, posB, pos, side) == state && !compare(state, getConnectionState(world, posB.offset(side), pos, side), side));
 			} else {
 				return true;
 			}

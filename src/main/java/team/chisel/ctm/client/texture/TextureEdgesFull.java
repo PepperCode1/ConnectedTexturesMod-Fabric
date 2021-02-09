@@ -34,11 +34,11 @@ public class TextureEdgesFull extends AbstractConnectingTexture<TextureTypeEdges
 		Sprite sprite;
 		Submap submap = null;
 		// Short circuit zero connections, as this is almost always the most common case
-		if (!logic.isObscured() && logic.connectedNone(ConnectionDirection.VALUES)) {
+		if (!logic.isObscured() && !logic.hasConnections()) {
 			sprite = sprites[0];
-			submap = SubmapImpl.X1;
 		} else {
 			sprite = sprites[1];
+
 			boolean top = logic.connected(ConnectionDirection.TOP) || logic.connectedAnd(ConnectionDirection.TOP_LEFT, ConnectionDirection.TOP_RIGHT);
 			boolean right = logic.connected(ConnectionDirection.RIGHT) || logic.connectedAnd(ConnectionDirection.TOP_RIGHT, ConnectionDirection.BOTTOM_RIGHT);
 			boolean bottom = logic.connected(ConnectionDirection.BOTTOM) || logic.connectedAnd(ConnectionDirection.BOTTOM_LEFT, ConnectionDirection.BOTTOM_RIGHT);
@@ -76,13 +76,15 @@ public class TextureEdgesFull extends AbstractConnectingTexture<TextureTypeEdges
 				submap = SubmapImpl.X4[3][2];
 			}
 
-			if (submap == null) {
-				submap = SubmapImpl.X1;
+			if (!untransform) {
+				quad.untransformUVs();
 			}
 		}
 
 		quad.setUVBounds(sprite);
-		quad.applySubmap(submap);
+		if (submap != null) {
+			quad.applySubmap(submap);
+		}
 		return quad;
 	}
 }

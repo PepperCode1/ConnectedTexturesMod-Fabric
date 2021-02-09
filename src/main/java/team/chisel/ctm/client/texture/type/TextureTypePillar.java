@@ -27,6 +27,7 @@ public class TextureTypePillar implements TextureType {
 		return 2;
 	}
 
+	@Deprecated
 	@Override
 	public TextureContext getContextFromData(long data) {
 		return new TextureContextPillar(data);

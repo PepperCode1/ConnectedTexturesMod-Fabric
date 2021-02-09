@@ -17,10 +17,10 @@ public interface Facade {
 	 *
 	 * @param world The world.
 	 * @param pos The block's position.
+	 * @param connection The position of the block being connected to. If this is null, the default facade state should be returned.
 	 * @param side The side being rendered, <b>not</b> the side being connected from. This value can be null if no side is specified. Make sure this is handled appropriately.
-	 * @param connection The position of the block being connected to.
 	 * @return The BlockState which the block appears as.
 	 */
 	@NotNull
-	BlockState getFacade(@NotNull BlockView world, @NotNull BlockPos pos, @Nullable Direction side, @NotNull BlockPos connection);
+	BlockState getFacadeState(@NotNull BlockView world, @NotNull BlockPos pos, @Nullable BlockPos connection, @Nullable Direction side);
 }

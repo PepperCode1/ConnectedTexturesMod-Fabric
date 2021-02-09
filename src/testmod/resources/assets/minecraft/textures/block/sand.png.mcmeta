@@ -9,8 +9,7 @@
       "connect_to": [
         { "block": "minecraft:water" },
         { "block": "minecraft:flowing_water" }
-      ],
-      "untransform": true
+      ]
     }
   }
 }

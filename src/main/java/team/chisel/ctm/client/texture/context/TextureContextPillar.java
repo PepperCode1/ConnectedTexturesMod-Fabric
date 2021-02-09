@@ -48,6 +48,7 @@ public class TextureContextPillar implements TextureContext {
 		}
 	}
 
+	@Deprecated
 	public TextureContextPillar(long data) {
 		this.data = new ConnectionData(data);
 	}
@@ -99,6 +100,7 @@ public class TextureContextPillar implements TextureContext {
 			return forPos(world, state, pos);
 		}
 
+		@Deprecated
 		public static Connections forData(long data, Direction offset) {
 			EnumSet<Direction> connections = EnumSet.noneOf(Direction.class);
 			if (offset == null) {
@@ -151,6 +153,7 @@ public class TextureContextPillar implements TextureContext {
 			}
 		}
 
+		@Deprecated
 		public ConnectionData(long data) {
 			connections = Connections.forData(data, null);
 			for (Direction facing : Direction.values()) {

@@ -25,9 +25,9 @@ import team.chisel.ctm.client.util.connection.ConnectionLogic;
 import team.chisel.ctm.client.util.connection.ConnectionLogic.StateComparisonCallback;
 
 public abstract class AbstractConnectingTexture<T extends TextureType> extends AbstractTexture<T> {
-	private final Optional<Boolean> connectInside;
-	private final boolean ignoreStates;
-	private final boolean untransform;
+	protected Optional<Boolean> connectInside;
+	protected boolean ignoreStates;
+	protected boolean untransform;
 
 	@Nullable
 	private final BiPredicate<Direction, BlockState> connectionChecks;

@@ -81,22 +81,26 @@ public enum ConnectionLocation {
 		this.offset = offset;
 	}
 
+	@Deprecated
 	@Nullable
 	public ConnectionDirection getDirectionForSide(Direction facing) {
 		return direction == null ? null : direction.relativize(facing);
 	}
 
+	@Deprecated
 	@Nullable
 	public Direction clipOrDestroy(Direction direction) {
-		throw new UnsupportedOperationException();
-		//Direction[] dirs = dir == null ? new Direction[] {normal, normal} : dir.getNormalizedDirs(direction);
-		//if (dirs[0] == direction) {
-		//	return dirs.length > 1 ? dirs[1] : null;
-		//} else if (dirs.length > 1 && dirs[1] == direction) {
-		//	return dirs[0];
-		//} else {
-		//	return null;
-		//}
+		throw new UnsupportedOperationException("Deserialization is not yet supported");
+		/*
+		Direction[] dirs = dir == null ? new Direction[] {normal, normal} : dir.getNormalizedDirs(direction);
+		if (dirs[0] == direction) {
+			return dirs.length > 1 ? dirs[1] : null;
+		} else if (dirs.length > 1 && dirs[1] == direction) {
+			return dirs[0];
+		} else {
+			return null;
+		}
+		*/
 	}
 
 	public BlockPos transform(BlockPos pos) {
@@ -110,6 +114,10 @@ public enum ConnectionLocation {
 			pos = pos.offset(normal);
 		}
 		return pos;
+	}
+
+	public long getMask() {
+		return 1 << ordinal();
 	}
 
 	public static ConnectionLocation fromFacing(Direction facing) {
@@ -152,15 +160,11 @@ public enum ConnectionLocation {
 
 	public static List<ConnectionLocation> decode(long data) {
 		List<ConnectionLocation> list = new ArrayList<>();
-		for (ConnectionLocation location : values()) {
+		for (ConnectionLocation location : VALUES) {
 			if ((1 & (data >> location.ordinal())) != 0) {
 				list.add(location);
 			}
 		}
 		return list;
-	}
-
-	public long getMask() {
-		return 1 << ordinal();
 	}
 }
