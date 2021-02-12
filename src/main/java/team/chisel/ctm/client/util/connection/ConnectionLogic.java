@@ -12,44 +12,51 @@ import net.minecraft.world.BlockView;
 
 import team.chisel.ctm.api.client.Facade;
 import team.chisel.ctm.client.CTMClient;
+import team.chisel.ctm.client.util.BitUtil;
 
 public class ConnectionLogic {
-	public Optional<Boolean> disableObscuredFaceCheck = Optional.empty();
-	// Mapping the different corner indeces to their respective dirs
 	protected byte connectionMap;
+	public Optional<Boolean> disableObscuredFaceCheck = Optional.empty();
 	protected boolean ignoreStates;
-	protected StateComparisonCallback stateComparator = StateComparisonCallback.DEFAULT;
+	protected StateComparator stateComparator = StateComparator.DEFAULT;
 
 	public boolean ignoreStates() {
 		return ignoreStates;
 	}
 
-	public StateComparisonCallback stateComparator() {
+	public StateComparator getStateComparator() {
 		return stateComparator;
 	}
 
-	public ConnectionLogic ignoreStates(final boolean ignoreStates) {
+	public ConnectionLogic ignoreStates(boolean ignoreStates) {
 		this.ignoreStates = ignoreStates;
 		return this;
 	}
 
-	public ConnectionLogic stateComparator(final StateComparisonCallback stateComparator) {
+	public ConnectionLogic setStateComparator(StateComparator stateComparator) {
 		this.stateComparator = stateComparator;
 		return this;
 	}
 
 	/**
-	 * Builds the connection map and stores it in this instance. The {@link #connected(ConnectionDirection)}, {@link #connectedAnd(ConnectionDirection...)}, and {@link #connectedOr(ConnectionDirection...)} methods can be used to access it.
+	 * Builds the connection map and stores it in this instance.
+	 * The {@link #connected(ConnectionDirection)}, {@link #connectedAnd(ConnectionDirection...)}, {@link #connectedOr(ConnectionDirection...)}, {@link #connectedNone(ConnectionDirection...)}, and {@link #connectedOnly(ConnectionDirection...)} methods can be used to access it.
 	 */
 	public void buildConnectionMap(@NotNull BlockView world, @NotNull BlockPos pos, @NotNull Direction side) {
-		BlockState state = getConnectionState(world, pos, null, side);
-		// TODO this naive check doesn't work for models that have unculled faces.
-		// Perhaps a smarter optimization could be done eventually?
-		//if (state.shouldDrawSide(world, pos, side)) {
+		connectionMap = 0;
 		for (ConnectionDirection direction : ConnectionDirection.VALUES) {
-			setConnected(direction, isConnected(world, pos, side, state, direction));
+			if (isConnected(world, pos, side, direction)) {
+				setConnected(direction, true);
+			}
 		}
-		//}
+	}
+
+	protected void setConnected(ConnectionDirection direction, boolean connected) {
+		if (connected) {
+			connectionMap = BitUtil.setBit(connectionMap, direction.ordinal());
+		} else {
+			connectionMap = BitUtil.clearBit(connectionMap, direction.ordinal());
+		}
 	}
 
 	/**
@@ -113,26 +120,28 @@ public class ConnectionLogic {
 	 */
 	public boolean isConnected(BlockView world, BlockPos pos, BlockPos connection, Direction side, BlockState state) {
 		BlockState connectionState = getConnectionState(world, connection, pos, side);
-		// bad API user
-		if (connectionState == null) {
-			throw new IllegalStateException("Error: received null facade blockstate from block " + world.getBlockState(connection));
-		}
 		boolean connected = compare(state, connectionState, side);
-		boolean disableObscured = disableObscuredFaceCheck.orElse(CTMClient.getConfigManager().getConfig().connectInsideCTM);
-		// no block obscuring this face
-		if (disableObscured) {
-			return connected;
+		if (!connected) {
+			return false;
 		}
-		BlockState obscuring = getConnectionState(world, connection.offset(side), pos, side);
-		// check that we aren't already connected outwards from this side
-		connected &= !compare(state, obscuring, side);
-		return connected;
+		// Check if obscuring check should be applied
+		if (disableObscuredFaceCheck.orElse(CTMClient.getConfigManager().getConfig().connectInsideCTM)) {
+			return true;
+		}
+		BlockState obscuring = getConnectionState(world, connection.offset(side), connection, side);
+		// Check if obscuring state should prevent connection
+		return !compare(connectionState, obscuring, side);
 	}
 
-	public BlockState getConnectionState(BlockView world, BlockPos pos, @Nullable BlockPos connection, @Nullable Direction side) {
+	public BlockState getConnectionState(BlockView world, BlockPos pos, BlockPos connection, @Nullable Direction side) {
 		BlockState state = world.getBlockState(pos);
 		if (state.getBlock() instanceof Facade) {
-			return ((Facade) state.getBlock()).getFacadeState(world, pos, connection, side);
+			BlockState facadeState = ((Facade) state.getBlock()).getFacadeState(world, pos, connection, side);
+			if (facadeState != null) {
+				return facadeState;
+			} else {
+				CTMClient.LOGGER.error("Received null facade blockstate from {} at {}.", state.getBlock(), pos);
+			}
 		}
 		return state;
 	}
@@ -143,10 +152,10 @@ public class ConnectionLogic {
 
 	/**
 	 * @param direction The direction to check connection in.
-	 * @return True if the cached connectionMap holds a connection in this {@link ConnectionDirection direction}.
+	 * @return True if the connection map holds a connection in this {@link ConnectionDirection direction}.
 	 */
 	public boolean connected(ConnectionDirection direction) {
-		return getConnected(connectionMap, direction);
+		return BitUtil.getBit(connectionMap, direction.ordinal());
 	}
 
 	/**
@@ -195,7 +204,7 @@ public class ConnectionLogic {
 	public boolean connectedOnly(ConnectionDirection... directions) {
 		byte map = 0;
 		for (ConnectionDirection direction : directions) {
-			map = setConnected(map, direction, true);
+			map = BitUtil.setBit(map, direction.ordinal());
 		}
 		return map == connectionMap;
 	}
@@ -208,28 +217,16 @@ public class ConnectionLogic {
 		return Integer.bitCount(connectionMap);
 	}
 
-	public long serialized() {
+	public long serialize() {
 		return Byte.toUnsignedLong(connectionMap);
 	}
 
-	protected void setConnected(ConnectionDirection direction, boolean connected) {
-		connectionMap = setConnected(connectionMap, direction, connected);
+	public void deserialize(long data) {
+		connectionMap = (byte) data;
 	}
 
-	protected static boolean getConnected(byte map, ConnectionDirection direction) {
-		return ((map >> direction.ordinal()) & 1) == 1;
-	}
-
-	protected static byte setConnected(byte map, ConnectionDirection direction, boolean connected) {
-		if (connected) {
-			return (byte) (map | (1 << direction.ordinal()));
-		} else {
-			return (byte) (map & ~(1 << direction.ordinal()));
-		}
-	}
-
-	public interface StateComparisonCallback {
-		StateComparisonCallback DEFAULT = (logic, from, to, side) -> logic.ignoreStates ? from.getBlock() == to.getBlock() : from == to;
+	public interface StateComparator {
+		StateComparator DEFAULT = (logic, from, to, side) -> logic.ignoreStates() ? from.getBlock() == to.getBlock() : from == to;
 
 		boolean connects(ConnectionLogic logic, BlockState from, BlockState to, Direction side);
 	}

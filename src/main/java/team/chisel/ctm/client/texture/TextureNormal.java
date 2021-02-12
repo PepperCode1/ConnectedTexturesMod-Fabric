@@ -6,8 +6,8 @@ import net.minecraft.util.math.Direction;
 import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
-import team.chisel.ctm.client.render.RenderUtil;
 import team.chisel.ctm.client.texture.type.TextureTypeNormal;
+import team.chisel.ctm.client.util.RenderUtil;
 
 /**
  * CTM texture for a normal texture.

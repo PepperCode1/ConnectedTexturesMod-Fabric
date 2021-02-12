@@ -111,26 +111,6 @@ public enum ConnectionDirection {
 		return pos.add(getOffset(side));
 	}
 
-	@Deprecated
-	public ConnectionDirection relativize(Direction normal) {
-		throw new UnsupportedOperationException("Deserialization is not yet supported");
-		/*
-		if (normal == NORMAL) {
-			return this;
-		} else if (normal == NORMAL.getOpposite()) {
-			return getDirFor(getNormalizedDirs(normal));
-		} else {
-			if (dirs.length == 1) {
-				if (normal.getAxis() == dirs[0].getAxis()) {
-					return null;
-				} else {
-					return this;
-				}
-			}
-		}
-		*/
-	}
-
 	@NotNull
 	public BlockPos getOffset(Direction normal) {
 		return offsets[normal.ordinal()];

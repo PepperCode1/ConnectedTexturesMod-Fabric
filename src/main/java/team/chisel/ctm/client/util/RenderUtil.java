@@ -1,4 +1,4 @@
-package team.chisel.ctm.client.render;
+package team.chisel.ctm.client.util;
 
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.model.BakedQuad;
@@ -26,19 +26,5 @@ public class RenderUtil {
 
 	public static int getLightmap(int skyLight, int blockLight) {
 		return MathHelper.clamp(skyLight, 0, 15) << 20 | MathHelper.clamp(blockLight, 0, 15) << 4;
-	}
-
-	/**
-	 * Casts to int but keeps the bits the same.
-	 */
-	public static int bitIntCast(byte b) {
-		return ((int) b) & 0xFF;
-	}
-
-	/**
-	 * Casts to int but keeps the bits the same.
-	 */
-	public static int bitIntCast(short s) {
-		return ((int) s) & 0xFFFF;
 	}
 }

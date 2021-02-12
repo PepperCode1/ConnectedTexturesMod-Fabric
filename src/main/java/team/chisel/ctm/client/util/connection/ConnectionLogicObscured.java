@@ -7,6 +7,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.world.BlockView;
 
+import team.chisel.ctm.client.util.BitUtil;
+
 public class ConnectionLogicObscured extends ConnectionLogic {
 	private boolean obscured;
 
@@ -58,7 +60,17 @@ public class ConnectionLogicObscured extends ConnectionLogic {
 	}
 
 	@Override
-	public long serialized() {
-		return isObscured() ? (super.serialized() | (1 << 8)) : super.serialized();
+	public long serialize() {
+		long data = super.serialize();
+		if (obscured) {
+			data = BitUtil.setBit(data, 8);
+		}
+		return data;
+	}
+
+	@Override
+	public void deserialize(long data) {
+		super.deserialize(data);
+		obscured = BitUtil.getBit(data, 8);
 	}
 }

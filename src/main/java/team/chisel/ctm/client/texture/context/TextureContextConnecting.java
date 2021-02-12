@@ -14,6 +14,8 @@ import team.chisel.ctm.client.texture.AbstractConnectingTexture;
 import team.chisel.ctm.client.util.connection.ConnectionLogic;
 
 public class TextureContextConnecting implements TextureContext {
+	public static final int CONNECTION_DATA_LENGTH = 10;
+
 	protected final AbstractConnectingTexture<?> texture;
 	private EnumMap<Direction, ConnectionLogic> logicMap = new EnumMap<>(Direction.class);
 	private long data;
@@ -24,7 +26,7 @@ public class TextureContextConnecting implements TextureContext {
 		for (Direction face : Direction.values()) {
 			ConnectionLogic logic = createLogic(world, pos, face);
 			logicMap.put(face, logic);
-			data |= logic.serialized() << (face.ordinal() * 8);
+			data |= (logic.serialize() & ((1 << CONNECTION_DATA_LENGTH) - 1)) << (face.ordinal() * CONNECTION_DATA_LENGTH);
 		}
 	}
 

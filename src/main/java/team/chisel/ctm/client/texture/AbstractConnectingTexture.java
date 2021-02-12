@@ -22,7 +22,7 @@ import team.chisel.ctm.client.resource.BlockStatePredicateParser;
 import team.chisel.ctm.client.util.IdentityStrategy;
 import team.chisel.ctm.client.util.ParseUtil;
 import team.chisel.ctm.client.util.connection.ConnectionLogic;
-import team.chisel.ctm.client.util.connection.ConnectionLogic.StateComparisonCallback;
+import team.chisel.ctm.client.util.connection.ConnectionLogic.StateComparator;
 
 public abstract class AbstractConnectingTexture<T extends TextureType> extends AbstractTexture<T> {
 	protected Optional<Boolean> connectInside;
@@ -69,7 +69,7 @@ public abstract class AbstractConnectingTexture<T extends TextureType> extends A
 			});
 			byte cached = sideCache.getByte(to);
 			if (cached == -1) {
-				sideCache.put(to, cached = (byte) ((connectionChecks == null ? StateComparisonCallback.DEFAULT.connects(logic, from, to, direction) : connectionChecks.test(direction, to)) ? 1 : 0));
+				sideCache.put(to, cached = (byte) ((connectionChecks == null ? StateComparator.DEFAULT.connects(logic, from, to, direction) : connectionChecks.test(direction, to)) ? 1 : 0));
 			}
 			return cached == 1;
 		}
@@ -77,7 +77,7 @@ public abstract class AbstractConnectingTexture<T extends TextureType> extends A
 
 	public void configureLogic(@NotNull ConnectionLogic logic) {
 		logic.ignoreStates(ignoreStates());
-		logic.stateComparator(this::connectTo);
+		logic.setStateComparator(this::connectTo);
 		logic.disableObscuredFaceCheck = connectInside();
 	}
 

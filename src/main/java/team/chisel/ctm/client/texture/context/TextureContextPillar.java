@@ -1,177 +1,34 @@
 package team.chisel.ctm.client.texture.context;
 
-import static team.chisel.ctm.client.util.connection.ConnectionLocation.DOWN;
-import static team.chisel.ctm.client.util.connection.ConnectionLocation.EAST;
-import static team.chisel.ctm.client.util.connection.ConnectionLocation.NORTH;
-import static team.chisel.ctm.client.util.connection.ConnectionLocation.NORTH_EAST_DOWN;
-import static team.chisel.ctm.client.util.connection.ConnectionLocation.NORTH_EAST_UP;
-import static team.chisel.ctm.client.util.connection.ConnectionLocation.NORTH_WEST_DOWN;
-import static team.chisel.ctm.client.util.connection.ConnectionLocation.NORTH_WEST_UP;
-import static team.chisel.ctm.client.util.connection.ConnectionLocation.SOUTH;
-import static team.chisel.ctm.client.util.connection.ConnectionLocation.SOUTH_EAST_DOWN;
-import static team.chisel.ctm.client.util.connection.ConnectionLocation.SOUTH_EAST_UP;
-import static team.chisel.ctm.client.util.connection.ConnectionLocation.SOUTH_WEST_DOWN;
-import static team.chisel.ctm.client.util.connection.ConnectionLocation.SOUTH_WEST_UP;
-import static team.chisel.ctm.client.util.connection.ConnectionLocation.UP;
-import static team.chisel.ctm.client.util.connection.ConnectionLocation.WEST;
-
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.Map;
-
-import com.google.common.collect.ObjectArrays;
-import org.apache.commons.lang3.ArrayUtils;
-
-import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 
 import team.chisel.ctm.api.client.TextureContext;
-import team.chisel.ctm.client.util.connection.ConnectionLocation;
+import team.chisel.ctm.client.util.connection.PillarConnectionLogic;
+import team.chisel.ctm.client.util.connection.SpacialConnectionLogic;
 
 public class TextureContextPillar implements TextureContext {
-	private static final ConnectionLocation[] MAIN_VALUES = {UP, DOWN, NORTH, SOUTH, EAST, WEST};
-	private static final ConnectionLocation[] OFFSET_VALUES = ArrayUtils.removeElements(ConnectionLocation.VALUES, ObjectArrays.concat(new ConnectionLocation[] {NORTH_EAST_UP, NORTH_EAST_DOWN, NORTH_WEST_UP, NORTH_WEST_DOWN, SOUTH_WEST_UP, SOUTH_WEST_DOWN, SOUTH_EAST_UP, SOUTH_EAST_DOWN}, MAIN_VALUES, ConnectionLocation.class));
-	private static final ConnectionLocation[] ALL_VALUES = ObjectArrays.concat(MAIN_VALUES, OFFSET_VALUES, ConnectionLocation.class);
-
-	private ConnectionData data;
-	private long compressedData;
+	private SpacialConnectionLogic logic;
+	private long data;
 
 	public TextureContextPillar(BlockView world, BlockPos pos) {
-		data = new ConnectionData(world, pos);
-		BlockState state = world.getBlockState(pos);
-		for (ConnectionLocation location : ALL_VALUES) {
-			if (state == world.getBlockState(location.transform(pos))) {
-				compressedData = compressedData | location.getMask();
-			}
-		}
+		logic = new PillarConnectionLogic();
+		logic.buildConnectionMap(world, pos);
+		data = logic.serialize();
 	}
 
-	@Deprecated
 	public TextureContextPillar(long data) {
-		this.data = new ConnectionData(data);
+		this.data = data;
+		logic = new PillarConnectionLogic();
+		logic.deserialize(this.data);
+	}
+
+	public SpacialConnectionLogic getLogic() {
+		return logic;
 	}
 
 	@Override
 	public long getCompressedData() {
-		return compressedData;
-	}
-
-	public ConnectionData getData() {
 		return data;
-	}
-
-	public static class Connections {
-		private EnumSet<Direction> connections;
-
-		public Connections(final EnumSet<Direction> connections) {
-			this.connections = connections;
-		}
-
-		public EnumSet<Direction> getConnections() {
-			return connections;
-		}
-
-		public boolean connected(Direction facing) {
-			return connections.contains(facing);
-		}
-
-		public boolean connectedAnd(Direction... facings) {
-			for (Direction f : facings) {
-				if (!connected(f)) {
-					return false;
-				}
-			}
-			return true;
-		}
-
-		public boolean connectedOr(Direction... facings) {
-			for (Direction f : facings) {
-				if (connected(f)) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		public static Connections forPos(BlockView world, BlockPos pos) {
-			BlockState state = world.getBlockState(pos);
-			return forPos(world, state, pos);
-		}
-
-		@Deprecated
-		public static Connections forData(long data, Direction offset) {
-			EnumSet<Direction> connections = EnumSet.noneOf(Direction.class);
-			if (offset == null) {
-				for (ConnectionLocation location : MAIN_VALUES) {
-					if ((data & location.getMask()) != 0) {
-						connections.add(ConnectionLocation.toFacing(location));
-					}
-				}
-			} else {
-				for (ConnectionLocation location : OFFSET_VALUES) {
-					if ((data & location.getMask()) != 0) {
-						Direction facing = location.clipOrDestroy(offset);
-						if (facing != null) {
-							connections.add(facing);
-						}
-					}
-				}
-			}
-			return new Connections(connections);
-		}
-
-		public static Connections forPos(BlockView world, BlockState baseState, BlockPos pos) {
-			EnumSet<Direction> connections = EnumSet.noneOf(Direction.class);
-			BlockState state = world.getBlockState(pos);
-			if (state == baseState) {
-				for (Direction f : Direction.values()) {
-					if (world.getBlockState(pos.offset(f)) == baseState) {
-						connections.add(f);
-					}
-				}
-			}
-			return new Connections(connections);
-		}
-
-		@Override
-		public String toString() {
-			return "TextureContextPillar.Connections(connections=" + getConnections() + ")";
-		}
-	}
-
-	public static class ConnectionData {
-		private Connections connections;
-		private Map<Direction, Connections> connectionsMap = new EnumMap<>(Direction.class);
-
-		public ConnectionData(BlockView world, BlockPos pos) {
-			connections = Connections.forPos(world, pos);
-			BlockState state = world.getBlockState(pos);
-			for (Direction facing : Direction.values()) {
-				connectionsMap.put(facing, Connections.forPos(world, state, pos.offset(facing)));
-			}
-		}
-
-		@Deprecated
-		public ConnectionData(long data) {
-			connections = Connections.forData(data, null);
-			for (Direction facing : Direction.values()) {
-				connectionsMap.put(facing, Connections.forData(data, facing));
-			}
-		}
-
-		public Connections getConnections(Direction facing) {
-			return connectionsMap.get(facing);
-		}
-
-		@Override
-		public String toString() {
-			return "TextureContextPillar.ConnectionData(connections=" + getConnections() + ", connectionConnections=" + connectionsMap + ")";
-		}
-
-		public Connections getConnections() {
-			return connections;
-		}
 	}
 }

@@ -10,6 +10,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 
 import team.chisel.ctm.api.client.Renderable;
+import team.chisel.ctm.client.util.BitUtil;
 
 /**
  * A class to assist in manipulating various attributes of quads, mainly UVs.
@@ -78,9 +79,9 @@ public class UnbakedQuad implements Renderable, Cloneable {
 		for (int vertexId = 0; vertexId < 4; vertexId++) {
 			vertex = vertexes[vertexId];
 			emitter.pos(vertexId, vertex.x, vertex.y, vertex.z);
-			emitter.spriteColor(vertexId, 0, RenderUtil.bitIntCast(vertex.alpha) << 24 | RenderUtil.bitIntCast(vertex.red) << 16 | RenderUtil.bitIntCast(vertex.green) << 8 | RenderUtil.bitIntCast(vertex.blue));
+			emitter.spriteColor(vertexId, 0, BitUtil.bitIntCast(vertex.alpha) << 24 | BitUtil.bitIntCast(vertex.red) << 16 | BitUtil.bitIntCast(vertex.green) << 8 | BitUtil.bitIntCast(vertex.blue));
 			emitter.sprite(vertexId, 0, vertex.u, vertex.v);
-			emitter.lightmap(vertexId, RenderUtil.bitIntCast(vertex.skyLight) << 16 | RenderUtil.bitIntCast(vertex.blockLight));
+			emitter.lightmap(vertexId, BitUtil.bitIntCast(vertex.skyLight) << 16 | BitUtil.bitIntCast(vertex.blockLight));
 			//emitter.normal(vertexId, vertex.normalX, vertex.normalY, vertex.normalZ);
 		}
 		if (cullFace != null) {
@@ -491,14 +492,14 @@ public class UnbakedQuad implements Renderable, Cloneable {
 			newVertex.x = MathHelper.lerp(delta, min.x, max.x);
 			newVertex.y = MathHelper.lerp(delta, min.y, max.y);
 			newVertex.z = MathHelper.lerp(delta, min.z, max.z);
-			newVertex.red = (byte) MathHelper.lerp(delta, RenderUtil.bitIntCast(min.red), RenderUtil.bitIntCast(max.red));
-			newVertex.green = (byte) MathHelper.lerp(delta, RenderUtil.bitIntCast(min.green), RenderUtil.bitIntCast(max.green));
-			newVertex.blue = (byte) MathHelper.lerp(delta, RenderUtil.bitIntCast(min.blue), RenderUtil.bitIntCast(max.blue));
-			newVertex.alpha = (byte) MathHelper.lerp(delta, RenderUtil.bitIntCast(min.alpha), RenderUtil.bitIntCast(max.alpha));
+			newVertex.red = (byte) MathHelper.lerp(delta, BitUtil.bitIntCast(min.red), BitUtil.bitIntCast(max.red));
+			newVertex.green = (byte) MathHelper.lerp(delta, BitUtil.bitIntCast(min.green), BitUtil.bitIntCast(max.green));
+			newVertex.blue = (byte) MathHelper.lerp(delta, BitUtil.bitIntCast(min.blue), BitUtil.bitIntCast(max.blue));
+			newVertex.alpha = (byte) MathHelper.lerp(delta, BitUtil.bitIntCast(min.alpha), BitUtil.bitIntCast(max.alpha));
 			newVertex.u = MathHelper.lerp(delta, min.u, max.u);
 			newVertex.v = MathHelper.lerp(delta, min.v, max.v);
-			newVertex.skyLight = (short) MathHelper.lerp(delta, RenderUtil.bitIntCast(min.skyLight), RenderUtil.bitIntCast(max.skyLight));
-			newVertex.blockLight = (short) MathHelper.lerp(delta, RenderUtil.bitIntCast(min.blockLight), RenderUtil.bitIntCast(max.blockLight));
+			newVertex.skyLight = (short) MathHelper.lerp(delta, BitUtil.bitIntCast(min.skyLight), BitUtil.bitIntCast(max.skyLight));
+			newVertex.blockLight = (short) MathHelper.lerp(delta, BitUtil.bitIntCast(min.blockLight), BitUtil.bitIntCast(max.blockLight));
 			newVertex.normalX = MathHelper.lerp(delta, min.normalX, max.normalX);
 			newVertex.normalY = MathHelper.lerp(delta, min.normalY, max.normalY);
 			newVertex.normalZ = MathHelper.lerp(delta, min.normalZ, max.normalZ);

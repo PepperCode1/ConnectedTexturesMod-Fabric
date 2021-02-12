@@ -21,7 +21,7 @@ import team.chisel.ctm.api.client.CTMTexture;
 import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.client.mixin.BakedQuadAccessor;
-import team.chisel.ctm.client.render.RenderUtil;
+import team.chisel.ctm.client.util.RenderUtil;
 
 public class CTMBakedModel extends AbstractCTMBakedModel {
 	private static final ThreadLocal<MeshBuilder> MESH_BUILDER = ThreadLocal.withInitial(() -> RendererAccess.INSTANCE.getRenderer().meshBuilder());
