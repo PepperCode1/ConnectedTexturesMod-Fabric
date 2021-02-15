@@ -21,6 +21,9 @@
   "entrypoints": {
     "client": [
       "team.chisel.ctm.client.CTMClient"
+    ],
+    "modmenu": [
+      "team.chisel.ctm.client.config.ModMenuApiImpl"
     ]
   },
   "mixins": [

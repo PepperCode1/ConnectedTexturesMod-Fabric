@@ -13,6 +13,7 @@ import net.minecraft.util.math.Direction;
 import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
+import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
 import team.chisel.ctm.client.render.Submap;
 import team.chisel.ctm.client.render.SubmapImpl;
@@ -28,7 +29,7 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 	@Override
 	public Renderable transformQuad(BakedQuad bakedQuad, Direction cullFace, TextureContext context) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
-		if (context instanceof TextureContextPillar) {
+		if (context instanceof TextureContextPillar && !CTMClient.getConfigManager().getConfig().disableCTM) {
 			transform(quad, ((TextureContextPillar) context).getLogic());
 		} else {
 			if (quad.nominalFace.getAxis().isVertical()) {

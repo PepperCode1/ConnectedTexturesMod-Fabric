@@ -1,4 +1,4 @@
-package team.chisel.ctm.client;
+package team.chisel.ctm.client.config;
 
 import java.io.File;
 import java.io.FileReader;
@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder;
 
 import net.minecraft.client.MinecraftClient;
 
+import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.model.AbstractCTMBakedModel;
 
 public class ConfigManager {

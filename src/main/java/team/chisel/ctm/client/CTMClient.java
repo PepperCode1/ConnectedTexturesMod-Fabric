@@ -16,6 +16,7 @@ import net.minecraft.client.render.model.json.JsonUnbakedModel;
 
 import team.chisel.ctm.api.client.TextureType;
 import team.chisel.ctm.api.client.TextureTypeRegistry;
+import team.chisel.ctm.client.config.ConfigManager;
 import team.chisel.ctm.client.event.AtlasStitchCallback;
 import team.chisel.ctm.client.event.DeserializeModelJsonCallback;
 import team.chisel.ctm.client.event.ModelsAddedCallback;

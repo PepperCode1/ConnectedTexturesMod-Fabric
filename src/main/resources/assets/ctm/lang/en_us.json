@@ -1,0 +1,7 @@
+{
+  "screen.ctm.config.title": "CTM Configuration",
+  "options.ctm.disable_ctm": "Disable CTM: %s",
+  "options.ctm.disable_ctm.tooltip": "Disable connected textures entirely.",
+  "options.ctm.connect_inside_ctm": "Connect Inside CTM: %s",
+  "options.ctm.connect_inside_ctm.tooltip": "Choose whether the inside corner is disconnected on a CTM block. https://imgur.com/eUywLZ4"
+}
