@@ -10,6 +10,7 @@
     "Pepper_Bell"
   ],
   "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/ctm-fabric",
     "issues": "https://github.com/PepperCode1/ConnectedTexturesMod-Fabric/issues",
     "sources": "https://github.com/PepperCode1/ConnectedTexturesMod-Fabric"
   },
@@ -35,5 +36,13 @@
     "fabricloader": ">=0.10.4",
     "fabric": "*",
     "minecraft": "1.16.x"
+  },
+
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/7rnTYXu"
+      }
+    }
   }
 }

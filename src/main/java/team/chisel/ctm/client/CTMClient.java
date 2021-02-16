@@ -37,7 +37,7 @@ import team.chisel.ctm.client.texture.type.TextureTypeSCTM;
 
 public class CTMClient implements ClientModInitializer {
 	public static final String MOD_ID = "ctm";
-	public static final Logger LOGGER = LogManager.getLogger("ctm");
+	public static final Logger LOGGER = LogManager.getLogger("CTM");
 
 	private static CTMClient instance;
 	private static ConfigManager configManager;
