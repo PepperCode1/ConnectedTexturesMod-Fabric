@@ -2,7 +2,6 @@ package team.chisel.ctm.client.util.connection;
 
 import static net.minecraft.util.math.Direction.DOWN;
 import static net.minecraft.util.math.Direction.EAST;
-import static net.minecraft.util.math.Direction.NORTH;
 import static net.minecraft.util.math.Direction.SOUTH;
 import static net.minecraft.util.math.Direction.UP;
 import static net.minecraft.util.math.Direction.WEST;
@@ -14,10 +13,8 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
 
-import team.chisel.ctm.client.util.DirectionHelper;
+import team.chisel.ctm.client.util.DirectionUtil;
 
 /**
  * Think of this class as a "two dimensional Direction, with diagonals".
@@ -89,7 +86,7 @@ public enum ConnectionDirection {
 				Direction[] ret = new Direction[directions.length];
 				// Finally apply all the rotations
 				for (int i = 0; i < ret.length; i++) {
-					ret[i] = rotate(directions[i], axis);
+					ret[i] = DirectionUtil.rotateClockwiseRelative(directions[i], axis);
 				}
 				normalized = ret;
 			}
@@ -128,51 +125,5 @@ public enum ConnectionDirection {
 			}
 		}
 		return null;
-	}
-
-	private Direction rotate(Direction facing, Direction axisFacing) {
-		Axis axis = axisFacing.getAxis();
-		AxisDirection axisDirection = axisFacing.getDirection();
-
-		if (axisDirection == AxisDirection.POSITIVE) {
-			return DirectionHelper.rotateAround(facing, axis);
-		}
-
-		if (facing.getAxis() != axis) {
-			switch (axis) {
-			case X:
-				// Inverted results from Direction#rotateX
-				switch (facing) {
-				case NORTH:
-					return UP;
-				case DOWN:
-					return NORTH;
-				case SOUTH:
-					return DOWN;
-				case UP:
-					return SOUTH;
-				default:
-					return facing; // Invalid but ignored
-				}
-			case Y:
-				return facing.rotateYCounterclockwise();
-			case Z:
-				// Inverted results from Direction#rotateZ
-				switch (facing) {
-				case EAST:
-					return EAST;
-				case WEST:
-					return WEST;
-				case UP:
-					return DOWN;
-				case DOWN:
-					return UP;
-				default:
-					return facing; // invalid but ignored
-				}
-			}
-		}
-
-		return facing;
 	}
 }

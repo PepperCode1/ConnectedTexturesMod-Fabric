@@ -13,22 +13,25 @@ public class TextureTypeRegistryImpl implements TextureTypeRegistry {
 
 	private Map<String, TextureType> types = new HashMap<>();
 
+	@Override
 	public void register(String name, TextureType type) {
 		String key = name.toLowerCase(Locale.ROOT);
 		if (types.get(key) != type) {
 			if (types.containsKey(key)) {
-				CTMClient.LOGGER.error("TextureType with name {} has already been registered!", key);
+				CTMClient.LOGGER.warn("TextureType with name {} has already been registered!", key);
 			} else {
 				types.put(key, type);
 			}
 		}
 	}
 
+	@Override
 	public TextureType getType(String name) {
 		String key = name.toLowerCase(Locale.ROOT);
 		return types.get(key);
 	}
 
+	@Override
 	public boolean isValid(String name) {
 		String key = name.toLowerCase(Locale.ROOT);
 		return types.containsKey(key);

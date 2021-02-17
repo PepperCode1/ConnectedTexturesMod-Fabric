@@ -11,7 +11,7 @@ import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.MathHelper;
 
 import team.chisel.ctm.client.texture.TextureMap;
-import team.chisel.ctm.client.util.FaceOffset;
+import team.chisel.ctm.client.util.DirectionUtil;
 
 public abstract class TextureContextGrid extends TextureContextPosition {
 	private final EnumMap<Direction, Point2i> textureCoords = new EnumMap<>(Direction.class);
@@ -26,20 +26,20 @@ public abstract class TextureContextGrid extends TextureContextPosition {
 		}
 		long serialized = 0;
 		for (Direction side : Direction.values()) {
-			BlockPos modifiedPosition = this.pos.add(FaceOffset.getBlockPosOffsetFromFaceOffset(side, texture.getXOffset(), texture.getYOffset()));
+			BlockPos modifiedPosition = this.pos.add(DirectionUtil.getRelativeOffset(side, texture.getXOffset(), texture.getYOffset()));
 			Point2i coords = calculateTextureCoord(modifiedPosition, texture.getXSize(), texture.getYSize(), side);
 			textureCoords.put(side, coords);
 			// Calculate a unique index for a submap (x + (y * x-size)), then shift it left by the max bit storage (10 bits = 1024 unique indices)
-			serialized |= (coords.x + (coords.y * texture.getXSize())) << (10 * side.ordinal());
+			serialized |= (coords.x + (coords.y * texture.getXSize())) << (side.ordinal() * 10);
 		}
 		this.serialized = serialized;
 	}
 
-	protected abstract Point2i calculateTextureCoord(BlockPos pos, int width, int height, Direction side);
-
 	public Point2i getTextureCoords(Direction side) {
 		return textureCoords.get(side);
 	}
+
+	protected abstract Point2i calculateTextureCoord(BlockPos pos, int width, int height, Direction side);
 
 	@Override
 	public long getCompressedData() {

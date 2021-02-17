@@ -36,11 +36,11 @@ public abstract class AbstractConnectingTexture<T extends TextureType> extends A
 	public AbstractConnectingTexture(T type, TextureInfo info) {
 		super(type, info);
 
-		this.connectInside = info.getExtraInfo().flatMap(obj -> ParseUtil.getBoolean(obj, "connect_inside"));
-		this.ignoreStates = info.getExtraInfo().map(obj -> JsonHelper.getBoolean(obj, "ignore_states", false)).orElse(false);
-		this.untransform = info.getExtraInfo().map(obj -> JsonHelper.getBoolean(obj, "untransform", false)).orElse(false);
+		connectInside = info.getExtraInfo().flatMap((obj) -> ParseUtil.getOptionalBoolean(obj, "connect_inside"));
+		ignoreStates = info.getExtraInfo().map((obj) -> JsonHelper.getBoolean(obj, "ignore_states", false)).orElse(false);
+		untransform = info.getExtraInfo().map((obj) -> JsonHelper.getBoolean(obj, "untransform", false)).orElse(false);
 
-		this.connectionChecks = info.getExtraInfo().map(obj -> BlockStatePredicateParser.INSTANCE.parse(obj.get("connect_to"))).orElse(null);
+		connectionChecks = info.getExtraInfo().map((obj) -> BlockStatePredicateParser.INSTANCE.parse(obj.get("connect_to"))).orElse(null);
 	}
 
 	@Override
@@ -60,16 +60,16 @@ public abstract class AbstractConnectingTexture<T extends TextureType> extends A
 		return ignoreStates;
 	}
 
-	public boolean connectTo(ConnectionLogic logic, BlockState from, BlockState to, Direction direction) {
+	public boolean connectTo(ConnectionLogic logic, BlockState from, BlockState to, Direction side) {
 		synchronized (connectionCache) {
-			Object2ByteMap<BlockState> sideCache = connectionCache.computeIfAbsent(new CacheKey(from, direction), key -> {
+			Object2ByteMap<BlockState> sideCache = connectionCache.computeIfAbsent(new CacheKey(from, side), key -> {
 				Object2ByteMap<BlockState> map = new Object2ByteOpenCustomHashMap<>(new IdentityStrategy<>());
 				map.defaultReturnValue((byte) -1);
 				return map;
 			});
 			byte cached = sideCache.getByte(to);
 			if (cached == -1) {
-				sideCache.put(to, cached = (byte) ((connectionChecks == null ? StateComparator.DEFAULT.connects(logic, from, to, direction) : connectionChecks.test(direction, to)) ? 1 : 0));
+				sideCache.put(to, cached = (byte) ((connectionChecks == null ? StateComparator.DEFAULT.connects(logic, from, to, side) : connectionChecks.test(side, to)) ? 1 : 0));
 			}
 			return cached == 1;
 		}
@@ -83,18 +83,18 @@ public abstract class AbstractConnectingTexture<T extends TextureType> extends A
 
 	private static final class CacheKey {
 		private final BlockState from;
-		private final Direction direction;
+		private final Direction side;
 
-		CacheKey(final BlockState from, final Direction direction) {
+		CacheKey(final BlockState from, final Direction side) {
 			this.from = from;
-			this.direction = direction;
+			this.side = side;
 		}
 
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + direction.hashCode();
+			result = prime * result + side.hashCode();
 			result = prime * result + System.identityHashCode(from);
 			return result;
 		}
@@ -105,7 +105,7 @@ public abstract class AbstractConnectingTexture<T extends TextureType> extends A
 			if (obj == null) return false;
 			if (getClass() != obj.getClass()) return false;
 			CacheKey other = (CacheKey) obj;
-			if (direction != other.direction) return false;
+			if (side != other.side) return false;
 			if (from != other.from) return false;
 			return true;
 		}

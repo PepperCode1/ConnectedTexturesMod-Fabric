@@ -2,6 +2,7 @@ package team.chisel.ctm.api.client;
 
 import team.chisel.ctm.impl.client.TextureTypeRegistryImpl;
 
+// TODO: Switch from String to Identifier
 /**
  * Registry for {@link TextureType}. Use {@link TextureTypeRegistry#INSTANCE} to obtain an instance of this class.
  */
