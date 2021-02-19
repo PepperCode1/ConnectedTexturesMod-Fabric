@@ -1,0 +1,41 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "all": "block/glass",
+    "particle": "#all",
+    "down": "#all",
+    "up": "#all",
+    "north": "#all",
+    "east": "#all",
+    "south": "#all",
+    "west": "#all"
+  },
+  "elements": [
+    {
+      "from": [ 0, 0, 0 ],
+      "to": [ 16, 16, 16 ],
+      "faces": {
+        "down":  { "texture": "#down", "cullface": "down" },
+        "up":  { "texture": "#up", "cullface": "up", "tintindex": 0 },
+        "north": { "texture": "#north", "cullface": "north", "tintindex": 1 },
+        "south": { "texture": "#south", "cullface": "south" },
+        "west":  { "texture": "#west", "cullface": "west" },
+        "east":  { "texture": "#east", "cullface": "east" }
+      }
+    }
+  ],
+  "ctm_version": 1,
+  "ctm_overrides": {
+    "0": {
+      "ctm_version": 1,
+      "type": "ctm",
+      "textures": [
+        "block/glass_ctm"
+      ],
+      "extra": {
+        "light": 15
+      }
+    },
+    "1": "block/orange_stained_glass"
+  }
+}

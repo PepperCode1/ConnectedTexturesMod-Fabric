@@ -3,7 +3,7 @@
     "ctm_version": 1,
     "type": "ctm",
     "textures": [
-      "minecraft:block/glass_ctm"
+      "block/glass_ctm"
     ],
     "extra": {
       "ignore_states": true,

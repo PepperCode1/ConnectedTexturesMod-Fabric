@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_all_ctm",
+  "textures": {
+    "all": "block/orange_stained_glass",
+    "connected": "block/orange_stained_glass_ctm"
+  }
+}

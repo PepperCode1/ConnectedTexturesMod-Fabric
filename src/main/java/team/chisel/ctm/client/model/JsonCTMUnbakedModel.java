@@ -12,7 +12,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import org.apache.commons.lang3.tuple.Pair;
@@ -28,7 +27,6 @@ import net.minecraft.client.render.model.json.ModelElementFace;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
 
 import team.chisel.ctm.api.client.CTMTexture;
 import team.chisel.ctm.client.CTMClient;
@@ -38,6 +36,8 @@ import team.chisel.ctm.client.util.ResourceUtil;
 import team.chisel.ctm.client.util.TextureUtil;
 
 public class JsonCTMUnbakedModel implements UnbakedModel {
+	private static final CTMOverrideReader OVERRIDE_READER = new CTMOverrideReader();
+
 	private final JsonUnbakedModel parent;
 	private final Int2ObjectMap<JsonElement> overrides;
 
@@ -58,8 +58,6 @@ public class JsonCTMUnbakedModel implements UnbakedModel {
 		this.parent = parent;
 		this.overrides = overrides;
 
-		// TODO: add support for references
-		// if a texture location in the json is a reference (starts with a "#"), the Identifier constructor will throw an exception
 		for (Int2ObjectMap.Entry<JsonElement> entry : this.overrides.int2ObjectEntrySet()) {
 			int tintIndex = entry.getIntKey();
 			JsonElement element = entry.getValue();
@@ -72,12 +70,11 @@ public class JsonCTMUnbakedModel implements UnbakedModel {
 					extraTextureDependencies.add(spriteId);
 					metadata = ResourceUtil.getMetadataSafe(ResourceUtil.toTextureIdentifier(identifier));
 				} else if (element.isJsonObject()) {
-					metadata = CTMMetadataReader.INSTANCE.fromJson(element.getAsJsonObject());
+					OVERRIDE_READER.setJsonModel(parent);
+					metadata = OVERRIDE_READER.fromJson(element.getAsJsonObject());
 				}
-			} catch (InvalidIdentifierException e) {
-				CTMClient.LOGGER.error("Error processing CTM override: invalid identifier.", e);
-			} catch (JsonParseException e) {
-				CTMClient.LOGGER.error("Error processing CTM override: invalid JSON.", e);
+			} catch (Exception e) {
+				CTMClient.LOGGER.error("Error processing CTM override.", e);
 			}
 			if (metadata != null) {
 				for (Identifier identifier : metadata.getAdditionalTextures()) {
@@ -165,6 +162,22 @@ public class JsonCTMUnbakedModel implements UnbakedModel {
 		@Override
 		public @Nullable CTMTexture<?> getOverrideTexture(int tintIndex, Identifier identifier) {
 			return textureOverrides.get(Pair.of(tintIndex, identifier));
+		}
+	}
+
+	private static class CTMOverrideReader extends CTMMetadataReader {
+		private JsonUnbakedModel jsonModel;
+
+		public void setJsonModel(JsonUnbakedModel jsonModel) {
+			this.jsonModel = jsonModel;
+		}
+
+		@Override
+		public Identifier makeIdentifier(String string) {
+			if (TextureUtil.isTextureReference(string)) {
+				return jsonModel.resolveSprite(string).getTextureId();
+			}
+			return super.makeIdentifier(string);
 		}
 	}
 }

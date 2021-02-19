@@ -1,13 +1,13 @@
 {
   "ctm": {
     "ctm_version": 1,
-    "type": "EDGES_FULL",
+    "type": "edges_full",
     "textures": [
-      "minecraft:block/obsidian_portal"
+      "block/obsidian_portal"
     ],
     "extra": {
       "connect_to": [
-        { "block": "minecraft:nether_portal" }
+        { "block": "nether_portal" }
       ]
     }
   }

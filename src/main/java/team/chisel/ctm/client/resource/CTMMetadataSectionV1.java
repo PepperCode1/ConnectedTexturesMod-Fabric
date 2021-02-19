@@ -2,6 +2,7 @@ package team.chisel.ctm.client.resource;
 
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.function.Function;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -24,18 +25,22 @@ public class CTMMetadataSectionV1 implements CTMMetadataSection {
 	private JsonObject extraData;
 
 	public static CTMMetadataSection fromJson(JsonObject jsonObject) throws JsonParseException {
+		return fromJson(jsonObject, Identifier::new);
+	}
+
+	public static CTMMetadataSection fromJson(JsonObject jsonObject, Function<String, Identifier> identifierProvider) throws JsonParseException {
 		CTMMetadataSectionV1 metadata = new CTMMetadataSectionV1();
 		if (jsonObject.has("proxy")) {
 			JsonElement proxyElement = jsonObject.get("proxy");
 			if (proxyElement.isJsonPrimitive() && proxyElement.getAsJsonPrimitive().isString()) {
 				String proxyString = proxyElement.getAsString();
 				try {
-					metadata.proxy = new Identifier(proxyString);
+					metadata.proxy = identifierProvider.apply(proxyString);
 				} catch (InvalidIdentifierException e) {
 					throw new JsonParseException("Invalid proxy identifier provided: " + proxyString);
 				}
 			}
-			if (jsonObject.entrySet().stream().filter(e -> e.getKey().equals("ctm_version")).count() > 1) {
+			if (jsonObject.entrySet().stream().filter((element) -> !element.getKey().equals("ctm_version")).count() > 1) {
 				throw new JsonParseException("Cannot define other fields when using proxy");
 			}
 		}
@@ -66,9 +71,14 @@ public class CTMMetadataSectionV1 implements CTMMetadataSection {
 				JsonArray texturesArray = texturesElement.getAsJsonArray();
 				metadata.additionalTextures = new Identifier[texturesArray.size()];
 				for (int i = 0; i < texturesArray.size(); i++) {
-					JsonElement e = texturesArray.get(i);
-					if (e.isJsonPrimitive() && e.getAsJsonPrimitive().isString()) {
-						metadata.additionalTextures[i] = new Identifier(e.getAsString());
+					JsonElement textureElement = texturesArray.get(i);
+					if (textureElement.isJsonPrimitive() && textureElement.getAsJsonPrimitive().isString()) {
+						String textureString = textureElement.getAsString();
+						try {
+							metadata.additionalTextures[i] = identifierProvider.apply(textureString);
+						} catch (InvalidIdentifierException e) {
+							throw new JsonParseException("Invalid texture identifier provided: " + textureString);
+						}
 					}
 				}
 			}

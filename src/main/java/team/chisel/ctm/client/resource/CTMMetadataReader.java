@@ -10,13 +10,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.resource.metadata.ResourceMetadataReader;
+import net.minecraft.util.Identifier;
 
 public class CTMMetadataReader implements ResourceMetadataReader<CTMMetadataSection> {
-	public static final String SECTION_NAME = "ctm";
+	public static final String SECTION_KEY = "ctm";
 
 	public static final CTMMetadataReader INSTANCE = new CTMMetadataReader();
 
-	private static final Map<Integer, Function<JsonObject, CTMMetadataSection>> FACTORIES = new ImmutableMap.Builder<Integer, Function<JsonObject, CTMMetadataSection>>()
+	private static final Map<Integer, CTMMetadataFactory> FACTORIES = new ImmutableMap.Builder<Integer, CTMMetadataFactory>()
 			.put(1, CTMMetadataSectionV1::fromJson)
 			.build();
 
@@ -25,14 +26,14 @@ public class CTMMetadataReader implements ResourceMetadataReader<CTMMetadataSect
 	public CTMMetadataSection fromJson(@Nullable JsonObject jsonObject) throws JsonParseException {
 		if (jsonObject != null) {
 			if (jsonObject.has("ctm_version")) {
-				Function<JsonObject, CTMMetadataSection> factory = FACTORIES.get(jsonObject.get("ctm_version").getAsInt());
+				CTMMetadataFactory factory = FACTORIES.get(jsonObject.get("ctm_version").getAsInt());
 				if (factory == null) {
 					throw new JsonParseException("Invalid \"ctm_version\"");
 				} else {
-					return factory.apply(jsonObject);
+					return factory.getCTMMetadata(jsonObject, this::makeIdentifier);
 				}
 			} else {
-				throw new JsonParseException("Found ctm section without ctm_version");
+				throw new JsonParseException("Found ctm section without \"ctm_version\"");
 			}
 		}
 		return null;
@@ -41,6 +42,14 @@ public class CTMMetadataReader implements ResourceMetadataReader<CTMMetadataSect
 	@Override
 	@NotNull
 	public String getKey() {
-		return SECTION_NAME;
+		return SECTION_KEY;
+	}
+
+	public Identifier makeIdentifier(String string) {
+		return new Identifier(string);
+	}
+
+	public interface CTMMetadataFactory {
+		CTMMetadataSection getCTMMetadata(JsonObject jsonObject, Function<String, Identifier> identifierProvider);
 	}
 }

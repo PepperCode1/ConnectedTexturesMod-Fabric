@@ -3,7 +3,7 @@
     "ctm_version": 1,
     "type": "ctm",
     "textures": [
-      "minecraft:block/beehive_end_ctm"
+      "block/beehive_end_ctm"
     ],
     "extra": {
       "ignore_states": true
