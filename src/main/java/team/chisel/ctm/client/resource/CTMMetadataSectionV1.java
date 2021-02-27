@@ -19,7 +19,7 @@ import team.chisel.ctm.client.texture.type.TextureTypeNormal;
 
 public class CTMMetadataSectionV1 implements CTMMetadataSection {
 	private TextureType type = TextureTypeNormal.INSTANCE;
-	private BlendMode blendMode;
+	private BlendMode blendMode = BlendMode.DEFAULT;
 	private Identifier proxy;
 	private Identifier[] additionalTextures;
 	private JsonObject extraData;

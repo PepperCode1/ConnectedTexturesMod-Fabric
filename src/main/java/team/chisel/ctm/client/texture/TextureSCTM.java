@@ -10,7 +10,6 @@ import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.render.SpriteUnbakedQuad;
-import team.chisel.ctm.client.render.SubmapImpl;
 import team.chisel.ctm.client.texture.context.TextureContextConnecting;
 import team.chisel.ctm.client.texture.type.TextureTypeSCTM;
 import team.chisel.ctm.client.util.connection.ConnectionDirection;
@@ -31,7 +30,7 @@ public class TextureSCTM extends AbstractConnectingTexture<TextureTypeSCTM> {
 		}
 
 		quad.setUVBounds(sprites[0]);
-		quad.applySubmap(SubmapImpl.getX2Submap(submapId, quad.getAbsoluteUVRotation()));
+		quad.applySubmap(TextureCTM.getX2Submap(submapId, quad.areUVsRotatedOnce()));
 		return quad;
 	}
 

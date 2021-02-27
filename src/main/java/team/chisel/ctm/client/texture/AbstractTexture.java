@@ -62,7 +62,7 @@ public abstract class AbstractTexture<T extends TextureType> implements CTMTextu
 		}
 
 		BlendMode blendMode = info.getBlendMode();
-		if (blendMode != null || isEmissive) {
+		if (blendMode != BlendMode.DEFAULT || isEmissive) {
 			material = FINDER.get().blendMode(0, blendMode).emissive(0, isEmissive).find();
 		}
 	}

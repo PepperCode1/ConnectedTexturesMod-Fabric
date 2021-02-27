@@ -57,12 +57,12 @@ public class TextureCTM extends AbstractConnectingTexture<TextureTypeCTM> {
 				int quadrantSubmapId = quadrantSubmapIds[quadrant];
 
 				int submapId = quadrantSubmapId / 2;
-				submapId = submapId < 8 ? (((submapId < 4) ? 0 : 2) + (submapId % 2 == 0 ? 0 : 1)) : 4;
+				submapId = submapId < 8 ? (((submapId < 4) ? 0 : 2) + submapId % 2) : 4;
 				Submap submap;
 				if (submapId == 4) {
 					submap = SubmapImpl.X1;
 				} else {
-					submap = SubmapImpl.getX2Submap(submapId, quad.getAbsoluteUVRotation());
+					submap = getX2Submap(submapId, quad.areUVsRotatedOnce());
 				}
 
 				quads[i].setUVBounds(sprites[quadrantSubmapId > 15 ? 0 : 1]);
@@ -105,5 +105,16 @@ public class TextureCTM extends AbstractConnectingTexture<TextureTypeCTM> {
 		} else {
 			return SubmapImpl.X2[(id-16) / 2][(id-16) % 2];
 		}
+	}
+
+	public static Submap getX2Submap(int id, boolean rotate) {
+		if (rotate) {
+			if (id == 1) {
+				id = 2;
+			} else if (id == 2) {
+				id = 1;
+			}
+		}
+		return SubmapImpl.getX2Submap(id);
 	}
 }

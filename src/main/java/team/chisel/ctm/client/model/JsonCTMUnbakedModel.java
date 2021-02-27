@@ -72,6 +72,14 @@ public class JsonCTMUnbakedModel implements UnbakedModel {
 				} else if (element.isJsonObject()) {
 					OVERRIDE_READER.setJsonModel(parent);
 					metadata = OVERRIDE_READER.fromJson(element.getAsJsonObject());
+
+					int required = metadata.getType().requiredTextures();
+					int provided = metadata.getAdditionalTextures().length + 1;
+					if (required > provided) {
+						CTMClient.LOGGER.error("Too few textures provided for override {} in model {}: TextureType {} requires {} textures, but {} were provided.", tintIndex, parent.id, metadata.getType(), required, provided);
+					} else if (required < provided) {
+						CTMClient.LOGGER.warn("Too many textures provided for override {} in model {}: TextureType {} requires {} textures, but {} were provided.", tintIndex, parent.id, metadata.getType(), required, provided);
+					}
 				}
 			} catch (Exception e) {
 				CTMClient.LOGGER.error("Error processing CTM override.", e);
@@ -116,11 +124,13 @@ public class JsonCTMUnbakedModel implements UnbakedModel {
 		}
 		for (Int2ObjectMap.Entry<CTMMetadataSection> entry : metadataOverrides.int2ObjectEntrySet()) {
 			int tintIndex = entry.getIntKey();
-			for (SpriteIdentifier id : spriteIds.get(tintIndex)) {
-				Sprite sprite = spriteOverrides.get(tintIndex);
-				if (sprite == null) {
+			Sprite sprite = spriteOverrides.get(tintIndex);
+			if (sprite == null) {
+				for (SpriteIdentifier id : spriteIds.get(tintIndex)) {
 					sprite = spriteGetter.apply(id);
+					textureOverrides.put(Pair.of(tintIndex, sprite.getId()), TextureUtil.makeTexture(entry.getValue(), sprite, spriteGetter));
 				}
+			} else {
 				textureOverrides.put(Pair.of(tintIndex, sprite.getId()), TextureUtil.makeTexture(entry.getValue(), sprite, spriteGetter));
 			}
 		}

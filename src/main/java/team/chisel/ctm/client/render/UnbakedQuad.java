@@ -50,9 +50,9 @@ public class UnbakedQuad implements Renderable, Cloneable {
 			vertex.skyLight = (short) (light >> 16);
 			vertex.blockLight = (short) (light);
 			//normal = data[offset+7];
-			//vertex.normalX = ((normal >> 24) & 255) / 127.0f;
-			//vertex.normalY = ((normal >> 16) & 255) / 127.0f;
-			//vertex.normalZ = ((normal >> 8) & 255) / 127.0f;
+			//vertex.normalX = ((normal >> 24) & 255) / 127.0F;
+			//vertex.normalY = ((normal >> 16) & 255) / 127.0F;
+			//vertex.normalZ = ((normal >> 8) & 255) / 127.0F;
 		}
 		colorIndex = bakedQuad.getColorIndex();
 	}
@@ -192,6 +192,9 @@ public class UnbakedQuad implements Renderable, Cloneable {
 	 */
 	public void rotateUVs(float[] center, int rotation) {
 		rotation %= 4;
+		if (rotation == 0) {
+			return;
+		}
 		if (rotation < 0) {
 			rotation += 4;
 		}
@@ -229,10 +232,12 @@ public class UnbakedQuad implements Renderable, Cloneable {
 	 * @param reflection The way to reflect.
 	 */
 	public void reflectUVs(float[] center, Reflection reflection) {
-		for (int vertexId = 0; vertexId < 4; vertexId++) {
-			if (reflection == Reflection.HORIZONTAL) {
+		if (reflection == Reflection.HORIZONTAL) {
+			for (int vertexId = 0; vertexId < 4; vertexId++) {
 				vertexes[vertexId].u = -(vertexes[vertexId].u - center[0]) + center[0];
-			} else if (reflection == Reflection.VERTICAL) {
+			}
+		} else if (reflection == Reflection.VERTICAL) {
+			for (int vertexId = 0; vertexId < 4; vertexId++) {
 				vertexes[vertexId].v = -(vertexes[vertexId].v - center[1]) + center[1];
 			}
 		}
@@ -244,12 +249,24 @@ public class UnbakedQuad implements Renderable, Cloneable {
 	 * @param center A point in the form of float[] {u, v}.
 	 */
 	public void untransformUVs(float[] center) {
-		reflectUVs(center, getUVReflection());
-		rotateUVs(center, -getUVRotation());
+		Winding winding = getUVWinding();
+		int rotation = getUVRotation();
+		if (winding == Winding.CLOCKWISE) {
+			if (rotation == 1) {
+				reflectUVs(center, Reflection.VERTICAL);
+			} else if (rotation == 3) {
+				reflectUVs(center, Reflection.HORIZONTAL);
+			} else {
+				reflectUVs(center, Reflection.HORIZONTAL);
+				rotateUVs(center, rotation - 1);
+			}
+		} else {
+			rotateUVs(center, -rotation);
+		}
 	}
 
 	/**
-	 * <b>Does not take UV reflection into account. Use {@link #getAbsoluteUVRotation()} if UVs might be reflected.</b>
+	 * <b>Assumes the UV winding is counterclockwise, meaning UV reflection is ignored.</b>
 	 *
 	 * <p>Calculates the counter-clockwise UV rotation by checking which vertex has the smallest UVs by using {@code u*u+v*v}.
 	 *
@@ -271,45 +288,29 @@ public class UnbakedQuad implements Renderable, Cloneable {
 	}
 
 	/**
-	 * Calculates the UV reflection.
+	 * <b>Behavior is undefined if the UV coordinates form a concave polygon or self-intersecting polygon.</b>
 	 *
-	 * @return The UV reflection.
+	 * <p>Calculates the winding direction of the UV coordinates, going in the vertex order.
+	 *
+	 * @return The winding direction of the UV coordinates.
 	 */
-	public Reflection getUVReflection() {
-		boolean horizontal = false;
-		boolean vertical = false;
-		if (vertexes[0].u > vertexes[3].u && vertexes[1].u > vertexes[2].u) {
-			horizontal = true;
+	public Winding getUVWinding() {
+		float val = (vertexes[3].u - vertexes[0].u) * (vertexes[1].v - vertexes[0].v) - (vertexes[3].v - vertexes[0].v) * (vertexes[1].u - vertexes[0].u);
+		if (val > 0) {
+			return Winding.COUNTERCLOCKWISE;
+		} else if (val < 0) {
+			return Winding.CLOCKWISE;
 		}
-		if (vertexes[0].v > vertexes[1].v && vertexes[3].v > vertexes[2].v) {
-			vertical = true;
-		}
-
-		if (horizontal && !vertical) {
-			return Reflection.HORIZONTAL;
-		}
-		if (vertical && !horizontal) {
-			return Reflection.VERTICAL;
-		}
-
-		return Reflection.NONE;
+		return Winding.UNDEFINED;
 	}
 
 	/**
-	 * Calculates the absolute counter-clockwise UV rotation by reflecting the result from {@link #getUVReflection()}.
+	 * Checks if the UVs are rotated once with regards to UV winding, so that a double rotation or double reflection is ignored.
 	 *
-	 * @return The absolute counter-clockwise UV rotation.
+	 * @return True if a single rotation is applied, false otherwise.
 	 */
-	public int getAbsoluteUVRotation() {
-		Reflection reflection = getUVReflection();
-		int rotation = getUVRotation();
-		if (reflection != Reflection.NONE) {
-			if (rotation % 2 == (reflection == Reflection.HORIZONTAL ? 0 : 1)) {
-				rotation += 2;
-			}
-			rotation = (rotation+1) % 4;
-		}
-		return rotation;
+	public boolean areUVsRotatedOnce() {
+		return getUVRotation() % 2 == (getUVWinding() == Winding.COUNTERCLOCKWISE ? 1 : 0);
 	}
 
 	/**
@@ -413,6 +414,19 @@ public class UnbakedQuad implements Renderable, Cloneable {
 			quad.vertexes[vertexId] = vertexes[vertexId].clone();
 		}
 		return quad;
+	}
+
+	public enum Winding {
+		COUNTERCLOCKWISE,
+		CLOCKWISE,
+		UNDEFINED;
+
+		public Winding reverse() {
+			if (this == UNDEFINED) {
+				return this;
+			}
+			return this == CLOCKWISE ? COUNTERCLOCKWISE : CLOCKWISE;
+		}
 	}
 
 	public enum Reflection {
