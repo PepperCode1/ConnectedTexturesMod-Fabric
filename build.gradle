@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.5-SNAPSHOT'
+	id 'fabric-loom' version '0.6-SNAPSHOT'
 	id 'maven-publish'
 	id 'checkstyle'
 }
@@ -33,7 +33,7 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modCompileOnly "com.terraformersmc:modmenu:1.16.7"
+	modCompileOnly "com.terraformersmc:modmenu:${project.mod_menu_version}"
 
 	afterEvaluate {
 		testmodImplementation sourceSets.main.output

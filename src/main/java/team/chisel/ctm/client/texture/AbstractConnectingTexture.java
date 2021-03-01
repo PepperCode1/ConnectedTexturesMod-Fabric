@@ -76,9 +76,9 @@ public abstract class AbstractConnectingTexture<T extends TextureType> extends A
 	}
 
 	public void configureLogic(@NotNull ConnectionLogic logic) {
+		logic.disableObscuredFaceCheck = connectInside();
 		logic.ignoreStates(ignoreStates());
 		logic.setStateComparator(this::connectTo);
-		logic.disableObscuredFaceCheck = connectInside();
 	}
 
 	private static final class CacheKey {

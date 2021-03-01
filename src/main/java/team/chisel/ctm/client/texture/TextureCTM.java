@@ -27,14 +27,11 @@ import team.chisel.ctm.client.util.connection.ConnectionLogic;
 
 public class TextureCTM extends AbstractConnectingTexture<TextureTypeCTM> {
 	protected static final ConnectionDirection[][] DIRECTION_MAP = new ConnectionDirection[][] {
+		{TOP, LEFT, TOP_LEFT},
 		{BOTTOM, LEFT, BOTTOM_LEFT},
 		{BOTTOM, RIGHT, BOTTOM_RIGHT},
-		{TOP, RIGHT, TOP_RIGHT},
-		{TOP, LEFT, TOP_LEFT}
+		{TOP, RIGHT, TOP_RIGHT}
 	};
-	// Some hardcoded offset values for the different corner indeces.
-	protected static final int[] QUADRANT_SUBMAP_OFFSETS = {4, 5, 1, 0};
-	protected static final int[] DEFAULT_QUADRANT_SUBMAPS = {18, 19, 17, 16};
 
 	public TextureCTM(TextureTypeCTM type, TextureInfo info) {
 		super(type, info);
@@ -49,62 +46,40 @@ public class TextureCTM extends AbstractConnectingTexture<TextureTypeCTM> {
 			return quad;
 		}
 
-		int[] quadrantSubmapIds = getQuadrantSubmapIds(((TextureContextConnecting) context).getLogic(quad.nominalFace));
+		ConnectionLogic logic = ((TextureContextConnecting) context).getLogic(quad.nominalFace);
 		SpriteUnbakedQuad[] quads = quad.toQuadrants();
 		for (int i = 0; i < quads.length; i++) {
 			if (quads[i] != null) {
-				int quadrant = (i + 3) % 4;
-				int quadrantSubmapId = quadrantSubmapIds[quadrant];
-
-				int submapId = quadrantSubmapId / 2;
-				submapId = submapId < 8 ? (((submapId < 4) ? 0 : 2) + submapId % 2) : 4;
-				Submap submap;
-				if (submapId == 4) {
-					submap = SubmapImpl.X1;
+				int id = getSubmapId(logic, i);
+				if (id != -1) {
+					quads[i].setUVBounds(sprites[1]);
+					quads[i].applySubmap(getX2Submap(id, quad.areUVsRotatedOnce()));
 				} else {
-					submap = getX2Submap(submapId, quad.areUVsRotatedOnce());
+					quads[i].setUVBounds(sprites[0]);
 				}
-
-				quads[i].setUVBounds(sprites[quadrantSubmapId > 15 ? 0 : 1]);
-				quads[i].applySubmap(submap);
 			}
 		}
 
 		return new RenderableArray(quads);
 	}
 
-	protected int[] getQuadrantSubmapIds(ConnectionLogic logic) {
-		int[] submapIds = new int[4];
-		for (int quadrant = 0; quadrant < 4; quadrant++) {
-			submapIds[quadrant] = getQuadrantSubmapId(logic, quadrant);
-		}
-		return submapIds;
-	}
-
-	protected int getQuadrantSubmapId(ConnectionLogic logic, int quadrant) {
+	protected int getSubmapId(ConnectionLogic logic, int quadrant) {
 		ConnectionDirection[] directions = DIRECTION_MAP[quadrant];
-		if (logic.connectedOr(directions[0], directions[1])) {
-			if (logic.connectedAnd(directions)) {
-				// If all dirs are connected, we use the fully connected face,
-				// the base offset value.
-				return QUADRANT_SUBMAP_OFFSETS[quadrant];
-			} else {
-				// This is a bit magic-y, but basically the array is ordered so
-				// the first dir requires an offset of 2, and the second dir
-				// requires an offset of 8, plus the initial offset for the
-				// corner.
-				return QUADRANT_SUBMAP_OFFSETS[quadrant] + (logic.connected(directions[0]) ? 2 : 0) + (logic.connected(directions[1]) ? 8 : 0);
+		boolean connected1 = logic.connected(directions[0]);
+		boolean connected2 = logic.connected(directions[1]);
+		if (connected1 && connected2) {
+			if (logic.connected(directions[2])) {
+				return 0;
 			}
+			return 3;
 		}
-		return DEFAULT_QUADRANT_SUBMAPS[quadrant];
-	}
-
-	protected Submap getQuadrantSubmap(int id) {
-		if (id < 16) {
-			return SubmapImpl.X4[id / 4][id % 4];
-		} else {
-			return SubmapImpl.X2[(id-16) / 2][(id-16) % 2];
+		if (connected1) {
+			return 1;
 		}
+		if (connected2) {
+			return 2;
+		}
+		return -1;
 	}
 
 	public static Submap getX2Submap(int id, boolean rotate) {

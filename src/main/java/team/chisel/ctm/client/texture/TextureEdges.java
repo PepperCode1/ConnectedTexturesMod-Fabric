@@ -21,15 +21,15 @@ public class TextureEdges extends TextureCTM {
 
 	@Override
 	public Renderable transformQuad(BakedQuad bakedQuad, Direction cullFace, TextureContext context) {
-		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
-
 		if (CTMClient.getConfigManager().getConfig().disableCTM || !(context instanceof TextureContextConnectingObscured)) {
+			SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 			quad.setUVBounds(sprites[0]);
 			return quad;
 		}
 
-		ConnectionLogicObscured logic = ((TextureContextConnectingObscured) context).getLogic(quad.nominalFace);
+		ConnectionLogicObscured logic = ((TextureContextConnectingObscured) context).getLogic(bakedQuad.getFace());
 		if (logic.isObscured()) {
+			SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
 			quad.setUVBounds(sprites[2]);
 			return quad;
 		}
@@ -38,11 +38,22 @@ public class TextureEdges extends TextureCTM {
 	}
 
 	@Override
-	protected int getQuadrantSubmapId(ConnectionLogic logic, int quadrant) {
+	protected int getSubmapId(ConnectionLogic logic, int quadrant) {
 		ConnectionDirection[] directions = DIRECTION_MAP[quadrant];
-		if (!logic.connectedOr(directions[0], directions[1]) && logic.connected(directions[2])) {
-			return QUADRANT_SUBMAP_OFFSETS[quadrant];
+		boolean connected1 = logic.connected(directions[0]);
+		boolean connected2 = logic.connected(directions[1]);
+		if (logic.connected(directions[2]) && ((connected1 && connected2) || (!connected1 && !connected2))) {
+			return 0;
 		}
-		return super.getQuadrantSubmapId(logic, quadrant);
+		if (connected1 && connected2) {
+			return 3;
+		}
+		if (connected1) {
+			return 1;
+		}
+		if (connected2) {
+			return 2;
+		}
+		return -1;
 	}
 }
