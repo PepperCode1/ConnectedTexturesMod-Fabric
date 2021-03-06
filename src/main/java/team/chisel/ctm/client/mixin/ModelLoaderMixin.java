@@ -18,7 +18,7 @@ import net.minecraft.util.profiler.Profiler;
 
 import team.chisel.ctm.client.event.ModelsAddedCallback;
 
-@Mixin(ModelLoader.class)
+@Mixin(value = ModelLoader.class, priority = 5000)
 public class ModelLoaderMixin {
 	@Shadow
 	@Final

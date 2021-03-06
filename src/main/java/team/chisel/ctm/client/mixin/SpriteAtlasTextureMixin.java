@@ -16,7 +16,7 @@ import net.minecraft.util.profiler.Profiler;
 
 import team.chisel.ctm.client.event.AtlasStitchCallback;
 
-@Mixin(value = SpriteAtlasTexture.class, priority = 100)
+@Mixin(value = SpriteAtlasTexture.class, priority = 5000)
 public class SpriteAtlasTextureMixin {
 	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/texture/SpriteAtlasTexture;loadSprites(Lnet/minecraft/resource/ResourceManager;Ljava/util/Set;)Ljava/util/Collection;"), method = "stitch(Lnet/minecraft/resource/ResourceManager;Ljava/util/stream/Stream;Lnet/minecraft/util/profiler/Profiler;I)Lnet/minecraft/client/texture/SpriteAtlasTexture$Data;", locals = LocalCapture.CAPTURE_FAILHARD)
 	public void beforeAtlasStitch(ResourceManager resourceManager, Stream<Identifier> idStream, Profiler profiler, int mipmapLevel, CallbackInfoReturnable<SpriteAtlasTexture.Data> cir, Set<Identifier> set) {

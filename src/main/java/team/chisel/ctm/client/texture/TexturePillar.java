@@ -6,9 +6,13 @@ import static net.minecraft.util.math.Direction.NORTH;
 import static net.minecraft.util.math.Direction.SOUTH;
 import static net.minecraft.util.math.Direction.UP;
 import static net.minecraft.util.math.Direction.WEST;
+import static net.minecraft.util.math.Direction.Axis.X;
+import static net.minecraft.util.math.Direction.Axis.Y;
+import static net.minecraft.util.math.Direction.Axis.Z;
 
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Direction.Axis;
 
 import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
@@ -29,40 +33,62 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 	@Override
 	public Renderable transformQuad(BakedQuad bakedQuad, Direction cullFace, TextureContext context) {
 		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
-		if (context instanceof TextureContextPillar && !CTMClient.getConfigManager().getConfig().disableCTM) {
-			transform(quad, ((TextureContextPillar) context).getLogic());
-		} else {
-			if (quad.nominalFace.getAxis().isVertical()) {
+		Direction nominalFace = quad.nominalFace;
+
+		if (CTMClient.getConfigManager().getConfig().disableCTM || !(context instanceof TextureContextPillar) || !((TextureContextPillar) context).getLogic().hasConnections()) {
+			if (nominalFace.getAxis().isVertical()) {
 				quad.setUVBounds(sprites[0]);
 			} else {
 				quad.setUVBounds(sprites[1]);
 				quad.applySubmap(SubmapImpl.X2[0][0]);
 			}
+			return quad;
+		}
+
+		SpacialConnectionLogic logic = ((TextureContextPillar) context).getLogic();
+		Axis connectionAxis = getConnectionAxis(logic);
+
+		quad.rotateUVs(getRotation(connectionAxis, nominalFace));
+
+		if (nominalFace.getAxis() == connectionAxis) {
+			quad.setUVBounds(sprites[0]);
+		} else {
+			Submap submap = SubmapImpl.X2[0][0];
+			if (connectionAxis == Y) {
+				submap = getSubmap(logic, UP, DOWN);
+			} else if (connectionAxis == X) {
+				submap = getSubmap(logic, EAST, WEST);
+			} else if (connectionAxis == Z) {
+				submap = getSubmap(logic, NORTH, SOUTH); // Flipped on purpose
+			}
+
+			quad.setUVBounds(sprites[1]);
+			quad.applySubmap(submap);
 		}
 		return quad;
 	}
 
-	private void transform(SpriteUnbakedQuad quad, SpacialConnectionLogic logic) {
-		Direction nominalFace = quad.nominalFace;
-
-		int rotation = 0;
-		Submap submap = SubmapImpl.X2[0][0];
-		if (nominalFace.getAxis().isHorizontal() && logic.connectedOr(UP, DOWN)) {
-			submap = getSubmap(UP, DOWN, logic);
-		} else if (logic.connectedOr(EAST, WEST)) {
-			submap = getSubmap(EAST, WEST, logic);
-			rotation = 3;
-		} else if (logic.connectedOr(NORTH, SOUTH)) {
-			submap = getSubmap(NORTH, SOUTH, logic);
-			if (nominalFace == DOWN) {
-				rotation += 2;
-			}
+	private Axis getConnectionAxis(SpacialConnectionLogic logic) {
+		if (logic.connectedOr(UP, DOWN)) {
+			return Y;
 		}
+		if (logic.connectedOr(EAST, WEST)) {
+			return X;
+		}
+		if (logic.connectedOr(SOUTH, NORTH)) {
+			return Z;
+		}
+		return null;
+	}
 
-		boolean connected = logic.hasConnections();
-
-		// Side textures need to be rotated to look correct
-		if (connected && !logic.connectedOr(UP, DOWN)) {
+	private int getRotation(Axis connectionAxis, Direction nominalFace) {
+		int rotation = 0;
+		if (connectionAxis != Y) {
+			if (connectionAxis == X) {
+				rotation = 3;
+			} else if (connectionAxis == Z && nominalFace == DOWN) {
+				rotation = 2;
+			}
 			if (nominalFace == WEST) {
 				rotation += 1;
 			} else if (nominalFace == NORTH) {
@@ -71,36 +97,21 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 				rotation += 3;
 			}
 		}
-
-		// If there is a connection opposite this side, it is an end-cap, so render as unconnected
-		if (logic.connected(nominalFace.getOpposite())) {
-			connected = false;
-		}
-		// If there are no connections at all, and this is not the top or bottom, render the "short" column texture
-		if (!logic.hasConnections() && nominalFace.getAxis().isHorizontal()) {
-			connected = true;
-		}
-
-		quad.rotateUVs(rotation);
-		if (connected) {
-			quad.setUVBounds(sprites[1]);
-			quad.applySubmap(submap);
-		} else {
-			quad.setUVBounds(sprites[0]);
-		}
+		return rotation;
 	}
 
-	private Submap getSubmap(Direction direction1, Direction direction2, SpacialConnectionLogic logic) {
-		Submap submap;
-		if (logic.connectedAnd(direction1, direction2)) {
-			submap = SubmapImpl.X2[1][0];
-		} else {
-			if (logic.connected(direction1)) {
-				submap = SubmapImpl.X2[1][1];
-			} else {
-				submap = SubmapImpl.X2[0][1];
-			}
+	private Submap getSubmap(SpacialConnectionLogic logic, Direction direction1, Direction direction2) {
+		boolean connected1 = logic.connected(direction1);
+		boolean connected2 = logic.connected(direction2);
+		if (connected1 && connected2) {
+			return SubmapImpl.X2[1][0];
 		}
-		return submap;
+		if (connected1) {
+			return SubmapImpl.X2[1][1];
+		}
+		if (connected2) {
+			return SubmapImpl.X2[0][1];
+		}
+		return SubmapImpl.X2[0][0];
 	}
 }

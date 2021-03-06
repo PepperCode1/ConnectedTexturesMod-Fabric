@@ -62,6 +62,11 @@ public class CTMClient implements ClientModInitializer {
 
 		getConfigManager();
 
+		if (FabricLoader.getInstance().isModLoaded("sodium") && !FabricLoader.getInstance().isModLoaded("indium")) {
+			LOGGER.error("Detected Sodium but not Indium! CTM will not work with this configuration!");
+			return;
+		}
+
 		Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap = new HashMap<>();
 		DeserializeModelJsonCallback.EVENT.register(new CTMDeserializeModelJsonCallbackHandler(jsonOverrideMap));
 		ModelsAddedCallback.EVENT.register(new CTMModelsAddedCallbackHandler(jsonOverrideMap));
