@@ -18,7 +18,7 @@ import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
-import team.chisel.ctm.client.render.SpriteUnbakedQuad;
+import team.chisel.ctm.client.render.UnbakedQuad;
 import team.chisel.ctm.client.render.Submap;
 import team.chisel.ctm.client.render.SubmapImpl;
 import team.chisel.ctm.client.texture.context.TextureContextPillar;
@@ -32,11 +32,11 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 
 	@Override
 	public Renderable transformQuad(BakedQuad bakedQuad, Direction cullFace, TextureContext context) {
-		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
-		Direction nominalFace = quad.nominalFace;
+		UnbakedQuad quad = unbake(bakedQuad, cullFace);
+		Direction lightFace = quad.lightFace;
 
 		if (CTMClient.getConfigManager().getConfig().disableCTM || !(context instanceof TextureContextPillar) || !((TextureContextPillar) context).getLogic().hasConnections()) {
-			if (nominalFace.getAxis().isVertical()) {
+			if (lightFace.getAxis().isVertical()) {
 				quad.setUVBounds(sprites[0]);
 			} else {
 				quad.setUVBounds(sprites[1]);
@@ -48,9 +48,9 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 		SpacialConnectionLogic logic = ((TextureContextPillar) context).getLogic();
 		Axis connectionAxis = getConnectionAxis(logic);
 
-		quad.rotateUVs(getRotation(connectionAxis, nominalFace));
+		quad.rotateUVs(getRotation(connectionAxis, lightFace));
 
-		if (nominalFace.getAxis() == connectionAxis) {
+		if (lightFace.getAxis() == connectionAxis) {
 			quad.setUVBounds(sprites[0]);
 		} else {
 			Submap submap = SubmapImpl.X2[0][0];
@@ -81,19 +81,19 @@ public class TexturePillar extends AbstractTexture<TextureTypePillar> {
 		return null;
 	}
 
-	private int getRotation(Axis connectionAxis, Direction nominalFace) {
+	private int getRotation(Axis connectionAxis, Direction lightFace) {
 		int rotation = 0;
 		if (connectionAxis != Y) {
 			if (connectionAxis == X) {
 				rotation = 3;
-			} else if (connectionAxis == Z && nominalFace == DOWN) {
+			} else if (connectionAxis == Z && lightFace == DOWN) {
 				rotation = 2;
 			}
-			if (nominalFace == WEST) {
+			if (lightFace == WEST) {
 				rotation += 1;
-			} else if (nominalFace == NORTH) {
+			} else if (lightFace == NORTH) {
 				rotation += 2;
-			} else if (nominalFace == EAST) {
+			} else if (lightFace == EAST) {
 				rotation += 3;
 			}
 		}

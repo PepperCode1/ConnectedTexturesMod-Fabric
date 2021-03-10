@@ -8,7 +8,7 @@ import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
-import team.chisel.ctm.client.render.SpriteUnbakedQuad;
+import team.chisel.ctm.client.render.UnbakedQuad;
 import team.chisel.ctm.client.render.Submap;
 import team.chisel.ctm.client.render.SubmapImpl;
 import team.chisel.ctm.client.texture.context.TextureContextConnectingObscured;
@@ -23,14 +23,14 @@ public class TextureEdgesFull extends AbstractConnectingTexture<TextureTypeEdges
 
 	@Override
 	public Renderable transformQuad(BakedQuad bakedQuad, Direction cullFace, TextureContext context) {
-		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
+		UnbakedQuad quad = unbake(bakedQuad, cullFace);
 
 		if (CTMClient.getConfigManager().getConfig().disableCTM || !(context instanceof TextureContextConnectingObscured)) {
 			quad.setUVBounds(sprites[0]);
 			return quad;
 		}
 
-		ConnectionLogicObscured logic = ((TextureContextConnectingObscured) context).getLogic(quad.nominalFace);
+		ConnectionLogicObscured logic = ((TextureContextConnectingObscured) context).getLogic(quad.lightFace);
 		Sprite sprite;
 		Submap submap = null;
 		// Short circuit zero connections, as this is almost always the most common case

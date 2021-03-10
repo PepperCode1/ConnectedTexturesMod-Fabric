@@ -37,7 +37,7 @@ public class TextureEldritch extends AbstractTexture<TextureTypeEldritch> {
 		} else {
 			pos = BlockPos.ORIGIN;
 		}
-		RANDOM.setSeed(MathHelper.hashCode(pos) + quad.nominalFace.ordinal());
+		RANDOM.setSeed(MathHelper.hashCode(pos) + quad.lightFace.ordinal());
 
 		float xOffset = getRandomOffset();
 		float yOffset = getRandomOffset();

@@ -30,7 +30,7 @@ public class SubmapImpl implements Submap {
 
 	private final NormalizedSubmap normalized = new NormalizedSubmap(this);
 
-	public SubmapImpl(final float width, final float height, final float xOffset, final float yOffset) {
+	public SubmapImpl(float width, float height, float xOffset, float yOffset) {
 		this.width = width;
 		this.height = height;
 		this.xOffset = xOffset;
@@ -79,7 +79,7 @@ public class SubmapImpl implements Submap {
 	}
 
 	public NormalizedSubmap getNormalized() {
-		return this.normalized;
+		return normalized;
 	}
 
 	public SubmapImpl multiply(Submap submap) {

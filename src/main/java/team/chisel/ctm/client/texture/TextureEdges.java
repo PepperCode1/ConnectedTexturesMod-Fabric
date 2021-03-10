@@ -7,7 +7,7 @@ import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
-import team.chisel.ctm.client.render.SpriteUnbakedQuad;
+import team.chisel.ctm.client.render.UnbakedQuad;
 import team.chisel.ctm.client.texture.context.TextureContextConnectingObscured;
 import team.chisel.ctm.client.texture.type.TextureTypeEdges;
 import team.chisel.ctm.client.util.connection.ConnectionDirection;
@@ -22,14 +22,14 @@ public class TextureEdges extends TextureCTM {
 	@Override
 	public Renderable transformQuad(BakedQuad bakedQuad, Direction cullFace, TextureContext context) {
 		if (CTMClient.getConfigManager().getConfig().disableCTM || !(context instanceof TextureContextConnectingObscured)) {
-			SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
+			UnbakedQuad quad = unbake(bakedQuad, cullFace);
 			quad.setUVBounds(sprites[0]);
 			return quad;
 		}
 
 		ConnectionLogicObscured logic = ((TextureContextConnectingObscured) context).getLogic(bakedQuad.getFace());
 		if (logic.isObscured()) {
-			SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
+			UnbakedQuad quad = unbake(bakedQuad, cullFace);
 			quad.setUVBounds(sprites[2]);
 			return quad;
 		}

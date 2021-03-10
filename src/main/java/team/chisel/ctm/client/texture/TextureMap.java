@@ -12,7 +12,7 @@ import net.minecraft.util.math.Direction;
 import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
-import team.chisel.ctm.client.render.SpriteUnbakedQuad;
+import team.chisel.ctm.client.render.UnbakedQuad;
 import team.chisel.ctm.client.render.Submap;
 import team.chisel.ctm.client.render.SubmapImpl;
 import team.chisel.ctm.client.texture.context.TextureContextGrid;
@@ -95,11 +95,11 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 		RANDOM {
 			@Override
 			public Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, Direction cullFace, @Nullable TextureContext context) {
-				SpriteUnbakedQuad quad = texture.unbake(bakedQuad, cullFace);
+				UnbakedQuad quad = texture.unbake(bakedQuad, cullFace);
 
 				Point2i textureCoords;
 				if (context instanceof TextureContextGrid) {
-					textureCoords = ((TextureContextGrid) context).getTextureCoords(quad.nominalFace);
+					textureCoords = ((TextureContextGrid) context).getTextureCoords(quad.lightFace);
 				} else {
 					textureCoords = new Point2i(1, 1);
 				}
@@ -123,11 +123,11 @@ public class TextureMap extends AbstractTexture<TextureTypeMap> {
 		PATTERNED {
 			@Override
 			public Renderable transformQuad(TextureMap texture, BakedQuad bakedQuad, Direction cullFace, @Nullable TextureContext context) {
-				SpriteUnbakedQuad quad = texture.unbake(bakedQuad, cullFace);
+				UnbakedQuad quad = texture.unbake(bakedQuad, cullFace);
 
 				Point2i textureCoords;
 				if (context instanceof TextureContextGrid) {
-					textureCoords = ((TextureContextGrid) context).getTextureCoords(quad.nominalFace);
+					textureCoords = ((TextureContextGrid) context).getTextureCoords(quad.lightFace);
 				} else {
 					textureCoords = new Point2i(0, 0);
 				}

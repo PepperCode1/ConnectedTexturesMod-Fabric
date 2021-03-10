@@ -22,7 +22,7 @@ import net.minecraft.util.math.MathHelper;
 import team.chisel.ctm.api.client.CTMTexture;
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.api.client.TextureType;
-import team.chisel.ctm.client.render.SpriteUnbakedQuad;
+import team.chisel.ctm.client.render.UnbakedQuad;
 
 /**
  * Abstract implementation of {@link CTMTexture}.
@@ -89,10 +89,9 @@ public abstract class AbstractTexture<T extends TextureType> implements CTMTextu
 		return sprites[0];
 	}
 
-	protected SpriteUnbakedQuad unbake(BakedQuad bakedQuad, Direction cullFace) {
-		SpriteUnbakedQuad quad = new SpriteUnbakedQuad(bakedQuad);
+	protected UnbakedQuad unbake(BakedQuad bakedQuad, Direction cullFace) {
+		UnbakedQuad quad = new UnbakedQuad(bakedQuad);
 		quad.cullFace = cullFace;
-		quad.nominalFace = bakedQuad.getFace();
 		quad.material = material;
 		if (hasLight) {
 			quad.setLight(skyLight, blockLight);

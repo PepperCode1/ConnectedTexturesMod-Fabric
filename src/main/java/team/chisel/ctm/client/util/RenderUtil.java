@@ -10,21 +10,25 @@ import team.chisel.ctm.client.mixin.BakedQuadAccessor;
 public class RenderUtil {
 	public static final int UV_OFFSET = 4;
 
-	public static BakedQuad retextureQuad(BakedQuad quad, Sprite sprite) {
+	public static BakedQuad retextureBakedQuad(BakedQuad quad, Sprite sprite) {
 		int[] newData = quad.getVertexData().clone();
-		retextureQuadData(newData, ((BakedQuadAccessor) quad).getSprite(), sprite);
+		retextureBakedQuadData(newData, ((BakedQuadAccessor) quad).getSprite(), sprite);
 		return new BakedQuad(newData, quad.getColorIndex(), quad.getFace(), sprite, quad.hasShade());
 	}
 
-	public static void retextureQuadData(int[] vertexData, Sprite oldSprite, Sprite sprite) {
+	public static void retextureBakedQuadData(int[] vertexData, Sprite oldSprite, Sprite sprite) {
 		for (int i = 0; i < 4; ++i) {
 			int j = VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL.getVertexSizeInteger() * i;
-			vertexData[j + UV_OFFSET] = Float.floatToRawIntBits(MathHelper.lerp((float) MathHelper.getLerpProgress(Float.intBitsToFloat(vertexData[j + UV_OFFSET]), oldSprite.getMinU(), oldSprite.getMaxU()), sprite.getMinU(), sprite.getMaxU()));
-			vertexData[j + UV_OFFSET + 1] = Float.floatToRawIntBits(MathHelper.lerp((float) MathHelper.getLerpProgress(Float.intBitsToFloat(vertexData[j + UV_OFFSET + 1]), oldSprite.getMinV(), oldSprite.getMaxV()), sprite.getMinV(), sprite.getMaxV()));
+			vertexData[j + UV_OFFSET] = Float.floatToRawIntBits(MathHelper.lerp(MathUtil.getLerpProgress(Float.intBitsToFloat(vertexData[j + UV_OFFSET]), oldSprite.getMinU(), oldSprite.getMaxU()), sprite.getMinU(), sprite.getMaxU()));
+			vertexData[j + UV_OFFSET + 1] = Float.floatToRawIntBits(MathHelper.lerp(MathUtil.getLerpProgress(Float.intBitsToFloat(vertexData[j + UV_OFFSET + 1]), oldSprite.getMinV(), oldSprite.getMaxV()), sprite.getMinV(), sprite.getMaxV()));
 		}
 	}
 
-	public static int getLightmap(int skyLight, int blockLight) {
-		return MathHelper.clamp(skyLight, 0, 15) << 20 | MathHelper.clamp(blockLight, 0, 15) << 4;
+	public static int getColor(int alpha, int red, int green, int blue) {
+		return alpha << 24 | red << 16 | green << 8 | blue;
+	}
+
+	public static int getLight(int skyLight, int blockLight) {
+		return skyLight << 20 | blockLight << 4;
 	}
 }

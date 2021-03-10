@@ -7,7 +7,7 @@ import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
-import team.chisel.ctm.client.render.SpriteUnbakedQuad;
+import team.chisel.ctm.client.render.UnbakedQuad;
 import team.chisel.ctm.client.render.SubmapImpl;
 import team.chisel.ctm.client.texture.context.TextureContextConnecting;
 import team.chisel.ctm.client.texture.type.TextureTypePlane;
@@ -24,11 +24,11 @@ public class TexturePlane extends AbstractConnectingTexture<TextureTypePlane> {
 
 	@Override
 	public Renderable transformQuad(BakedQuad bakedQuad, Direction cullFace, TextureContext context) {
-		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
+		UnbakedQuad quad = unbake(bakedQuad, cullFace);
 
 		int submapId = 0;
 		if (!CTMClient.getConfigManager().getConfig().disableCTM && context instanceof TextureContextConnecting) {
-			submapId = getSubmapId(((TextureContextConnecting) context).getLogic(quad.nominalFace));
+			submapId = getSubmapId(((TextureContextConnecting) context).getLogic(quad.lightFace));
 		}
 
 		quad.setUVBounds(sprites[0]);

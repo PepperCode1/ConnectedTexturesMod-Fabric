@@ -9,7 +9,7 @@ import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
-import team.chisel.ctm.client.render.SpriteUnbakedQuad;
+import team.chisel.ctm.client.render.UnbakedQuad;
 import team.chisel.ctm.client.texture.context.TextureContextConnecting;
 import team.chisel.ctm.client.texture.type.TextureTypeSCTM;
 import team.chisel.ctm.client.util.connection.ConnectionDirection;
@@ -18,15 +18,17 @@ import team.chisel.ctm.client.util.connection.ConnectionLogic;
 public class TextureSCTM extends AbstractConnectingTexture<TextureTypeSCTM> {
 	public TextureSCTM(TextureTypeSCTM type, TextureInfo info) {
 		super(type, info);
+
+		connectInside = Optional.of(true);
 	}
 
 	@Override
 	public Renderable transformQuad(BakedQuad bakedQuad, Direction cullFace, TextureContext context) {
-		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
+		UnbakedQuad quad = unbake(bakedQuad, cullFace);
 
 		int submapId = 0;
 		if (!CTMClient.getConfigManager().getConfig().disableCTM && context instanceof TextureContextConnecting) {
-			submapId = getSubmapId(((TextureContextConnecting) context).getLogic(quad.nominalFace));
+			submapId = getSubmapId(((TextureContextConnecting) context).getLogic(quad.lightFace));
 		}
 
 		quad.setUVBounds(sprites[0]);
@@ -56,10 +58,5 @@ public class TextureSCTM extends AbstractConnectingTexture<TextureTypeSCTM> {
 			}
 		}
 		return 0;
-	}
-
-	@Override
-	public Optional<Boolean> connectInside() {
-		return Optional.of(true);
 	}
 }

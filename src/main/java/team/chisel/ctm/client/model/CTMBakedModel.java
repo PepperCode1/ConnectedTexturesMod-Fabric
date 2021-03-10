@@ -47,7 +47,7 @@ public class CTMBakedModel extends AbstractCTMBakedModel {
 
 				Sprite overrideSprite = getOverrideSprite(random, tintIndex);
 				if (overrideSprite != null) {
-					bakedQuad = RenderUtil.retextureQuad(bakedQuad, overrideSprite);
+					bakedQuad = RenderUtil.retextureBakedQuad(bakedQuad, overrideSprite);
 					spriteId = overrideSprite.getId();
 				}
 

@@ -17,7 +17,7 @@ import net.minecraft.util.math.Direction;
 
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.api.client.TextureType;
-import team.chisel.ctm.client.render.SpriteUnbakedQuad;
+import team.chisel.ctm.client.render.UnbakedQuad;
 import team.chisel.ctm.client.resource.BlockStatePredicateParser;
 import team.chisel.ctm.client.util.IdentityStrategy;
 import team.chisel.ctm.client.util.ParseUtil;
@@ -44,8 +44,8 @@ public abstract class AbstractConnectingTexture<T extends TextureType> extends A
 	}
 
 	@Override
-	protected SpriteUnbakedQuad unbake(BakedQuad bakedQuad, Direction cullFace) {
-		SpriteUnbakedQuad quad = super.unbake(bakedQuad, cullFace);
+	protected UnbakedQuad unbake(BakedQuad bakedQuad, Direction cullFace) {
+		UnbakedQuad quad = super.unbake(bakedQuad, cullFace);
 		if (untransform) {
 			quad.untransformUVs();
 		}

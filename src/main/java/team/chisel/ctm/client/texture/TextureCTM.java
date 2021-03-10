@@ -17,7 +17,7 @@ import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.render.RenderableArray;
-import team.chisel.ctm.client.render.SpriteUnbakedQuad;
+import team.chisel.ctm.client.render.UnbakedQuad;
 import team.chisel.ctm.client.render.Submap;
 import team.chisel.ctm.client.render.SubmapImpl;
 import team.chisel.ctm.client.texture.context.TextureContextConnecting;
@@ -39,15 +39,15 @@ public class TextureCTM extends AbstractConnectingTexture<TextureTypeCTM> {
 
 	@Override
 	public Renderable transformQuad(BakedQuad bakedQuad, Direction cullFace, TextureContext context) {
-		SpriteUnbakedQuad quad = unbake(bakedQuad, cullFace);
+		UnbakedQuad quad = unbake(bakedQuad, cullFace);
 
 		if (CTMClient.getConfigManager().getConfig().disableCTM || !(context instanceof TextureContextConnecting)) {
 			quad.setUVBounds(sprites[0]);
 			return quad;
 		}
 
-		ConnectionLogic logic = ((TextureContextConnecting) context).getLogic(quad.nominalFace);
-		SpriteUnbakedQuad[] quads = quad.toQuadrants();
+		ConnectionLogic logic = ((TextureContextConnecting) context).getLogic(quad.lightFace);
+		UnbakedQuad[] quads = quad.toQuadrants();
 		for (int i = 0; i < quads.length; i++) {
 			if (quads[i] != null) {
 				int id = getSubmapId(logic, i);
