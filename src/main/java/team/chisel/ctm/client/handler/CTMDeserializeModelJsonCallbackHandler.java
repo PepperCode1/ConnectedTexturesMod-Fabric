@@ -21,7 +21,7 @@ public class CTMDeserializeModelJsonCallbackHandler implements DeserializeModelJ
 			.put(1, new ModelParserV1())
 			.build();
 
-	private Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap;
+	private final Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap;
 
 	public CTMDeserializeModelJsonCallbackHandler(Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap) {
 		this.jsonOverrideMap = jsonOverrideMap;

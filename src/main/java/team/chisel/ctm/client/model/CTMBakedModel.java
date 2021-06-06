@@ -2,12 +2,13 @@ package team.chisel.ctm.client.model;
 
 import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
 
-import com.google.common.collect.ObjectArrays;
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MeshBuilder;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.BlockState;
@@ -25,19 +26,19 @@ import team.chisel.ctm.client.util.RenderUtil;
 
 public class CTMBakedModel extends AbstractCTMBakedModel {
 	private static final ThreadLocal<MeshBuilder> MESH_BUILDER = ThreadLocal.withInitial(() -> RendererAccess.INSTANCE.getRenderer().meshBuilder());
-	private static final Direction[] CULL_FACES = ObjectArrays.concat(Direction.values(), (Direction) null);
+	private static final Direction[] CULL_FACES = ArrayUtils.add(Direction.values(), null);
 
 	public CTMBakedModel(BakedModel parent, CTMModelInfo modelInfo) {
 		super(parent, modelInfo);
 	}
 
 	@Override
-	protected Mesh createMesh(BakedModel parent, CTMModelInfo modelInfo, @Nullable TextureContextList contextList, @Nullable BlockState state, Random random) {
+	protected Mesh createMesh(BakedModel parent, CTMModelInfo modelInfo, @Nullable TextureContextList contextList, @Nullable BlockState state, Supplier<Random> randomSupplier) {
 		MeshBuilder builder = MESH_BUILDER.get();
 		QuadEmitter emitter = builder.getEmitter();
 
 		for (Direction cullFace : CULL_FACES) {
-			List<BakedQuad> parentQuads = parent.getQuads(state, cullFace, random);
+			List<BakedQuad> parentQuads = parent.getQuads(state, cullFace, randomSupplier.get());
 
 			// Gather all BakedQuads and map them to their CTMTextures
 			// Pass BakedQuads that do not have an associated CTMTexture directly to the QuadEmitter
@@ -45,15 +46,15 @@ public class CTMBakedModel extends AbstractCTMBakedModel {
 				Identifier spriteId = ((BakedQuadAccessor) bakedQuad).getSprite().getId();
 				int tintIndex = bakedQuad.getColorIndex();
 
-				Sprite overrideSprite = getOverrideSprite(random, tintIndex);
+				Sprite overrideSprite = getOverrideSprite(randomSupplier.get(), tintIndex);
 				if (overrideSprite != null) {
 					bakedQuad = RenderUtil.retextureBakedQuad(bakedQuad, overrideSprite);
 					spriteId = overrideSprite.getId();
 				}
 
-				CTMTexture<?> texture = getOverrideTexture(random, tintIndex, spriteId);
+				CTMTexture<?> texture = getOverrideTexture(randomSupplier.get(), tintIndex, spriteId);
 				if (texture == null) {
-					texture = getTexture(random, spriteId);
+					texture = getTexture(randomSupplier.get(), spriteId);
 				}
 
 				if (texture != null) {

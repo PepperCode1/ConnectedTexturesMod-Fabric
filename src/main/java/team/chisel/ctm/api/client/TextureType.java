@@ -1,5 +1,7 @@
 package team.chisel.ctm.api.client;
 
+import team.chisel.ctm.client.texture.type.TextureTypeCTM;
+
 /**
  * Root interface representing a type of CTMTexture. To register, use {@link TextureTypeRegistry}.
  */
@@ -19,7 +21,7 @@ public interface TextureType extends ContextProvider {
 
 	/**
 	 * The number of textures required for this texture type.
-	 * For example, {@link team.chisel.ctm.client.texture.type.TextureTypeCTM} requires two.
+	 * For example, {@link TextureTypeCTM} requires two.
 	 *
 	 * @return The number of textures required.
 	 */

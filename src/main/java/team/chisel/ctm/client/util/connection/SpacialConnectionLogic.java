@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
+import net.minecraft.world.BlockRenderView;
 
 import team.chisel.ctm.api.client.Facade;
 import team.chisel.ctm.client.CTMClient;
@@ -32,7 +32,7 @@ public class SpacialConnectionLogic {
 		this.stateComparator = stateComparator;
 	}
 
-	public void buildConnectionMap(@NotNull BlockView world, @NotNull BlockPos pos) {
+	public void buildConnectionMap(@NotNull BlockRenderView world, @NotNull BlockPos pos) {
 		connectionMap = 0;
 		for (Direction direction : Direction.values()) {
 			if (isConnected(world, pos, direction)) {
@@ -49,25 +49,25 @@ public class SpacialConnectionLogic {
 		}
 	}
 
-	public boolean isConnected(BlockView world, BlockPos pos, Direction direction) {
+	public boolean isConnected(BlockRenderView world, BlockPos pos, Direction direction) {
 		return isConnected(world, pos, pos.offset(direction));
 	}
 
-	public boolean isConnected(BlockView world, BlockPos pos, BlockState state, Direction direction) {
+	public boolean isConnected(BlockRenderView world, BlockPos pos, BlockState state, Direction direction) {
 		return isConnected(world, pos, pos.offset(direction), state);
 	}
 
-	public boolean isConnected(BlockView world, BlockPos pos, BlockPos connection) {
+	public boolean isConnected(BlockRenderView world, BlockPos pos, BlockPos connection) {
 		BlockState state = getConnectionState(world, pos, connection);
 		return isConnected(world, pos, connection, state);
 	}
 
-	public boolean isConnected(BlockView world, BlockPos pos, BlockPos connection, BlockState state) {
+	public boolean isConnected(BlockRenderView world, BlockPos pos, BlockPos connection, BlockState state) {
 		BlockState connectionState = getConnectionState(world, connection, pos);
 		return compare(state, connectionState);
 	}
 
-	public BlockState getConnectionState(BlockView world, BlockPos pos, BlockPos connection) {
+	public BlockState getConnectionState(BlockRenderView world, BlockPos pos, BlockPos connection) {
 		BlockState state = world.getBlockState(pos);
 		if (state.getBlock() instanceof Facade) {
 			BlockState facadeState = ((Facade) state.getBlock()).getFacadeState(world, pos, connection, null);

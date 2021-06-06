@@ -10,11 +10,11 @@ import static net.minecraft.util.math.Direction.WEST;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
+import net.minecraft.world.BlockRenderView;
 
 public class PillarConnectionLogic extends SpacialConnectionLogic {
 	@Override
-	public void buildConnectionMap(@NotNull BlockView world, @NotNull BlockPos pos) {
+	public void buildConnectionMap(@NotNull BlockRenderView world, @NotNull BlockPos pos) {
 		connectionMap = 0;
 
 		if (!checkY(world, pos, true)) {
@@ -24,7 +24,7 @@ public class PillarConnectionLogic extends SpacialConnectionLogic {
 		}
 	}
 
-	private boolean checkY(BlockView world, BlockPos pos, boolean changeMap) {
+	private boolean checkY(BlockRenderView world, BlockPos pos, boolean changeMap) {
 		boolean connectedUp = isConnected(world, pos, UP);
 		boolean connectedDown = isConnected(world, pos, DOWN);
 		if (connectedUp || connectedDown) {
@@ -37,7 +37,7 @@ public class PillarConnectionLogic extends SpacialConnectionLogic {
 		return false;
 	}
 
-	private boolean checkX(BlockView world, BlockPos pos, boolean changeMap) {
+	private boolean checkX(BlockRenderView world, BlockPos pos, boolean changeMap) {
 		boolean connectedEast = isConnected(world, pos, EAST);
 		if (connectedEast) {
 			connectedEast = !checkY(world, pos.offset(EAST), false);
@@ -56,7 +56,7 @@ public class PillarConnectionLogic extends SpacialConnectionLogic {
 		return false;
 	}
 
-	private boolean checkZ(BlockView world, BlockPos pos, boolean changeMap) {
+	private boolean checkZ(BlockRenderView world, BlockPos pos, boolean changeMap) {
 		BlockPos offsetPos;
 		boolean connectedSouth = isConnected(world, pos, SOUTH);
 		if (connectedSouth) {

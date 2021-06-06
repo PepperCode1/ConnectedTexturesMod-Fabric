@@ -1,7 +1,7 @@
 package team.chisel.ctm.client.model;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -11,9 +11,8 @@ import java.util.function.Supplier;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
-import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh;
-import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
+import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,51 +20,38 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.render.model.WeightedBakedModel;
-import net.minecraft.client.render.model.json.ModelOverrideList;
-import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockRenderView;
 
 import team.chisel.ctm.api.client.CTMTexture;
 import team.chisel.ctm.client.mixinterface.WeightedBakedModelExtension;
-import team.chisel.ctm.client.util.ProfileUtil;
 
-public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedModel {
-	private static final Cache<State, Mesh> STATE_CACHE = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).maximumSize(5000).<State, Mesh>build();
-	private static final Cache<BakedModel, Mesh> ITEM_CACHE = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).<BakedModel, Mesh>build();
+public abstract class AbstractCTMBakedModel extends ForwardingBakedModel {
+	private static final Cache<BlockMeshCacheKey, Mesh> BLOCK_MESH_CACHE = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).maximumSize(5000).build();
+	private static final Cache<BakedModel, Mesh> ITEM_MESH_CACHE = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).build();
 
-	@NotNull
-	private final BakedModel parent;
 	@NotNull
 	private final CTMModelInfo modelInfo;
 
 	public AbstractCTMBakedModel(@NotNull final BakedModel parent, @NotNull final CTMModelInfo modelInfo) {
-		if (parent == null) {
-			throw new NullPointerException("parent is marked non-null but is null");
-		}
-		if (modelInfo == null) {
-			throw new NullPointerException("modelInfo is marked non-null but is null");
-		}
-		this.parent = parent;
-		this.modelInfo = modelInfo;
+		this.wrapped = Objects.requireNonNull(parent, "parent is marked non-null but is null");
+		this.modelInfo = Objects.requireNonNull(modelInfo, "modelInfo is marked non-null but is null");
 	}
 
 	public static void invalidateCaches() {
-		STATE_CACHE.invalidateAll();
-		ITEM_CACHE.invalidateAll();
+		BLOCK_MESH_CACHE.invalidateAll();
+		ITEM_MESH_CACHE.invalidateAll();
 	}
 
 	@NotNull
 	public BakedModel getParent() {
-		return parent;
+		return wrapped;
 	}
 
 	@NotNull
@@ -73,55 +59,15 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 		return modelInfo;
 	}
 
-	@Override
-	public List<BakedQuad> getQuads(BlockState state, Direction face, Random random) {
-		return parent.getQuads(state, face, random);
-	}
-
-	@Override
-	public boolean useAmbientOcclusion() {
-		return parent.useAmbientOcclusion();
-	}
-
-	@Override
-	public boolean hasDepth() {
-		return parent.hasDepth();
-	}
-
-	@Override
-	public boolean isSideLit() {
-		return parent.isSideLit();
-	}
-
-	@Override
-	public boolean isBuiltin() {
-		return parent.isBuiltin();
-	}
-
-	@Override
-	public Sprite getSprite() {
-		return parent.getSprite();
-	}
-
-	@Override
-	public ModelTransformation getTransformation() {
-		return parent.getTransformation();
-	}
-
-	@Override
-	public ModelOverrideList getOverrides() {
-		return parent.getOverrides();
-	}
-
 	/**
 	 * Random sensitive parent, will proxy to {@link WeightedBakedModel} if possible.
 	 */
 	@NotNull
 	public BakedModel getParent(Random random) {
-		if (parent instanceof WeightedBakedModel) {
-			return ((WeightedBakedModelExtension) parent).getRandomModel(random);
+		if (wrapped instanceof WeightedBakedModel) {
+			return ((WeightedBakedModelExtension) wrapped).getRandomModel(random);
 		}
-		return parent;
+		return wrapped;
 	}
 
 	private <T> T applyToParent(Random random, Function<AbstractCTMBakedModel, T> function) {
@@ -135,8 +81,8 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	public Collection<CTMTexture<?>> getCTMTextures() {
 		ImmutableList.Builder<CTMTexture<?>> builder = ImmutableList.builder();
 		builder.addAll(modelInfo.getTextures());
-		if (parent instanceof AbstractCTMBakedModel) {
-			builder.addAll(((AbstractCTMBakedModel) parent).getCTMTextures());
+		if (wrapped instanceof AbstractCTMBakedModel) {
+			builder.addAll(((AbstractCTMBakedModel) wrapped).getCTMTextures());
 		}
 		return builder.build();
 	}
@@ -165,51 +111,43 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 		return texture;
 	}
 
-	public Mesh getBlockMesh(BlockState state, Random random, BlockRenderView blockView, BlockPos pos) {
-		ProfileUtil.push("ctm_model_block");
-		BakedModel parent = getParent(random);
+	public Mesh getBlockMesh(BlockState state, BlockRenderView blockView, BlockPos pos, Supplier<Random> randomSupplier) {
 		Mesh mesh = null;
 		try {
-			ProfileUtil.push("ctm_context_creation");
-			TextureContextList contextList = new TextureContextList(state, getCTMTextures(), blockView, pos);
-			Object2LongMap<CTMTexture<?>> serialized = contextList.serialized();
-			ProfileUtil.swap("ctm_mesh_creation");
-			mesh = STATE_CACHE.get(new State(state, serialized, parent), () -> createMesh(parent, modelInfo, contextList, state, random));
-			ProfileUtil.pop();
+			TextureContextList contextList = new TextureContextList(getCTMTextures(), state, blockView, pos);
+			BakedModel parent = getParent(randomSupplier.get());
+			mesh = BLOCK_MESH_CACHE.get(new BlockMeshCacheKey(contextList, parent, state), () -> createMesh(parent, modelInfo, contextList, state, randomSupplier));
 		} catch (ExecutionException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Error getting CTM block mesh", e);
 		}
-		ProfileUtil.pop();
 		return mesh;
 	}
 
-	public Mesh getItemMesh(ItemStack itemStack, Random random) {
-		ProfileUtil.push("ctm_model_item");
+	public Mesh getItemMesh(ItemStack itemStack, Supplier<Random> randomSupplier) {
 		Mesh mesh = null;
 		try {
-			mesh = ITEM_CACHE.get(this, () -> {
+			mesh = ITEM_MESH_CACHE.get(this, () -> {
 				Item item = itemStack.getItem();
 				Block block = null;
 				if (item instanceof BlockItem) {
 					block = ((BlockItem) item).getBlock();
 				}
-				return createMesh(getParent(random), modelInfo, null, block == null ? null : block.getDefaultState(), random);
+				return createMesh(getParent(randomSupplier.get()), modelInfo, null, block == null ? null : block.getDefaultState(), randomSupplier);
 			});
 		} catch (ExecutionException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Error getting CTM item mesh", e);
 		}
-		ProfileUtil.pop();
 		return mesh;
 	}
 
 	@Override
 	public void emitBlockQuads(BlockRenderView blockView, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, RenderContext context) {
-		context.meshConsumer().accept(getBlockMesh(state, randomSupplier.get(), blockView, pos));
+		context.meshConsumer().accept(getBlockMesh(state, blockView, pos, randomSupplier));
 	}
 
 	@Override
 	public void emitItemQuads(ItemStack stack, Supplier<Random> randomSupplier, RenderContext context) {
-		context.meshConsumer().accept(getItemMesh(stack, randomSupplier.get()));
+		context.meshConsumer().accept(getItemMesh(stack, randomSupplier));
 	}
 
 	@Override
@@ -220,69 +158,42 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 	/**
 	 * This method must be thread-safe as it may be called from multiple threads at once.
 	 */
-	protected abstract Mesh createMesh(BakedModel parent, @NotNull CTMModelInfo modelInfo, TextureContextList contextList, BlockState state, Random random);
+	protected abstract Mesh createMesh(BakedModel parent, CTMModelInfo modelInfo, @Nullable TextureContextList contextList, @Nullable BlockState state, Supplier<Random> randomSupplier);
 
-	private static class State {
-		@NotNull
-		private final BlockState cleanState;
+	private static class BlockMeshCacheKey {
 		@Nullable
-		private final Object2LongMap<CTMTexture<?>> serializedContext;
+		private final TextureContextList contextList;
 		@NotNull
 		private final BakedModel parent;
+		@NotNull
+		private final BlockState blockState;
+		private final int hashCode;
 
-		State(@NotNull final BlockState cleanState, @Nullable final Object2LongMap<CTMTexture<?>> serializedContext, @NotNull final BakedModel parent) {
-			if (cleanState == null) {
-				throw new NullPointerException("cleanState is marked non-null but is null");
-			}
-			if (parent == null) {
-				throw new NullPointerException("parent is marked non-null but is null");
-			}
-			this.cleanState = cleanState;
-			this.serializedContext = serializedContext;
-			this.parent = parent;
+		BlockMeshCacheKey(@Nullable final TextureContextList contextList, @NotNull final BakedModel parent, @NotNull final BlockState blockState) {
+			this.contextList = contextList;
+			this.parent = Objects.requireNonNull(parent, "parent is marked non-null but is null");
+			this.blockState = Objects.requireNonNull(blockState, "blockState is marked non-null but is null");
+			hashCode = Objects.hash(contextList, parent, blockState);
 		}
 
 		@Override
-		public boolean equals(Object obj) {
+		public boolean equals(@Nullable Object obj) {
 			if (this == obj) return true;
 			if (obj == null) return false;
 			if (getClass() != obj.getClass()) return false;
-			State other = (State) obj;
-			if (cleanState != other.cleanState) {
-				return false;
-			}
-			if (parent != other.parent) {
-				return false;
-			}
-			if (serializedContext == null) {
-				if (other.serializedContext != null) {
-					return false;
-				}
-			} else if (!serializedContext.equals(other.serializedContext)) {
-				return false;
-			}
+			BlockMeshCacheKey other = (BlockMeshCacheKey) obj;
+			if (hashCode != other.hashCode) return false;
 			return true;
 		}
 
 		@Override
 		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			// for some reason blockstates hash their properties, we only care about the identity hash
-			result = prime * result + System.identityHashCode(cleanState);
-			result = prime * result + (parent == null ? 0 : parent.hashCode());
-			result = prime * result + (serializedContext == null ? 0 : serializedContext.hashCode());
-			return result;
-		}
-
-		@NotNull
-		public BlockState getCleanState() {
-			return cleanState;
+			return hashCode;
 		}
 
 		@Nullable
-		public Object2LongMap<CTMTexture<?>> getSerializedContext() {
-			return serializedContext;
+		public TextureContextList getContextList() {
+			return contextList;
 		}
 
 		@NotNull
@@ -290,9 +201,14 @@ public abstract class AbstractCTMBakedModel implements BakedModel, FabricBakedMo
 			return parent;
 		}
 
+		@NotNull
+		public BlockState getBlockState() {
+			return blockState;
+		}
+
 		@Override
 		public String toString() {
-			return "AbstractCTMBakedModel.State(cleanState=" + getCleanState() + ", serializedContext=" + getSerializedContext() + ", parent=" + getParent() + ")";
+			return "AbstractCTMBakedModel.BlockMeshCacheKey(contextList=" + getContextList() + ", parent=" + getParent() + ", blockState=" + getBlockState() + ", hashCode=" + hashCode + ")";
 		}
 	}
 }

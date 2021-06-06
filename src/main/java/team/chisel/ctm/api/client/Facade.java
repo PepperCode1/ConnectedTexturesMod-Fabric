@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
+import net.minecraft.world.BlockRenderView;
 
 /**
  * To be implemented on blocks that "hide" another block inside, so that connected textures can still be accomplished.
@@ -22,5 +22,5 @@ public interface Facade {
 	 * @return The BlockState which the block appears as.
 	 */
 	@NotNull
-	BlockState getFacadeState(@NotNull BlockView world, @NotNull BlockPos pos, @NotNull BlockPos connection, @Nullable Direction side);
+	BlockState getFacadeState(@NotNull BlockRenderView world, @NotNull BlockPos pos, @NotNull BlockPos connection, @Nullable Direction side);
 }

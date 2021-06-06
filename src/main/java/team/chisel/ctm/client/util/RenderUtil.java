@@ -25,10 +25,10 @@ public class RenderUtil {
 	}
 
 	public static int getColor(int alpha, int red, int green, int blue) {
-		return alpha << 24 | red << 16 | green << 8 | blue;
+		return (alpha & 0xFF) << 24 | (red & 0xFF) << 16 | (green & 0xFF) << 8 | (blue & 0xFF);
 	}
 
 	public static int getLight(int skyLight, int blockLight) {
-		return skyLight << 20 | blockLight << 4;
+		return (skyLight & 0xF) << 20 | (blockLight & 0xF) << 4;
 	}
 }

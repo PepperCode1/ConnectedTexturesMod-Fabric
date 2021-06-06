@@ -1,13 +1,15 @@
 package team.chisel.ctm.api.client;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockRenderView;
 
 public interface ContextProvider {
 	/**
 	 * Creates the context for an upcoming mesh build. This context will then be passed to
-	 * {@link CTMTexture#transformQuad(net.minecraft.client.renderer.block.model.BakedQuad, TextureContext, int, net.minecraft.util.math.Direction)}.
+	 * {@link CTMTexture#transformQuad(BakedQuad, TextureContext, Direction)}.
 	 *
 	 * @param state The state of the block being rendered.
 	 * @param world The world.

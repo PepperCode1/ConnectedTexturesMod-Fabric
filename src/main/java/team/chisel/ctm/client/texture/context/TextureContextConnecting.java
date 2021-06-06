@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
+import net.minecraft.world.BlockRenderView;
 
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.client.texture.AbstractConnectingTexture;
@@ -20,7 +20,7 @@ public class TextureContextConnecting implements TextureContext {
 	private EnumMap<Direction, ConnectionLogic> logicMap = new EnumMap<>(Direction.class);
 	private long data;
 
-	public TextureContextConnecting(@NotNull BlockState state, BlockView world, BlockPos pos, AbstractConnectingTexture<?> texture) {
+	public TextureContextConnecting(@NotNull BlockState state, BlockRenderView world, BlockPos pos, AbstractConnectingTexture<?> texture) {
 		this.texture = texture;
 
 		for (Direction face : Direction.values()) {
@@ -30,7 +30,7 @@ public class TextureContextConnecting implements TextureContext {
 		}
 	}
 
-	protected ConnectionLogic createLogic(BlockView world, BlockPos pos, Direction face) {
+	protected ConnectionLogic createLogic(BlockRenderView world, BlockPos pos, Direction face) {
 		ConnectionLogic logic = new ConnectionLogic();
 		texture.configureLogic(logic);
 		logic.buildConnectionMap(world, pos, face);

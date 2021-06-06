@@ -1,11 +1,9 @@
 package team.chisel.ctm.client.model;
 
 import java.util.Collection;
-import java.util.IdentityHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
-import it.unimi.dsi.fastutil.objects.Object2LongMap;
-import it.unimi.dsi.fastutil.objects.Object2LongOpenCustomHashMap;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.BlockState;
@@ -14,23 +12,21 @@ import net.minecraft.world.BlockRenderView;
 
 import team.chisel.ctm.api.client.CTMTexture;
 import team.chisel.ctm.api.client.TextureContext;
-import team.chisel.ctm.client.util.IdentityStrategy;
-import team.chisel.ctm.client.util.ProfileUtil;
 
 public class TextureContextList {
-	private final Map<CTMTexture<?>, TextureContext> contextMap = new IdentityHashMap<>();
-	private final Object2LongMap<CTMTexture<?>> serialized = new Object2LongOpenCustomHashMap<>(new IdentityStrategy<>());
+	private final Map<CTMTexture<?>, TextureContext> contextMap = new HashMap<>();
+	private final int hashCode;
 
-	public TextureContextList(BlockState state, Collection<CTMTexture<?>> textures, BlockRenderView world, BlockPos pos) {
-		ProfileUtil.push("ctm_context_gather");
+	public TextureContextList(Collection<CTMTexture<?>> textures, BlockState state, BlockRenderView world, BlockPos pos) {
+		int hash = 0;
 		for (CTMTexture<?> texture : textures) {
 			TextureContext context = texture.getType().getTextureContext(state, world, pos, texture);
 			if (context != null) {
 				contextMap.put(texture, context);
-				serialized.put(texture, context.getCompressedData());
+				hash += texture.hashCode() ^ Long.hashCode(context.getCompressedData());
 			}
 		}
-		ProfileUtil.pop();
+		hashCode = hash;
 	}
 
 	@Nullable
@@ -42,7 +38,18 @@ public class TextureContextList {
 		return contextMap.containsKey(texture);
 	}
 
-	public Object2LongMap<CTMTexture<?>> serialized() {
-		return serialized;
+	@Override
+	public boolean equals(@Nullable Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		TextureContextList other = (TextureContextList) obj;
+		if (hashCode != other.hashCode) return false;
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return hashCode;
 	}
 }

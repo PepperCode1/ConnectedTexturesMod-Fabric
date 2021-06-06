@@ -1,7 +1,6 @@
 package team.chisel.ctm.client.model;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,10 +24,10 @@ import team.chisel.ctm.client.util.TextureUtil;
 public class CTMUnbakedModel implements UnbakedModel {
 	private final UnbakedModel parent;
 
-	// filled during getTextureDependencies
+	// Filled during getTextureDependencies
 	private Set<SpriteIdentifier> textureDependencies;
 
-	// filled during bake
+	// Filled during bake
 	private Map<Identifier, CTMTexture<?>> textures = new HashMap<>();
 
 	public CTMUnbakedModel(UnbakedModel parent) {
@@ -37,7 +36,7 @@ public class CTMUnbakedModel implements UnbakedModel {
 
 	@Override
 	public Collection<Identifier> getModelDependencies() {
-		return Collections.emptyList();
+		return parent.getModelDependencies();
 	}
 
 	@Override

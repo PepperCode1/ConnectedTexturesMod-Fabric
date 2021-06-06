@@ -1,7 +1,7 @@
 package team.chisel.ctm.client.texture.context;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
+import net.minecraft.world.BlockRenderView;
 
 import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.client.util.connection.PillarConnectionLogic;
@@ -11,7 +11,7 @@ public class TextureContextPillar implements TextureContext {
 	private SpacialConnectionLogic logic;
 	private long data;
 
-	public TextureContextPillar(BlockView world, BlockPos pos) {
+	public TextureContextPillar(BlockRenderView world, BlockPos pos) {
 		logic = new PillarConnectionLogic();
 		logic.buildConnectionMap(world, pos);
 		data = logic.serialize();

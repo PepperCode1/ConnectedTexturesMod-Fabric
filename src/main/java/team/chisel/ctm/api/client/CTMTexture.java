@@ -9,7 +9,8 @@ import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 
-public interface CTMTexture<T extends TextureType> { // TODO remove generic argument?
+// TODO: Remove generic argument?
+public interface CTMTexture<T extends TextureType> {
 	/**
 	 * Transforms a BakedQuad.
 	 *

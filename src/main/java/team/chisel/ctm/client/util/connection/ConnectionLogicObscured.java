@@ -3,9 +3,9 @@ package team.chisel.ctm.client.util.connection;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.world.BlockView;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.BlockRenderView;
 
 import team.chisel.ctm.client.util.BitUtil;
 
@@ -21,7 +21,7 @@ public class ConnectionLogicObscured extends ConnectionLogic {
 	}
 
 	@Override
-	public boolean isConnected(BlockView world, BlockPos pos, BlockPos connection, Direction side, BlockState state) {
+	public boolean isConnected(BlockRenderView world, BlockPos pos, BlockPos connection, Direction side, BlockState state) {
 		if (isObscured()) {
 			return false;
 		}

@@ -1,7 +1,6 @@
 package team.chisel.ctm.client.model;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,6 +11,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import org.apache.commons.lang3.tuple.Pair;
@@ -41,15 +42,15 @@ public class JsonCTMUnbakedModel implements UnbakedModel {
 	private final JsonUnbakedModel parent;
 	private final Int2ObjectMap<JsonElement> overrides;
 
-	// filled during constructor
+	// Filled during constructor
 	private Int2ObjectMap<SpriteIdentifier> identifierOverrides = new Int2ObjectArrayMap<>();
 	private Set<SpriteIdentifier> extraTextureDependencies = new HashSet<>();
 	private Int2ObjectMap<CTMMetadataSection> metadataOverrides = new Int2ObjectArrayMap<>();
 
-	// filled during getTextureDependencies
+	// Filled during getTextureDependencies
 	private Set<SpriteIdentifier> textureDependencies;
 
-	// filled during bake
+	// Filled during bake
 	private Map<Identifier, CTMTexture<?>> textures = new HashMap<>();
 	private Int2ObjectMap<Sprite> spriteOverrides = new Int2ObjectArrayMap<>();
 	private Map<Pair<Integer, Identifier>, CTMTexture<?>> textureOverrides = new HashMap<>();
@@ -70,8 +71,12 @@ public class JsonCTMUnbakedModel implements UnbakedModel {
 					extraTextureDependencies.add(spriteId);
 					metadata = ResourceUtil.getMetadataSafe(ResourceUtil.toTextureIdentifier(identifier));
 				} else if (element.isJsonObject()) {
+					JsonObject object = element.getAsJsonObject();
+					if (!object.has("ctm_version")) {
+						object.add("ctm_version", new JsonPrimitive(1));
+					}
 					OVERRIDE_READER.setJsonModel(parent);
-					metadata = OVERRIDE_READER.fromJson(element.getAsJsonObject());
+					metadata = OVERRIDE_READER.fromJson(object);
 
 					int required = metadata.getType().requiredTextures();
 					int provided = metadata.getAdditionalTextures().length + 1;
@@ -95,7 +100,7 @@ public class JsonCTMUnbakedModel implements UnbakedModel {
 
 	@Override
 	public Collection<Identifier> getModelDependencies() {
-		return Collections.emptyList();
+		return parent.getModelDependencies();
 	}
 
 	@Override

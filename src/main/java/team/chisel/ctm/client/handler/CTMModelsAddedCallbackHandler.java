@@ -24,7 +24,7 @@ import team.chisel.ctm.client.util.ResourceUtil;
 import team.chisel.ctm.client.util.VoidSet;
 
 public class CTMModelsAddedCallbackHandler implements ModelsAddedCallback {
-	private Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap;
+	private final Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap;
 
 	public CTMModelsAddedCallbackHandler(Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap) {
 		this.jsonOverrideMap = jsonOverrideMap;
@@ -34,7 +34,7 @@ public class CTMModelsAddedCallbackHandler implements ModelsAddedCallback {
 	public void onModelsAdded(ModelLoader modelLoader, ResourceManager resourceManager, Profiler profiler, Map<Identifier, UnbakedModel> unbakedModels, Map<Identifier, UnbakedModel> modelsToBake) {
 		Map<Identifier, UnbakedModel> wrappedModels = new HashMap<>();
 
-		// check which models should be wrapped
+		// Check which models should be wrapped
 		for (Map.Entry<Identifier, UnbakedModel> entry : unbakedModels.entrySet()) {
 			Identifier identifier = entry.getKey();
 			UnbakedModel unbakedModel = entry.getValue();
@@ -42,14 +42,14 @@ public class CTMModelsAddedCallbackHandler implements ModelsAddedCallback {
 			Collection<SpriteIdentifier> dependencies = unbakedModel.getTextureDependencies(modelLoader::getOrLoadModel, VoidSet.get());
 			if (unbakedModel instanceof JsonUnbakedModel) {
 				JsonUnbakedModel jsonModel = (JsonUnbakedModel) unbakedModel;
-				// do not wrap builtin models
-				// root model check after getTextureDependencies so it's actually set
+				// Do not wrap builtin models
+				// Root model check after getTextureDependencies so it's actually set
 				if (jsonModel.getRootModel() == ModelLoader.GENERATION_MARKER || jsonModel.getRootModel() == ModelLoader.BLOCK_ENTITY_MARKER) {
 					continue;
 				}
 				Int2ObjectMap<JsonElement> overrides = getOverrides(jsonModel);
 				if (overrides != null && !overrides.isEmpty()) {
-					// wrap models with overrides
+					// Wrap models with overrides
 					wrappedModels.put(identifier, new JsonCTMUnbakedModel(jsonModel, overrides));
 					continue;
 				}
@@ -57,7 +57,7 @@ public class CTMModelsAddedCallbackHandler implements ModelsAddedCallback {
 			for (SpriteIdentifier spriteId : dependencies) {
 				CTMMetadataSection metadata = ResourceUtil.getMetadataSafe(ResourceUtil.toTextureIdentifier(spriteId.getTextureId()));
 				if (metadata != null) {
-					// at least one texture has CTM metadata, so this model should be wrapped
+					// At least one texture has CTM metadata, so this model should be wrapped
 					wrappedModels.put(identifier, new CTMUnbakedModel(unbakedModel));
 					break;
 				}
@@ -65,7 +65,7 @@ public class CTMModelsAddedCallbackHandler implements ModelsAddedCallback {
 		}
 		jsonOverrideMap.clear();
 
-		// inject wrapped models
+		// Inject wrapped models
 		for (Map.Entry<Identifier, UnbakedModel> entry : wrappedModels.entrySet()) {
 			Identifier identifier = entry.getKey();
 			UnbakedModel wrapped = entry.getValue();

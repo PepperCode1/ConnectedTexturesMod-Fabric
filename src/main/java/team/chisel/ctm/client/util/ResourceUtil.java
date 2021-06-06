@@ -88,6 +88,8 @@ public class ResourceUtil {
 	public static CTMMetadataSection getMetadataSafe(Sprite sprite) {
 		try {
 			return getMetadata(sprite);
+		} catch (FileNotFoundException e) {
+			// For virtual sprites, such as missingno
 		} catch (Exception e) {
 			CTMClient.LOGGER.error("Error loading metadata for sprite " + sprite.getId() + ".", e);
 		}

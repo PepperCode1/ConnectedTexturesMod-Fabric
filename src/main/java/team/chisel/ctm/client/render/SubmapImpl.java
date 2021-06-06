@@ -37,18 +37,22 @@ public class SubmapImpl implements Submap {
 		this.yOffset = yOffset;
 	}
 
+	@Override
 	public float getWidth() {
 		return width;
 	}
 
+	@Override
 	public float getHeight() {
 		return height;
 	}
 
+	@Override
 	public float getXOffset() {
 		return xOffset;
 	}
 
+	@Override
 	public float getYOffset() {
 		return yOffset;
 	}
