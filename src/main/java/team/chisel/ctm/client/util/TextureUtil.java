@@ -1,5 +1,6 @@
 package team.chisel.ctm.client.util;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -17,6 +18,12 @@ import team.chisel.ctm.client.resource.CTMMetadataSection;
 import team.chisel.ctm.client.texture.type.TextureTypeNormal;
 
 public class TextureUtil {
+	public static Map<Identifier, CTMTexture<?>> initializeTextures(Set<SpriteIdentifier> textureDependencies, Function<SpriteIdentifier, Sprite> spriteGetter) {
+		Map<Identifier, CTMTexture<?>> textures = new HashMap<>();
+		initializeTextures(textureDependencies, textures, spriteGetter);
+		return textures;
+	}
+
 	public static void initializeTextures(Set<SpriteIdentifier> textureDependencies, Map<Identifier, CTMTexture<?>> textures, Function<SpriteIdentifier, Sprite> spriteGetter) {
 		for (SpriteIdentifier identifier : textureDependencies) {
 			Sprite sprite = spriteGetter.apply(identifier);
@@ -43,14 +50,14 @@ public class TextureUtil {
 		}
 
 		Identifier[] textures = metadata.getAdditionalTextures();
-		int provided = textures.length;
-		int required = metadata.getType().requiredTextures()+1;
+		int provided = textures.length + 1;
+		int required = metadata.getType().requiredTextures();
 		Sprite[] sprites = new Sprite[required];
 		sprites[0] = sprite;
 		for (int i = 1; i < required; i++) {
 			Identifier identifier = null;
-			if (i <= provided) {
-				identifier = textures[i-1];
+			if (i < provided) {
+				identifier = textures[i - 1];
 			}
 			sprites[i] = spriteGetter.apply(toSpriteIdentifier(identifier));
 		}

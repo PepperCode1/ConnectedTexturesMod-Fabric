@@ -30,11 +30,10 @@
   "mixins": [
     "ctm.mixins.json"
   ],
-  "accessWidener": "ctm.accesswidener",
 
   "depends": {
     "fabricloader": ">=0.10.4",
-    "fabric": "*",
+    "fabric": ">=0.34.7+1.16",
     "minecraft": "1.16.x"
   },
 

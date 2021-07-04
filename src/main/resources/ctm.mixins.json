@@ -9,9 +9,7 @@
     "JsonUnbakedModelAccessor",
     "JsonUnbakedModelDeserializerMixin",
     "ModelLoaderMixin",
-    "SpriteAtlasTextureMixin",
-    "WeightedBakedModelEntryAccessor",
-    "WeightedBakedModelMixin"
+    "SpriteAtlasTextureMixin"
   ],
   "injectors": {
     "defaultRequire": 1

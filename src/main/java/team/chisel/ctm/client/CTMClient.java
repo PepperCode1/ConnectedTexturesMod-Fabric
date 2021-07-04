@@ -39,12 +39,7 @@ public class CTMClient implements ClientModInitializer {
 	public static final String MOD_ID = "ctm";
 	public static final Logger LOGGER = LogManager.getLogger("CTM");
 
-	private static CTMClient instance;
 	private static ConfigManager configManager;
-
-	public static CTMClient getInstance() {
-		return instance;
-	}
 
 	public static ConfigManager getConfigManager() {
 		if (configManager == null) {
@@ -58,8 +53,6 @@ public class CTMClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		instance = this;
-
 		getConfigManager();
 
 		if (FabricLoader.getInstance().isModLoaded("sodium") && !FabricLoader.getInstance().isModLoaded("indium")) {

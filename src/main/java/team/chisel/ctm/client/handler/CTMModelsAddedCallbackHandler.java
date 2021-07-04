@@ -10,6 +10,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.client.render.model.ModelLoader;
 import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
+import net.minecraft.client.render.model.json.WeightedUnbakedModel;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -38,6 +39,11 @@ public class CTMModelsAddedCallbackHandler implements ModelsAddedCallback {
 		for (Map.Entry<Identifier, UnbakedModel> entry : unbakedModels.entrySet()) {
 			Identifier identifier = entry.getKey();
 			UnbakedModel unbakedModel = entry.getValue();
+
+			// Do not wrap weighted models because they always get quads from other models
+			if (unbakedModel instanceof WeightedUnbakedModel) {
+				continue;
+			}
 
 			Collection<SpriteIdentifier> dependencies = unbakedModel.getTextureDependencies(modelLoader::getOrLoadModel, VoidSet.get());
 			if (unbakedModel instanceof JsonUnbakedModel) {

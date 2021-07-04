@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -44,16 +44,11 @@ public class JsonCTMUnbakedModel implements UnbakedModel {
 
 	// Filled during constructor
 	private Int2ObjectMap<SpriteIdentifier> identifierOverrides = new Int2ObjectArrayMap<>();
-	private Set<SpriteIdentifier> extraTextureDependencies = new HashSet<>();
 	private Int2ObjectMap<CTMMetadataSection> metadataOverrides = new Int2ObjectArrayMap<>();
+	private Set<SpriteIdentifier> extraTextureDependencies = new HashSet<>();
 
 	// Filled during getTextureDependencies
 	private Set<SpriteIdentifier> textureDependencies;
-
-	// Filled during bake
-	private Map<Identifier, CTMTexture<?>> textures = new HashMap<>();
-	private Int2ObjectMap<Sprite> spriteOverrides = new Int2ObjectArrayMap<>();
-	private Map<Pair<Integer, Identifier>, CTMTexture<?>> textureOverrides = new HashMap<>();
 
 	public JsonCTMUnbakedModel(JsonUnbakedModel parent, Int2ObjectMap<JsonElement> overrides) {
 		this.parent = parent;
@@ -115,8 +110,12 @@ public class JsonCTMUnbakedModel implements UnbakedModel {
 
 	@Override
 	public BakedModel bake(ModelLoader loader, Function<SpriteIdentifier, Sprite> spriteGetter, ModelBakeSettings rotationContainer, Identifier modelId) {
-		TextureUtil.initializeTextures(textureDependencies, textures, spriteGetter);
+		Map<Identifier, CTMTexture<?>> textures = TextureUtil.initializeTextures(textureDependencies, spriteGetter);
 
+		// TODO: Figure out why connections break without duplicate textures
+		Map<Identifier, CTMTexture<?>> textures1 = TextureUtil.initializeTextures(textureDependencies, spriteGetter);
+
+		Int2ObjectMap<Sprite> spriteOverrides = new Int2ObjectArrayMap<>();
 		for (Int2ObjectMap.Entry<SpriteIdentifier> entry : identifierOverrides.int2ObjectEntrySet()) {
 			spriteOverrides.put(entry.getIntKey(), spriteGetter.apply(entry.getValue()));
 		}
@@ -127,6 +126,8 @@ public class JsonCTMUnbakedModel implements UnbakedModel {
 				spriteIds.put(face.tintIndex, parent.resolveSprite(face.textureId));
 			}
 		}
+
+		Map<Pair<Integer, Identifier>, CTMTexture<?>> textureOverrides = new HashMap<>();
 		for (Int2ObjectMap.Entry<CTMMetadataSection> entry : metadataOverrides.int2ObjectEntrySet()) {
 			int tintIndex = entry.getIntKey();
 			Sprite sprite = spriteOverrides.get(tintIndex);
@@ -140,22 +141,23 @@ public class JsonCTMUnbakedModel implements UnbakedModel {
 			}
 		}
 
-		return new CTMBakedModel(parent.bake(loader, spriteGetter, rotationContainer, modelId), new JsonCTMModelInfo(this));
+		return new CTMBakedModel(parent.bake(loader, spriteGetter, rotationContainer, modelId), new JsonCTMModelInfo(textures, spriteOverrides, textureOverrides, textures1));
 	}
 
 	private static class JsonCTMModelInfo implements CTMModelInfo {
-		private final Collection<CTMTexture<?>> allTextures;
+		private final Set<CTMTexture<?>> allTextures;
 		private final Map<Identifier, CTMTexture<?>> textures;
 		private final Int2ObjectMap<Sprite> spriteOverrides;
 		private final Map<Pair<Integer, Identifier>, CTMTexture<?>> textureOverrides;
 
-		JsonCTMModelInfo(JsonCTMUnbakedModel unbakedModel) {
-			textures = unbakedModel.textures;
-			spriteOverrides = unbakedModel.spriteOverrides;
-			textureOverrides = unbakedModel.textureOverrides;
-			allTextures = ImmutableList.<CTMTexture<?>>builder()
-					.addAll(textures.values())
-					.addAll(textureOverrides.values())
+		private JsonCTMModelInfo(Map<Identifier, CTMTexture<?>> textures, Int2ObjectMap<Sprite> spriteOverrides, Map<Pair<Integer, Identifier>, CTMTexture<?>> textureOverrides, Map<Identifier, CTMTexture<?>> textures1) {
+			this.textures = textures;
+			this.spriteOverrides = spriteOverrides;
+			this.textureOverrides = textureOverrides;
+			allTextures = ImmutableSet.<CTMTexture<?>>builder()
+					.addAll(this.textures.values())
+					.addAll(this.textureOverrides.values())
+					.addAll(textures1.values())
 					.build();
 		}
 

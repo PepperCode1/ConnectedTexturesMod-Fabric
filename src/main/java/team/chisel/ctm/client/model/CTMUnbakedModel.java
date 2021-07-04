@@ -1,7 +1,6 @@
 package team.chisel.ctm.client.model;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -27,9 +26,6 @@ public class CTMUnbakedModel implements UnbakedModel {
 	// Filled during getTextureDependencies
 	private Set<SpriteIdentifier> textureDependencies;
 
-	// Filled during bake
-	private Map<Identifier, CTMTexture<?>> textures = new HashMap<>();
-
 	public CTMUnbakedModel(UnbakedModel parent) {
 		this.parent = parent;
 	}
@@ -50,17 +46,17 @@ public class CTMUnbakedModel implements UnbakedModel {
 
 	@Override
 	public BakedModel bake(ModelLoader loader, Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings rotationContainer, Identifier modelId) {
-		TextureUtil.initializeTextures(textureDependencies, textures, textureGetter);
-		return new CTMBakedModel(parent.bake(loader, textureGetter, rotationContainer, modelId), new CTMModelInfoImpl(this));
+		Map<Identifier, CTMTexture<?>> textures = TextureUtil.initializeTextures(textureDependencies, textureGetter);
+		return new CTMBakedModel(parent.bake(loader, textureGetter, rotationContainer, modelId), new CTMModelInfoImpl(textures));
 	}
 
 	private static class CTMModelInfoImpl implements CTMModelInfo {
-		private final Collection<CTMTexture<?>> allTextures;
+		private final Set<CTMTexture<?>> allTextures;
 		private final Map<Identifier, CTMTexture<?>> textures;
 
-		CTMModelInfoImpl(CTMUnbakedModel unbakedModel) {
-			textures = unbakedModel.textures;
-			allTextures = ImmutableSet.copyOf(textures.values());
+		private CTMModelInfoImpl(Map<Identifier, CTMTexture<?>> textures) {
+			this.textures = textures;
+			allTextures = ImmutableSet.copyOf(this.textures.values());
 		}
 
 		@Override

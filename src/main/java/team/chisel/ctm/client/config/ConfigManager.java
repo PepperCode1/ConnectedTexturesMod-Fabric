@@ -11,7 +11,7 @@ import com.google.gson.GsonBuilder;
 import net.minecraft.client.MinecraftClient;
 
 import team.chisel.ctm.client.CTMClient;
-import team.chisel.ctm.client.model.AbstractCTMBakedModel;
+import team.chisel.ctm.client.model.CTMBakedModel;
 
 public class ConfigManager {
 	private static final Gson GSON = new GsonBuilder()
@@ -53,7 +53,7 @@ public class ConfigManager {
 
 	@SuppressWarnings("resource")
 	public void onConfigChange() {
-		AbstractCTMBakedModel.invalidateCaches();
+		CTMBakedModel.invalidateCaches();
 		MinecraftClient.getInstance().worldRenderer.reload();
 		save();
 	}

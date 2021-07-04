@@ -1,13 +1,21 @@
 package team.chisel.ctm.client.util;
 
+import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
+import net.fabricmc.fabric.api.renderer.v1.mesh.MeshBuilder;
+import org.apache.commons.lang3.ArrayUtils;
+
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 
 import team.chisel.ctm.client.mixin.BakedQuadAccessor;
 
 public class RenderUtil {
+	public static final ThreadLocal<MeshBuilder> MESH_BUILDER = ThreadLocal.withInitial(() -> RendererAccess.INSTANCE.getRenderer().meshBuilder());
+	public static final Direction[] CULL_FACES = ArrayUtils.add(Direction.values(), null);
+
 	public static final int UV_OFFSET = 4;
 
 	public static BakedQuad retextureBakedQuad(BakedQuad quad, Sprite sprite) {
