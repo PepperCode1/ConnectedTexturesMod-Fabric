@@ -23,7 +23,7 @@ public class CTMConfigScreen extends Screen {
 
 	@Override
 	protected void init() {
-		addButton(new ButtonWidget(width / 2 - 90 - 75, (int) (height * 0.5F) - 10, 150, 20, getBooleanOptionText("options.ctm.disable_ctm", configManager.getConfig().disableCTM),
+		addDrawableChild(new ButtonWidget(width / 2 - 90 - 75, (int) (height * 0.5F) - 10, 150, 20, getBooleanOptionText("options.ctm.disable_ctm", configManager.getConfig().disableCTM),
 				(button) -> {
 					boolean value = !configManager.getConfig().disableCTM;
 					button.setMessage(getBooleanOptionText("options.ctm.disable_ctm", value));
@@ -34,7 +34,7 @@ public class CTMConfigScreen extends Screen {
 				}
 		));
 
-		addButton(new ButtonWidget(width / 2 + 90 - 75, (int) (height * 0.5F) - 10, 150, 20, getBooleanOptionText("options.ctm.connect_inside_ctm", configManager.getConfig().connectInsideCTM),
+		addDrawableChild(new ButtonWidget(width / 2 + 90 - 75, (int) (height * 0.5F) - 10, 150, 20, getBooleanOptionText("options.ctm.connect_inside_ctm", configManager.getConfig().connectInsideCTM),
 				(button) -> {
 					boolean value = !configManager.getConfig().connectInsideCTM;
 					button.setMessage(getBooleanOptionText("options.ctm.connect_inside_ctm", value));
@@ -45,7 +45,7 @@ public class CTMConfigScreen extends Screen {
 				}
 		));
 
-		addButton(new ButtonWidget(width / 2 - 100, (int) (height * 0.88F) - 10, 200, 20, ScreenTexts.DONE, (button) -> onClose()));
+		addDrawableChild(new ButtonWidget(width / 2 - 100, (int) (height * 0.88F) - 10, 200, 20, ScreenTexts.DONE, (button) -> onClose()));
 	}
 
 	@Override
@@ -74,6 +74,6 @@ public class CTMConfigScreen extends Screen {
 	}
 
 	private static Text getBooleanOptionText(String key, boolean value) {
-		return new TranslatableText(key, ScreenTexts.getToggleText(value));
+		return new TranslatableText(key, ScreenTexts.onOrOff(value));
 	}
 }

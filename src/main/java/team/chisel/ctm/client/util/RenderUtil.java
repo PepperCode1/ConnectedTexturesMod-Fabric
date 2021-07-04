@@ -10,8 +10,6 @@ import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 
-import team.chisel.ctm.client.mixin.BakedQuadAccessor;
-
 public class RenderUtil {
 	public static final ThreadLocal<MeshBuilder> MESH_BUILDER = ThreadLocal.withInitial(() -> RendererAccess.INSTANCE.getRenderer().meshBuilder());
 	public static final Direction[] CULL_FACES = ArrayUtils.add(Direction.values(), null);
@@ -20,7 +18,7 @@ public class RenderUtil {
 
 	public static BakedQuad retextureBakedQuad(BakedQuad quad, Sprite sprite) {
 		int[] newData = quad.getVertexData().clone();
-		retextureBakedQuadData(newData, ((BakedQuadAccessor) quad).getSprite(), sprite);
+		retextureBakedQuadData(newData, quad.getSprite(), sprite);
 		return new BakedQuad(newData, quad.getColorIndex(), quad.getFace(), sprite, quad.hasShade());
 	}
 

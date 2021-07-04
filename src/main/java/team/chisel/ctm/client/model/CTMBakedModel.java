@@ -33,7 +33,6 @@ import net.minecraft.world.BlockRenderView;
 import team.chisel.ctm.api.client.CTMTexture;
 import team.chisel.ctm.api.client.Renderable;
 import team.chisel.ctm.api.client.TextureContext;
-import team.chisel.ctm.client.mixin.BakedQuadAccessor;
 import team.chisel.ctm.client.util.RenderUtil;
 
 public class CTMBakedModel extends ForwardingBakedModel {
@@ -138,7 +137,7 @@ public class CTMBakedModel extends ForwardingBakedModel {
 			// Gather all BakedQuads and map them to their CTMTextures
 			// Pass BakedQuads that do not have an associated CTMTexture directly to the QuadEmitter
 			for (BakedQuad bakedQuad : parentQuads) {
-				Identifier spriteId = ((BakedQuadAccessor) bakedQuad).getSprite().getId();
+				Identifier spriteId = bakedQuad.getSprite().getId();
 				int tintIndex = bakedQuad.getColorIndex();
 
 				Sprite overrideSprite = modelInfo.getOverrideSprite(tintIndex);

@@ -12,7 +12,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 
 import team.chisel.ctm.api.client.Renderable;
-import team.chisel.ctm.client.mixin.BakedQuadAccessor;
 import team.chisel.ctm.client.util.MathUtil;
 import team.chisel.ctm.client.util.RenderUtil;
 
@@ -34,7 +33,7 @@ public class UnbakedQuad implements Renderable, Cloneable {
 	public UnbakedQuad(BakedQuad bakedQuad) {
 		lightFace = bakedQuad.getFace();
 		colorIndex = bakedQuad.getColorIndex();
-		sprite = ((BakedQuadAccessor) bakedQuad).getSprite();
+		sprite = bakedQuad.getSprite();
 		int[] data = bakedQuad.getVertexData();
 		vertexes = new Vertex[4];
 		for (int vertexId = 0; vertexId < 4; vertexId++) {
