@@ -1,8 +1,8 @@
 # ConnectedTexturesMod for Fabric
 
-CTMF aims to be a direct port of the original ConnectedTexturesMod, which ran on Forge. CTMF allows the same resource pack to work on both Fabric and Forge with almost the same end result. CTMF also tries to address some of CTM's bugs and shortcomings.
+ConnectedTexturesMod for Fabric tries to maintain feature parity with the original [ConnectedTexturesMod](https://www.curseforge.com/minecraft/mc-mods/ctm) so that CTM/Chisel format resource packs can work on both platforms without any changes. CTMF also adds some new features and fixes some bugs from the original. It is a client-side only mod that requires the [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api) and utilizes the Fabric Rendering API for efficiency and compatibility.
 
-In short, CTM(F) allows resource packs to create dynamic models by adding custom JSON to model or texture metadata files. CTM(F) also has a public facing API that allows other mods to add their own texture types, which can then be used through texture metadata. CTMF is a client-side only mod that depends on the Fabric API.
+CTM/CTMF allows resource packs to create dynamic models by adding custom JSON to model or texture metadata files. **CTM/CTMF by itself does not add connected textures. A separate resource pack is needed.** CTM/CTMF also has a public facing API that allows other mods to add their own texture types, which can then be used through texture metadata.
 
 All important information regarding this port can be found [here](https://github.com/PepperCode1/ConnectedTexturesMod-Fabric/wiki). For information on everything else, visit the original's wiki [here](https://github.com/Chisel-Team/ConnectedTexturesMod/wiki).
 
