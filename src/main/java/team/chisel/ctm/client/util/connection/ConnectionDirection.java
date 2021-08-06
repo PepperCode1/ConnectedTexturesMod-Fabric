@@ -38,6 +38,9 @@ public enum ConnectionDirection {
 	 * All values of this enum, used to prevent unnecessary allocation via {@link #values()}.
 	 */
 	public static final ConnectionDirection[] VALUES = values();
+	public static final ConnectionDirection[] SIDES = new ConnectionDirection[] { TOP, RIGHT, BOTTOM, LEFT };
+	public static final ConnectionDirection[] CORNERS = new ConnectionDirection[] { TOP_RIGHT, BOTTOM_RIGHT, BOTTOM_LEFT, TOP_LEFT };
+
 	private static final Direction NORMAL = SOUTH;
 
 	static {

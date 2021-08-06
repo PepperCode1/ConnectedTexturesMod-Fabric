@@ -1,39 +1,33 @@
 package team.chisel.ctm.client.handler;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-
-import com.google.common.collect.Sets;
 
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 
 import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.event.AtlasStitchCallback;
 import team.chisel.ctm.client.resource.CTMMetadataSection;
 import team.chisel.ctm.client.util.ResourceUtil;
 
-public class CTMAtlasStitchCallbackHandler implements AtlasStitchCallback {
+public class AtlasStitchCallbackHandler implements AtlasStitchCallback {
 	@Override
 	public void onAtlasStitch(SpriteAtlasTexture atlas, Set<Identifier> sprites) {
-		Set<Identifier> newSprites = Sets.newConcurrentHashSet();
-		List<CompletableFuture<Void>> futures = new ArrayList<>(sprites.size());
-
-		for (Identifier identifier : sprites) {
-			futures.add(CompletableFuture.runAsync(() -> addSprites(identifier, newSprites), Util.getMainWorkerExecutor()));
+		if (!atlas.getId().equals(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE)) {
+			return;
 		}
 
-		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
+		Set<Identifier> newSprites = new HashSet<>();
+		for (Identifier identifier : sprites) {
+			addSprites(identifier, newSprites);
+		}
 		sprites.addAll(newSprites);
 	}
 
 	private void addSprites(Identifier identifier, Set<Identifier> newSprites) {
 		CTMMetadataSection metadata = ResourceUtil.getMetadataSafe(ResourceUtil.toTextureIdentifier(identifier));
 		if (metadata != null) {
-			addSprites(identifier, metadata, newSprites);
 			// Load proxy data
 			if (metadata.getProxy() != null) {
 				Identifier proxy = metadata.getProxy();
@@ -43,6 +37,8 @@ public class CTMAtlasStitchCallbackHandler implements AtlasStitchCallback {
 				if (proxyMetadata != null) {
 					addSprites(proxy, proxyMetadata, newSprites);
 				}
+			} else {
+				addSprites(identifier, metadata, newSprites);
 			}
 		}
 	}

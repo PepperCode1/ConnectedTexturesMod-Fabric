@@ -18,7 +18,7 @@ public class TextureContextConnecting implements TextureContext {
 
 	protected final AbstractConnectingTexture<?> texture;
 	private EnumMap<Direction, ConnectionLogic> logicMap = new EnumMap<>(Direction.class);
-	private long data;
+	private long serialized;
 
 	public TextureContextConnecting(@NotNull BlockState state, BlockRenderView world, BlockPos pos, AbstractConnectingTexture<?> texture) {
 		this.texture = texture;
@@ -26,7 +26,7 @@ public class TextureContextConnecting implements TextureContext {
 		for (Direction face : Direction.values()) {
 			ConnectionLogic logic = createLogic(world, pos, face);
 			logicMap.put(face, logic);
-			data |= (logic.serialize() & ((1 << CONNECTION_DATA_LENGTH) - 1)) << (face.ordinal() * CONNECTION_DATA_LENGTH);
+			serialized |= (logic.serialize() & ((1 << CONNECTION_DATA_LENGTH) - 1)) << (face.ordinal() * CONNECTION_DATA_LENGTH);
 		}
 	}
 
@@ -42,7 +42,7 @@ public class TextureContextConnecting implements TextureContext {
 	}
 
 	@Override
-	public long getCompressedData() {
-		return data;
+	public long serialize() {
+		return serialized;
 	}
 }

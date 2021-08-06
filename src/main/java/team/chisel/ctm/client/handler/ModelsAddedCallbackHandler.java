@@ -3,8 +3,10 @@ package team.chisel.ctm.client.handler;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import com.google.gson.JsonElement;
+import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
 import net.minecraft.client.render.model.ModelLoader;
@@ -24,16 +26,26 @@ import team.chisel.ctm.client.resource.CTMMetadataSection;
 import team.chisel.ctm.client.util.ResourceUtil;
 import team.chisel.ctm.client.util.VoidSet;
 
-public class CTMModelsAddedCallbackHandler implements ModelsAddedCallback {
+public class ModelsAddedCallbackHandler implements ModelsAddedCallback {
 	private final Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap;
 
-	public CTMModelsAddedCallbackHandler(Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap) {
+	public ModelsAddedCallbackHandler(Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap) {
 		this.jsonOverrideMap = jsonOverrideMap;
 	}
 
 	@Override
 	public void onModelsAdded(ModelLoader modelLoader, ResourceManager resourceManager, Profiler profiler, Map<Identifier, UnbakedModel> unbakedModels, Map<Identifier, UnbakedModel> modelsToBake) {
 		Map<Identifier, UnbakedModel> wrappedModels = new HashMap<>();
+
+		UnbakedModel missingModel = unbakedModels.get(ModelLoader.MISSING_ID);
+		Function<Identifier, UnbakedModel> unbakedModelGetter = id -> {
+			UnbakedModel unbakedModel = unbakedModels.get(id);
+			if (unbakedModel == null) {
+				return missingModel;
+			}
+			return unbakedModel;
+		};
+		VoidSet<Pair<String, String>> voidSet = VoidSet.get();
 
 		// Check which models should be wrapped
 		for (Map.Entry<Identifier, UnbakedModel> entry : unbakedModels.entrySet()) {
@@ -45,7 +57,7 @@ public class CTMModelsAddedCallbackHandler implements ModelsAddedCallback {
 				continue;
 			}
 
-			Collection<SpriteIdentifier> dependencies = unbakedModel.getTextureDependencies(modelLoader::getOrLoadModel, VoidSet.get());
+			Collection<SpriteIdentifier> dependencies = unbakedModel.getTextureDependencies(unbakedModelGetter, voidSet);
 			if (unbakedModel instanceof JsonUnbakedModel) {
 				JsonUnbakedModel jsonModel = (JsonUnbakedModel) unbakedModel;
 				// Do not wrap builtin models

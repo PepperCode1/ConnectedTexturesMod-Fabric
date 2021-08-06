@@ -9,6 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
@@ -20,8 +21,8 @@ import team.chisel.ctm.client.texture.type.TextureTypeNormal;
 public class CTMMetadataSectionV1 implements CTMMetadataSection {
 	private TextureType type = TextureTypeNormal.INSTANCE;
 	private BlendMode blendMode = BlendMode.DEFAULT;
-	private Identifier proxy;
 	private Identifier[] additionalTextures;
+	private Identifier proxy;
 	private JsonObject extraData;
 
 	public static CTMMetadataSection fromJson(JsonObject jsonObject) throws JsonParseException {
@@ -108,22 +109,22 @@ public class CTMMetadataSectionV1 implements CTMMetadataSection {
 	}
 
 	@Override
-	public Identifier getProxy() {
-		return proxy;
-	}
-
-	@Override
 	public Identifier[] getAdditionalTextures() {
 		return additionalTextures;
 	}
 
 	@Override
-	public JsonObject getExtraData() {
+	public @Nullable Identifier getProxy() {
+		return proxy;
+	}
+
+	@Override
+	public @Nullable JsonObject getExtraData() {
 		return extraData;
 	}
 
 	@Override
 	public String toString() {
-		return "CTMMetadataSectionV1(type=" + getType() + ", blendMode=" + getBlendMode() + ", proxy=" + getProxy() + ", additionalTextures=" + Arrays.deepToString(getAdditionalTextures()) + ", extraData=" + getExtraData() + ")";
+		return "CTMMetadataSectionV1(type=" + getType() + ", blendMode=" + getBlendMode() + ", additionalTextures=" + Arrays.deepToString(getAdditionalTextures()) + ", proxy=" + getProxy() + ", extraData=" + getExtraData() + ")";
 	}
 }

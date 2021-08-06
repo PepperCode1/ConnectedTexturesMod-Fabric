@@ -26,7 +26,9 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modCompileOnly "com.terraformersmc:modmenu:${project.mod_menu_version}"
+	modCompileOnly("com.terraformersmc:modmenu:${project.mod_menu_version}") {
+		exclude(group: "net.fabricmc.fabric-api")
+	}
 
 	afterEvaluate {
 		testmodImplementation sourceSets.main.output

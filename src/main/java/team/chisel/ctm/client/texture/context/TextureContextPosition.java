@@ -32,7 +32,7 @@ public class TextureContextPosition implements TextureContext {
 	}
 
 	@Override
-	public long getCompressedData() {
+	public long serialize() {
 		return 0L; // Position data is not useful for serialization (and in fact breaks caching as each location is a new key)
 	}
 }

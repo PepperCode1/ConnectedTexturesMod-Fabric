@@ -70,7 +70,7 @@ public class ConnectionLogic {
 	 * @param direction The direction in which to check.
 	 * @return True if the block can connect in the given ConnectionDirection, false otherwise.
 	 */
-	public boolean isConnected(BlockRenderView world, BlockPos pos, Direction side, ConnectionDirection direction) {
+	protected boolean isConnected(BlockRenderView world, BlockPos pos, Direction side, ConnectionDirection direction) {
 		return isConnected(world, pos, direction.applyOffset(pos, side), side);
 	}
 
@@ -86,7 +86,7 @@ public class ConnectionLogic {
 	 * @param direction The direction in which to check.
 	 * @return True if the block can connect in the given ConnectionDirection, false otherwise.
 	 */
-	public boolean isConnected(BlockRenderView world, BlockPos pos, Direction side, BlockState state, ConnectionDirection direction) {
+	protected boolean isConnected(BlockRenderView world, BlockPos pos, Direction side, BlockState state, ConnectionDirection direction) {
 		return isConnected(world, pos, direction.applyOffset(pos, side), side, state);
 	}
 
@@ -101,7 +101,7 @@ public class ConnectionLogic {
 	 * @param side The {@link Direction side} of the block to check for connection status. This is <i>not</i> the direction to check in.
 	 * @return True if the positions can connect, false otherwise.
 	 */
-	public boolean isConnected(BlockRenderView world, BlockPos pos, BlockPos connection, Direction side) {
+	protected boolean isConnected(BlockRenderView world, BlockPos pos, BlockPos connection, Direction side) {
 		BlockState state = getConnectionState(world, pos, connection, side);
 		return isConnected(world, pos, connection, side, state);
 	}
@@ -118,7 +118,7 @@ public class ConnectionLogic {
 	 * @param state The state of the block with which to check for connection with.
 	 * @return True if the positions can connect, false otherwise.
 	 */
-	public boolean isConnected(BlockRenderView world, BlockPos pos, BlockPos connection, Direction side, BlockState state) {
+	protected boolean isConnected(BlockRenderView world, BlockPos pos, BlockPos connection, Direction side, BlockState state) {
 		BlockState connectionState = getConnectionState(world, connection, pos, side);
 		boolean connected = compare(state, connectionState, side);
 		if (!connected) {
@@ -133,7 +133,7 @@ public class ConnectionLogic {
 		return !compare(connectionState, obscuring, side);
 	}
 
-	public BlockState getConnectionState(BlockRenderView world, BlockPos pos, BlockPos connection, @Nullable Direction side) {
+	protected BlockState getConnectionState(BlockRenderView world, BlockPos pos, BlockPos connection, @Nullable Direction side) {
 		BlockState state = world.getBlockState(pos);
 		if (state.getBlock() instanceof Facade) {
 			BlockState facadeState = ((Facade) state.getBlock()).getFacadeState(world, pos, connection, side);

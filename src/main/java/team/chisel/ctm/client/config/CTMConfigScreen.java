@@ -23,7 +23,7 @@ public class CTMConfigScreen extends Screen {
 
 	@Override
 	protected void init() {
-		addButton(new ButtonWidget(width / 2 - 90 - 75, (int) (height * 0.5F) - 10, 150, 20, getBooleanOptionText("options.ctm.disable_ctm", configManager.getConfig().disableCTM),
+		addButton(new ButtonWidget(width / 2 - 90 - 75, height / 2 - 10, 150, 20, getBooleanOptionText("options.ctm.disable_ctm", configManager.getConfig().disableCTM),
 				(button) -> {
 					boolean value = !configManager.getConfig().disableCTM;
 					button.setMessage(getBooleanOptionText("options.ctm.disable_ctm", value));
@@ -34,7 +34,7 @@ public class CTMConfigScreen extends Screen {
 				}
 		));
 
-		addButton(new ButtonWidget(width / 2 + 90 - 75, (int) (height * 0.5F) - 10, 150, 20, getBooleanOptionText("options.ctm.connect_inside_ctm", configManager.getConfig().connectInsideCTM),
+		addButton(new ButtonWidget(width / 2 + 90 - 75, height / 2 - 10, 150, 20, getBooleanOptionText("options.ctm.connect_inside_ctm", configManager.getConfig().connectInsideCTM),
 				(button) -> {
 					boolean value = !configManager.getConfig().connectInsideCTM;
 					button.setMessage(getBooleanOptionText("options.ctm.connect_inside_ctm", value));
@@ -45,13 +45,13 @@ public class CTMConfigScreen extends Screen {
 				}
 		));
 
-		addButton(new ButtonWidget(width / 2 - 100, (int) (height * 0.88F) - 10, 200, 20, ScreenTexts.DONE, (button) -> onClose()));
+		addButton(new ButtonWidget(width / 2 - 100, (int) (height * 0.8F), 200, 20, ScreenTexts.DONE, (button) -> onClose()));
 	}
 
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		renderBackground(matrices);
-		drawCenteredText(matrices, textRenderer, title, width / 2, 15, 0xFFFFFF);
+		drawCenteredText(matrices, textRenderer, title, width / 2, (int) (height * 0.15F), 0xFFFFFF);
 		super.render(matrices, mouseX, mouseY, delta);
 	}
 

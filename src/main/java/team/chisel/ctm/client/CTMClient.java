@@ -21,10 +21,10 @@ import team.chisel.ctm.client.event.AtlasStitchCallback;
 import team.chisel.ctm.client.event.DeserializeModelJsonCallback;
 import team.chisel.ctm.client.event.ModelsAddedCallback;
 import team.chisel.ctm.client.event.ModelsLoadedCallback;
-import team.chisel.ctm.client.handler.CTMAtlasStitchCallbackHandler;
-import team.chisel.ctm.client.handler.CTMDeserializeModelJsonCallbackHandler;
-import team.chisel.ctm.client.handler.CTMModelsAddedCallbackHandler;
-import team.chisel.ctm.client.handler.CTMModelsLoadedCallbackHandler;
+import team.chisel.ctm.client.handler.AtlasStitchCallbackHandler;
+import team.chisel.ctm.client.handler.DeserializeModelJsonCallbackHandler;
+import team.chisel.ctm.client.handler.ModelsAddedCallbackHandler;
+import team.chisel.ctm.client.handler.ModelsLoadedCallbackHandler;
 import team.chisel.ctm.client.texture.type.TextureTypeCTM;
 import team.chisel.ctm.client.texture.type.TextureTypeEdges;
 import team.chisel.ctm.client.texture.type.TextureTypeEdgesFull;
@@ -61,10 +61,10 @@ public class CTMClient implements ClientModInitializer {
 		}
 
 		Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap = new HashMap<>();
-		DeserializeModelJsonCallback.EVENT.register(new CTMDeserializeModelJsonCallbackHandler(jsonOverrideMap));
-		ModelsAddedCallback.EVENT.register(new CTMModelsAddedCallbackHandler(jsonOverrideMap));
-		AtlasStitchCallback.EVENT.register(new CTMAtlasStitchCallbackHandler());
-		ModelsLoadedCallback.EVENT.register(new CTMModelsLoadedCallbackHandler());
+		DeserializeModelJsonCallback.EVENT.register(new DeserializeModelJsonCallbackHandler(jsonOverrideMap));
+		ModelsAddedCallback.EVENT.register(new ModelsAddedCallbackHandler(jsonOverrideMap));
+		AtlasStitchCallback.EVENT.register(new AtlasStitchCallbackHandler());
+		ModelsLoadedCallback.EVENT.register(new ModelsLoadedCallbackHandler());
 
 		TextureType type;
 		TextureTypeRegistry.INSTANCE.register("ctm", new TextureTypeCTM());

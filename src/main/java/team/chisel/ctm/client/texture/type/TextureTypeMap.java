@@ -40,7 +40,7 @@ public class TextureTypeMap implements TextureType {
 	}
 
 	@Override
-	public TextureContext getContextFromData(long data) {
+	public TextureContext deserializeContext(long data) {
 		return new TextureContextPosition(BlockPos.fromLong(data));
 	}
 
