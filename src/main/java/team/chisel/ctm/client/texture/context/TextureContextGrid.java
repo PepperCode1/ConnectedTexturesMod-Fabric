@@ -42,7 +42,7 @@ public abstract class TextureContextGrid extends TextureContextPosition {
 	protected abstract Point2i calculateTextureCoord(BlockPos pos, int width, int height, Direction side);
 
 	@Override
-	public long getCompressedData() {
+	public long serialize() {
 		return serialized;
 	}
 

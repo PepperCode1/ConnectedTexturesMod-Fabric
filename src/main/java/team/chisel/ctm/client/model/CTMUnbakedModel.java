@@ -2,11 +2,12 @@ package team.chisel.ctm.client.model;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.client.render.model.BakedModel;
@@ -51,12 +52,12 @@ public class CTMUnbakedModel implements UnbakedModel {
 	}
 
 	private static class CTMModelInfoImpl implements CTMModelInfo {
-		private final Set<CTMTexture<?>> allTextures;
+		private final List<CTMTexture<?>> allTextures;
 		private final Map<Identifier, CTMTexture<?>> textures;
 
 		private CTMModelInfoImpl(Map<Identifier, CTMTexture<?>> textures) {
 			this.textures = textures;
-			allTextures = ImmutableSet.copyOf(this.textures.values());
+			allTextures = ImmutableList.copyOf(this.textures.values());
 		}
 
 		@Override

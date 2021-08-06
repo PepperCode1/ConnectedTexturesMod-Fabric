@@ -16,14 +16,14 @@ import team.chisel.ctm.client.event.DeserializeModelJsonCallback;
 import team.chisel.ctm.client.resource.ModelParser;
 import team.chisel.ctm.client.resource.ModelParserV1;
 
-public class CTMDeserializeModelJsonCallbackHandler implements DeserializeModelJsonCallback {
+public class DeserializeModelJsonCallbackHandler implements DeserializeModelJsonCallback {
 	private static final Map<Integer, ModelParser> PARSERS = new ImmutableMap.Builder<Integer, ModelParser>()
 			.put(1, new ModelParserV1())
 			.build();
 
 	private final Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap;
 
-	public CTMDeserializeModelJsonCallbackHandler(Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap) {
+	public DeserializeModelJsonCallbackHandler(Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap) {
 		this.jsonOverrideMap = jsonOverrideMap;
 	}
 

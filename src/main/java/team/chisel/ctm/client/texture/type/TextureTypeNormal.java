@@ -28,7 +28,7 @@ public class TextureTypeNormal implements TextureType {
 	}
 
 	@Override
-	public TextureContext getContextFromData(long data) {
+	public TextureContext deserializeContext(long data) {
 		return EMPTY_CONTEXT;
 	}
 }

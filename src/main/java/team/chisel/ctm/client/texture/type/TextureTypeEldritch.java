@@ -23,7 +23,7 @@ public class TextureTypeEldritch implements TextureType {
 	}
 
 	@Override
-	public TextureContext getContextFromData(long data) {
+	public TextureContext deserializeContext(long data) {
 		return new TextureContextEldritch(BlockPos.fromLong(data));
 	}
 }

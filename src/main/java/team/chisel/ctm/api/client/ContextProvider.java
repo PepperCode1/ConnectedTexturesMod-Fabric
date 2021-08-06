@@ -24,10 +24,10 @@ public interface ContextProvider {
 	 *
 	 * <p>As of yet, this method is unused.
 	 *
-	 * @param data The compressed data, which will match what is produced by {@link TextureContext#getCompressedData()}.
+	 * @param data The compressed data, which will match what is produced by {@link TextureContext#serialize()}.
 	 */
 	@Deprecated
-	default TextureContext getContextFromData(long data) {
+	default TextureContext deserializeContext(long data) {
 		throw new UnsupportedOperationException();
 	}
 }

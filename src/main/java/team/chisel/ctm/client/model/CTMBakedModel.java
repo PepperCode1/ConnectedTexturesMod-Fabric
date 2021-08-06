@@ -1,5 +1,6 @@
 package team.chisel.ctm.client.model;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -9,6 +10,7 @@ import java.util.function.Supplier;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MeshBuilder;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
@@ -39,6 +41,8 @@ public class CTMBakedModel extends ForwardingBakedModel {
 	private static final Cache<BlockMeshCacheKey, Mesh> BLOCK_MESH_CACHE = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).maximumSize(5000).build();
 	private static final Cache<BakedModel, Mesh> ITEM_MESH_CACHE = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).build();
 
+	protected static final ThreadLocal<ObjectContainer> CONTAINERS = ThreadLocal.withInitial(ObjectContainer::new);
+
 	@NotNull
 	protected CTMModelInfo modelInfo;
 	protected Sprite sprite;
@@ -65,7 +69,7 @@ public class CTMBakedModel extends ForwardingBakedModel {
 	}
 
 	protected Sprite initSprite() {
-		CTMTexture<?> texture = getModelInfo().getTexture(getParent().getSprite().getId());
+		CTMTexture<?> texture = getModelInfo().getTexture(getParent().getParticleSprite().getId());
 		if (texture != null) {
 			return texture.getParticle();
 		}
@@ -73,11 +77,11 @@ public class CTMBakedModel extends ForwardingBakedModel {
 	}
 
 	@Override
-	public Sprite getSprite() {
+	public Sprite getParticleSprite() {
 		if (sprite != null) {
 			return sprite;
 		}
-		return super.getSprite();
+		return super.getParticleSprite();
 	}
 
 	@Override
@@ -96,13 +100,19 @@ public class CTMBakedModel extends ForwardingBakedModel {
 	}
 
 	public Mesh getBlockMesh(BlockState state, BlockRenderView blockView, BlockPos pos, Supplier<Random> randomSupplier) {
+		ObjectContainer container = CONTAINERS.get();
+		BakedModel parent = getParent();
+		CTMModelInfo modelInfo = getModelInfo();
+		TextureContextMap contextMap = container.contextMap;
+		contextMap.fill(modelInfo.getTextures(), state, blockView, pos);
+
 		Mesh mesh = null;
 		try {
-			TextureContextList contextList = new TextureContextList(getModelInfo().getTextures(), state, blockView, pos);
-			BakedModel parent = getParent();
-			mesh = BLOCK_MESH_CACHE.get(new BlockMeshCacheKey(contextList, parent, state), () -> createMesh(parent, getModelInfo(), contextList, state, randomSupplier));
+			mesh = BLOCK_MESH_CACHE.get(new BlockMeshCacheKey(parent, state, contextMap.toDataArray()), () -> createMesh(parent, modelInfo, contextMap, state, randomSupplier, container.meshBuilder));
 		} catch (ExecutionException e) {
 			throw new RuntimeException("Error getting CTM block mesh", e);
+		} finally {
+			contextMap.reset();
 		}
 		return mesh;
 	}
@@ -116,7 +126,7 @@ public class CTMBakedModel extends ForwardingBakedModel {
 				if (item instanceof BlockItem) {
 					block = ((BlockItem) item).getBlock();
 				}
-				return createMesh(getParent(), getModelInfo(), null, block == null ? null : block.getDefaultState(), randomSupplier);
+				return createMesh(getParent(), getModelInfo(), null, block == null ? null : block.getDefaultState(), randomSupplier, CONTAINERS.get().meshBuilder);
 			});
 		} catch (ExecutionException e) {
 			throw new RuntimeException("Error getting CTM item mesh", e);
@@ -127,9 +137,8 @@ public class CTMBakedModel extends ForwardingBakedModel {
 	/**
 	 * This method must be thread-safe as it may be called from multiple threads at once.
 	 */
-	protected Mesh createMesh(BakedModel parent, CTMModelInfo modelInfo, @Nullable TextureContextList contextList, @Nullable BlockState state, Supplier<Random> randomSupplier) {
-		MeshBuilder builder = RenderUtil.MESH_BUILDER.get();
-		QuadEmitter emitter = builder.getEmitter();
+	protected Mesh createMesh(BakedModel parent, CTMModelInfo modelInfo, @Nullable TextureContextMap contextMap, @Nullable BlockState state, Supplier<Random> randomSupplier, MeshBuilder meshBuilder) {
+		QuadEmitter emitter = meshBuilder.getEmitter();
 
 		for (Direction cullFace : RenderUtil.CULL_FACES) {
 			List<BakedQuad> parentQuads = parent.getQuads(state, cullFace, randomSupplier.get());
@@ -153,7 +162,7 @@ public class CTMBakedModel extends ForwardingBakedModel {
 
 				boolean renderFallback = false;
 				if (texture != null) {
-					TextureContext context = contextList == null ? null : contextList.getContext(texture);
+					TextureContext context = contextMap == null ? null : contextMap.getContext(texture);
 					Renderable renderable = texture.transformQuad(bakedQuad, cullFace, context);
 					if (renderable != null) {
 						renderable.render(emitter);
@@ -171,14 +180,18 @@ public class CTMBakedModel extends ForwardingBakedModel {
 			}
 		}
 
-		return builder.build();
+		return meshBuilder.build();
 	}
 
 	private static class BlockMeshCacheKey {
-		private final int hashCode;
+		private final BakedModel parent;
+		private final BlockState blockState;
+		private final long[] data;
 
-		private BlockMeshCacheKey(TextureContextList contextList, BakedModel parent, BlockState blockState) {
-			hashCode = Objects.hash(contextList, parent, blockState);
+		private BlockMeshCacheKey(BakedModel parent, BlockState blockState, long[] data) {
+			this.parent = parent;
+			this.blockState = blockState;
+			this.data = data;
 		}
 
 		@Override
@@ -187,13 +200,20 @@ public class CTMBakedModel extends ForwardingBakedModel {
 			if (obj == null) return false;
 			if (getClass() != obj.getClass()) return false;
 			BlockMeshCacheKey other = (BlockMeshCacheKey) obj;
-			if (hashCode != other.hashCode) return false;
+			if (parent != other.parent) return false;
+			if (blockState != other.blockState) return false;
+			if (!Arrays.equals(data, other.data)) return false;
 			return true;
 		}
 
 		@Override
 		public int hashCode() {
-			return hashCode;
+			return Objects.hash(parent, blockState, Arrays.hashCode(data));
 		}
+	}
+
+	protected static class ObjectContainer {
+		public TextureContextMap contextMap = new TextureContextMap();
+		public MeshBuilder meshBuilder = RendererAccess.INSTANCE.getRenderer().meshBuilder();
 	}
 }

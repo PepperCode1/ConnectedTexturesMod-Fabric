@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.BlockState;
@@ -13,20 +15,23 @@ import net.minecraft.world.BlockRenderView;
 import team.chisel.ctm.api.client.CTMTexture;
 import team.chisel.ctm.api.client.TextureContext;
 
-public class TextureContextList {
+public class TextureContextMap {
 	private final Map<CTMTexture<?>, TextureContext> contextMap = new HashMap<>();
-	private final int hashCode;
+	private final LongList dataList = new LongArrayList();
 
-	public TextureContextList(Collection<CTMTexture<?>> textures, BlockState state, BlockRenderView world, BlockPos pos) {
-		int hash = 0;
+	public void fill(Collection<CTMTexture<?>> textures, BlockState state, BlockRenderView world, BlockPos pos) {
 		for (CTMTexture<?> texture : textures) {
 			TextureContext context = texture.getType().getTextureContext(state, world, pos, texture);
 			if (context != null) {
 				contextMap.put(texture, context);
-				hash += texture.hashCode() ^ Long.hashCode(context.getCompressedData());
+				dataList.add(context.serialize());
 			}
 		}
-		hashCode = hash;
+	}
+
+	public void reset() {
+		contextMap.clear();
+		dataList.clear();
 	}
 
 	@Nullable
@@ -38,18 +43,7 @@ public class TextureContextList {
 		return contextMap.containsKey(texture);
 	}
 
-	@Override
-	public boolean equals(@Nullable Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
-		TextureContextList other = (TextureContextList) obj;
-		if (hashCode != other.hashCode) return false;
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		return hashCode;
+	public long[] toDataArray() {
+		return dataList.toLongArray();
 	}
 }

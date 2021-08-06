@@ -21,7 +21,7 @@ public class ConnectionLogicObscured extends ConnectionLogic {
 	}
 
 	@Override
-	public boolean isConnected(BlockRenderView world, BlockPos pos, BlockPos connection, Direction side, BlockState state) {
+	protected boolean isConnected(BlockRenderView world, BlockPos pos, BlockPos connection, Direction side, BlockState state) {
 		if (isObscured()) {
 			return false;
 		}

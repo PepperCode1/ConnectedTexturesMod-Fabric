@@ -16,7 +16,7 @@ public class TextureContextEldritch extends TextureContextPosition {
 	}
 
 	@Override
-	public long getCompressedData() {
+	public long serialize() {
 		return getPosition().asLong();
 	}
 }

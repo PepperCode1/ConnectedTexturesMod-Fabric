@@ -8,7 +8,7 @@ import team.chisel.ctm.client.event.ModelsLoadedCallback;
 import team.chisel.ctm.client.model.CTMBakedModel;
 import team.chisel.ctm.client.util.ResourceUtil;
 
-public class CTMModelsLoadedCallbackHandler implements ModelsLoadedCallback {
+public class ModelsLoadedCallbackHandler implements ModelsLoadedCallback {
 	@Override
 	public void onModelsLoaded(ModelLoader modelLoader, ResourceManager resourceManager, Profiler profiler) {
 		CTMBakedModel.invalidateCaches();

@@ -9,18 +9,18 @@ import team.chisel.ctm.client.util.connection.SpacialConnectionLogic;
 
 public class TextureContextPillar implements TextureContext {
 	private SpacialConnectionLogic logic;
-	private long data;
+	private long serialized;
 
 	public TextureContextPillar(BlockRenderView world, BlockPos pos) {
 		logic = new PillarConnectionLogic();
 		logic.buildConnectionMap(world, pos);
-		data = logic.serialize();
+		serialized = logic.serialize();
 	}
 
 	public TextureContextPillar(long data) {
-		this.data = data;
+		this.serialized = data;
 		logic = new PillarConnectionLogic();
-		logic.deserialize(this.data);
+		logic.deserialize(this.serialized);
 	}
 
 	public SpacialConnectionLogic getLogic() {
@@ -28,7 +28,7 @@ public class TextureContextPillar implements TextureContext {
 	}
 
 	@Override
-	public long getCompressedData() {
-		return data;
+	public long serialize() {
+		return serialized;
 	}
 }

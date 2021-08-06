@@ -2,11 +2,9 @@ package team.chisel.ctm.client.util;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
-import com.google.common.collect.Sets;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.MinecraftClient;
@@ -18,12 +16,8 @@ import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.resource.CTMMetadataReader;
 import team.chisel.ctm.client.resource.CTMMetadataSection;
 
-/**
- * All methods are thread-safe.
- */
 public class ResourceUtil {
-	private static final Map<Identifier, CTMMetadataSection> METADATA_CACHE = new ConcurrentHashMap<>();
-	private static final Set<Identifier> NO_METADATA = Sets.newConcurrentHashSet();
+	private static final Map<Identifier, CTMMetadataSection> METADATA_CACHE = new HashMap<>();
 
 	public static Resource getResource(Identifier identifier) throws IOException {
 		return MinecraftClient.getInstance().getResourceManager().getResource(identifier);
@@ -42,18 +36,15 @@ public class ResourceUtil {
 	}
 
 	@Nullable
-	public static CTMMetadataSection getMetadata(Identifier identifier) throws IOException, RuntimeException {
-		if (NO_METADATA.contains(identifier)) {
-			return null;
+	public static CTMMetadataSection getMetadata(Identifier identifier) throws IOException {
+		if (METADATA_CACHE.containsKey(identifier)) {
+			return METADATA_CACHE.get(identifier);
 		}
-		CTMMetadataSection metadata = METADATA_CACHE.get(identifier);
-		if (metadata == null) {
-			metadata = getResource(identifier).getMetadata(CTMMetadataReader.INSTANCE);
-			if (metadata == null) {
-				NO_METADATA.add(identifier);
-			} else {
-				METADATA_CACHE.put(identifier, metadata);
-			}
+		CTMMetadataSection metadata = null;
+		try (Resource resource = getResource(identifier)) {
+			metadata = resource.getMetadata(CTMMetadataReader.INSTANCE);
+		} finally {
+			METADATA_CACHE.put(identifier, metadata);
 		}
 		return metadata;
 	}
@@ -61,6 +52,15 @@ public class ResourceUtil {
 	@Nullable
 	public static CTMMetadataSection getMetadata(Sprite sprite) throws IOException {
 		return getMetadata(toTextureIdentifier(sprite.getId()));
+	}
+
+	@Nullable
+	public static CTMMetadataSection getMetadataUnsafe(Identifier identifier) {
+		try {
+			return getMetadata(identifier);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Nullable
@@ -109,6 +109,5 @@ public class ResourceUtil {
 
 	public static void invalidateCaches() {
 		METADATA_CACHE.clear();
-		NO_METADATA.clear();
 	}
 }
