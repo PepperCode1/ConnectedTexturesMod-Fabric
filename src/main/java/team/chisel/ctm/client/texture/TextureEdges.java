@@ -42,9 +42,6 @@ public class TextureEdges extends TextureCTM {
 		ConnectionDirection[] directions = DIRECTION_MAP[quadrant];
 		boolean connected1 = logic.connected(directions[0]);
 		boolean connected2 = logic.connected(directions[1]);
-		if (logic.connected(directions[2]) && ((connected1 && connected2) || (!connected1 && !connected2))) {
-			return 0;
-		}
 		if (connected1 && connected2) {
 			return 3;
 		}
@@ -53,6 +50,9 @@ public class TextureEdges extends TextureCTM {
 		}
 		if (connected2) {
 			return 2;
+		}
+		if (logic.connected(directions[2])) {
+			return 0;
 		}
 		return -1;
 	}
