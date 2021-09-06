@@ -1,0 +1,7 @@
+{
+  "screen.ctm.config.title": "Настройки CTM",
+  "options.ctm.disable_ctm": "Отключить CTM: %s",
+  "options.ctm.disable_ctm.tooltip": "Полностью отключить соединенные текстуры.",
+  "options.ctm.connect_inside_ctm": "Подключиться внутри CTM: %s",
+  "options.ctm.connect_inside_ctm.tooltip": "Выберите, отключен ли внутренний угол на блоке CTM. https://imgur.com/eUywLZ4"
+}
