@@ -6,9 +6,10 @@ import net.minecraft.world.BlockRenderView;
 
 import team.chisel.ctm.api.client.CTMTexture;
 import team.chisel.ctm.api.client.TextureInfo;
+import team.chisel.ctm.client.texture.AbstractConnectingTexture;
 import team.chisel.ctm.client.texture.TextureEdges;
 import team.chisel.ctm.client.texture.context.TextureContextConnecting;
-import team.chisel.ctm.client.texture.context.TextureContextConnectingObscured;
+import team.chisel.ctm.client.texture.context.TextureContextEdges;
 
 public class TextureTypeEdges extends TextureTypeCTM {
 	@Override
@@ -18,7 +19,7 @@ public class TextureTypeEdges extends TextureTypeCTM {
 
 	@Override
 	public TextureContextConnecting getTextureContext(BlockState state, BlockRenderView world, BlockPos pos, CTMTexture<?> texture) {
-		return new TextureContextConnectingObscured(state, world, pos, (TextureEdges) texture);
+		return new TextureContextEdges(state, world, pos, (AbstractConnectingTexture<?>) texture);
 	}
 
 	@Override

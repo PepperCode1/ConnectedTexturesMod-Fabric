@@ -44,6 +44,10 @@ public class ConnectionLogic {
 	 */
 	public void buildConnectionMap(@NotNull BlockRenderView world, @NotNull BlockPos pos, @NotNull Direction side) {
 		connectionMap = 0;
+		buildConnectionMapInner(world, pos, side);
+	}
+
+	protected void buildConnectionMapInner(@NotNull BlockRenderView world, @NotNull BlockPos pos, @NotNull Direction side) {
 		for (ConnectionDirection direction : ConnectionDirection.VALUES) {
 			if (isConnected(world, pos, side, direction)) {
 				setConnected(direction, true);

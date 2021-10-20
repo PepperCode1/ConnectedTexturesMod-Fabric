@@ -10,7 +10,7 @@ import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.api.client.TextureType;
 import team.chisel.ctm.client.texture.AbstractConnectingTexture;
 import team.chisel.ctm.client.texture.TextureEdgesFull;
-import team.chisel.ctm.client.texture.context.TextureContextConnectingObscured;
+import team.chisel.ctm.client.texture.context.TextureContextEdges;
 
 public class TextureTypeEdgesFull implements TextureType {
 	@Override
@@ -20,7 +20,7 @@ public class TextureTypeEdgesFull implements TextureType {
 
 	@Override
 	public TextureContext getTextureContext(BlockState state, BlockRenderView world, BlockPos pos, CTMTexture<?> texture) {
-		return new TextureContextConnectingObscured(state, world, pos, (AbstractConnectingTexture<?>) texture);
+		return new TextureContextEdges(state, world, pos, (AbstractConnectingTexture<?>) texture);
 	}
 
 	@Override

@@ -1,7 +1,6 @@
 package team.chisel.ctm.client;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,14 +36,14 @@ import team.chisel.ctm.client.texture.type.TextureTypeSCTM;
 
 public class CTMClient implements ClientModInitializer {
 	public static final String MOD_ID = "ctm";
-	public static final Logger LOGGER = LogManager.getLogger("CTM");
+	public static final String NAME = "CTM";
+	public static final Logger LOGGER = LogManager.getLogger(NAME);
 
 	private static ConfigManager configManager;
 
 	public static ConfigManager getConfigManager() {
 		if (configManager == null) {
-			Path configPath = FabricLoader.getInstance().getConfigDir();
-			File configFile = new File(configPath.toFile(), "ctm.json");
+			File configFile = FabricLoader.getInstance().getConfigDir().resolve("ctm.json").toFile();
 			configManager = new ConfigManager(configFile);
 			configManager.load();
 		}
@@ -54,11 +53,6 @@ public class CTMClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		getConfigManager();
-
-		if (FabricLoader.getInstance().isModLoaded("sodium") && !FabricLoader.getInstance().isModLoaded("indium")) {
-			LOGGER.error("Detected Sodium but not Indium! CTM will not work with this configuration!");
-			return;
-		}
 
 		Map<JsonUnbakedModel, Int2ObjectMap<JsonElement>> jsonOverrideMap = new HashMap<>();
 		DeserializeModelJsonCallback.EVENT.register(new DeserializeModelJsonCallbackHandler(jsonOverrideMap));

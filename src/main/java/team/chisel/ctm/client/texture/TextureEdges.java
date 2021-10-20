@@ -8,11 +8,11 @@ import team.chisel.ctm.api.client.TextureContext;
 import team.chisel.ctm.api.client.TextureInfo;
 import team.chisel.ctm.client.CTMClient;
 import team.chisel.ctm.client.render.UnbakedQuad;
-import team.chisel.ctm.client.texture.context.TextureContextConnectingObscured;
+import team.chisel.ctm.client.texture.context.TextureContextEdges;
 import team.chisel.ctm.client.texture.type.TextureTypeEdges;
 import team.chisel.ctm.client.util.connection.ConnectionDirection;
 import team.chisel.ctm.client.util.connection.ConnectionLogic;
-import team.chisel.ctm.client.util.connection.ConnectionLogicObscured;
+import team.chisel.ctm.client.util.connection.ConnectionLogicEdges;
 
 public class TextureEdges extends TextureCTM {
 	public TextureEdges(TextureTypeEdges type, TextureInfo info) {
@@ -21,13 +21,13 @@ public class TextureEdges extends TextureCTM {
 
 	@Override
 	public Renderable transformQuad(BakedQuad bakedQuad, Direction cullFace, TextureContext context) {
-		if (CTMClient.getConfigManager().getConfig().disableCTM || !(context instanceof TextureContextConnectingObscured)) {
+		if (CTMClient.getConfigManager().getConfig().disableCTM || !(context instanceof TextureContextEdges)) {
 			UnbakedQuad quad = unbake(bakedQuad, cullFace);
 			quad.setUVBounds(sprites[0]);
 			return quad;
 		}
 
-		ConnectionLogicObscured logic = ((TextureContextConnectingObscured) context).getLogic(bakedQuad.getFace());
+		ConnectionLogicEdges logic = ((TextureContextEdges) context).getLogic(bakedQuad.getFace());
 		if (logic.isObscured()) {
 			UnbakedQuad quad = unbake(bakedQuad, cullFace);
 			quad.setUVBounds(sprites[2]);
