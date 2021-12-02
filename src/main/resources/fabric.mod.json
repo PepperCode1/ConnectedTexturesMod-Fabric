@@ -32,9 +32,9 @@
   ],
 
   "depends": {
-    "fabricloader": ">=0.10.4",
-    "fabric": ">=0.34.10+1.17",
-    "minecraft": "1.17.x"
+    "fabricloader": ">=0.12.6",
+    "fabric": ">=0.43.1+1.18",
+    "minecraft": "1.18.x"
   },
 
   "custom": {
